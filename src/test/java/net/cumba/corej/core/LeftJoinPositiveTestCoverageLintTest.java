@@ -100,7 +100,7 @@ class LeftJoinPositiveTestCoverageLintTest
      * </p>
      */
     private static final Set<String> NULL_SATISFIED = Set.of("empty",
-            "empty_within_except_last_row", "var_is_null", "var_not_exists", "ds_not_exists",
+            "empty_within_except_last_row", "var_is_empty", "var_not_exists", "ds_not_exists",
             "is_not_contained_by", "is_not_contained_by_case_insensitive", "not_equal_to",
             "not_equal_to_case_insensitive", "not_equal_to_divide", "not_equal_to_pctchg",
             "not_equal_to_subtract", "date_not_equal_to", "date_part_not_equal_to",

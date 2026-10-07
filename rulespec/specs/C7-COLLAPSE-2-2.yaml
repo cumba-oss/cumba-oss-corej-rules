@@ -1,0 +1,39 @@
+name: C7-COLLAPSE-2-2
+kind: rule
+description: |
+  D8 (owner: "yes 2-2 gives one finding"): the 2-2 shape — a presence gate and no sister — over a
+  present but all-blank AEBDSYCD reports ONE finding when opted in. The gate (Requirements) is
+  satisfied because the column is PRESENT (D1: the gate stays about availability).
+python_source: PLAN-present-empty-column-fold (2026-10-06), the sensitivity arm of phase 3 — an inline rule; no shipped rule opts in
+rule:
+  id: c7-collapse-2-2-gate
+  Core: {Id: C7-COLLAPSE-2-2}
+  Description: "AEBDSYCD must be populated (a 2-2 gate shape: the check is the whole rule, the gate is Requirements)."
+  Sensitivity: Record
+  Executability: Fully Executable
+  Scope:
+    Domains: {Include: [AE]}
+  Check:
+    expression: 'empty(AEBDSYCD)'
+  Outcome:
+    Message: AEBDSYCD is not populated (per record).
+    Message_Folded: AEBDSYCD is not populated on any record of the dataset.
+    Output_Variables: [AEBDSYCD]
+datasets:
+  AE:
+    row_key: [STUDYID, USUBJID, AESEQ]
+    rows:
+      - {STUDYID: S1, DOMAIN: AE, USUBJID: '001', AESEQ: 1, AEBODSYS: 'Cardiac', AEBDSYCD: ''}
+      - {STUDYID: S1, DOMAIN: AE, USUBJID: '002', AESEQ: 1, AEBODSYS: 'Renal', AEBDSYCD: ''}
+config:
+  standard: sdtmig
+  standard_version: '3.4'
+expected_status: EXECUTED
+expected_violations:
+  - rule_id: C7-COLLAPSE-2-2
+    dataset: AE
+    row_key: {STUDYID: S1, USUBJID: '001', AESEQ: 1}
+    status: SUCCESS
+    output_variables: {}
+    name_only: [AEBDSYCD]
+expected_errors: []

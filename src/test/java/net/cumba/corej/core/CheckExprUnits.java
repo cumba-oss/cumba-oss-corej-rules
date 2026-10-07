@@ -64,9 +64,9 @@ public final class CheckExprUnits
 
     /** Predicates the strict lowering mapped 1:1 to a like-named leaf operator. */
     private static final Set<String> UNARY_PREDICATES = Set.of("ds_exists", "ds_not_exists",
-            "var_exists", "var_not_exists", "var_is_null", "empty", "non_empty", "is_complete_date",
-            "is_incomplete_date", "invalid_date", "invalid_duration", "is_integer",
-            "is_not_integer", "is_complete_date_part", "is_not_complete_date_part");
+            "var_exists", "var_not_exists", "var_is_empty", "empty", "non_empty",
+            "is_complete_date", "is_incomplete_date", "invalid_date", "invalid_duration",
+            "is_integer", "is_not_integer", "is_complete_date_part", "is_not_complete_date_part");
 
     /** Function operators whose call form is the operator name verbatim. */
     private static final Set<String> FUNCTION_OPERATORS = Set.of("has_multiple_values_for",

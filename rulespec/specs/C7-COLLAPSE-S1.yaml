@@ -1,0 +1,42 @@
+name: C7-COLLAPSE-S1
+kind: rule
+description: |
+  S1 (PLAN-present-empty-column-fold §4.3, owner D5/D6): the empty leaf is the only row-level leaf
+  and AEBDSYCD is PRESENT but blank on all three records. The rule declares Message_Folded, so the
+  three per-row findings COLLAPSE to ONE dataset-level finding, anchored at the first firing row
+  (row 0's key), with the name-only projection (D4 = like 5c). C7-collapse-not-opted-in is the
+  control: the same rule without the key keeps three row findings.
+python_source: PLAN-present-empty-column-fold (2026-10-06), the sensitivity arm of phase 3 — an inline rule; no shipped rule opts in
+rule:
+  id: c7-collapse-s1
+  Core: {Id: C7-COLLAPSE-S1}
+  Description: "AEBDSYCD must be populated."
+  Sensitivity: Record
+  Executability: Fully Executable
+  Scope:
+    Domains: {Include: [AE]}
+  Check:
+    expression: 'empty(AEBDSYCD)'
+  Outcome:
+    Message: AEBDSYCD is not populated (per record).
+    Message_Folded: AEBDSYCD is not populated on any record of the dataset.
+    Output_Variables: [AEBDSYCD]
+datasets:
+  AE:
+    row_key: [STUDYID, USUBJID, AESEQ]
+    rows:
+      - {STUDYID: S1, DOMAIN: AE, USUBJID: '001', AESEQ: 1, AEBODSYS: 'Cardiac', AEBDSYCD: ''}
+      - {STUDYID: S1, DOMAIN: AE, USUBJID: '002', AESEQ: 1, AEBODSYS: 'Renal', AEBDSYCD: ''}
+      - {STUDYID: S1, DOMAIN: AE, USUBJID: '003', AESEQ: 1, AEBODSYS: 'Hepatic', AEBDSYCD: ''}
+config:
+  standard: sdtmig
+  standard_version: '3.4'
+expected_status: EXECUTED
+expected_violations:
+  - rule_id: C7-COLLAPSE-S1
+    dataset: AE
+    row_key: {STUDYID: S1, USUBJID: '001', AESEQ: 1}
+    status: SUCCESS
+    output_variables: {}
+    name_only: [AEBDSYCD]
+expected_errors: []

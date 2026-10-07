@@ -107,6 +107,57 @@ doubled `!!X`.
 Use an exclusion when the derived list would carry a column that is noise in the finding — not as
 a way to hand-write the whole list, which the derivation already does.
 
+## `Message_Folded`
+
+The message of a **record-level** rule when its findings are **folded or collapsed to one
+dataset-level finding** — and the opt-in for the present-but-empty collapse.
+
+A column that is **present but blank on every record** makes an `empty`-family leaf (`empty`,
+`is_missing`, `non_empty` / `not empty`, `present`, `is_present`) answer the same on every row: the
+rule's verdict is a fact about the dataset, not about a record. A rule that declares
+`Message_Folded` reports that fact **once**, under this message, instead of once per record; when
+no record fires it reports nothing. The row evaluation is unchanged — only the reporting collapses.
+
+```yaml
+Check:
+  expression: 'not empty(AEBODSYS) and empty(AEBDSYCD)'
+Outcome:
+  Message: AEBDSYCD is not populated for a coded AEBODSYS.
+  Message_Folded: AEBDSYCD is not populated on any record of the dataset.
+```
+
+Over an AE whose `AEBDSYCD` is blank on all 961 records: one finding under `Message_Folded`,
+anchored at the first firing record, the columns listed by name without row values (the shape of
+every dataset-level finding). Without the key: 961 findings under `Message`.
+
+**Rules of the key.**
+
+- It is **opt-in**. A rule without it never collapses; nothing moves until an author writes it.
+- An **absent** column keeps the absent-column fold ([absent columns](../semantics/absent-columns.md));
+  a rule that declares `Message_Folded` reports that fold under it too.
+- Only a **plain** column reference triggers the collapse: a joined `DM.X` or a SUPP-delivered
+  qualifier is read per record and never folds.
+- A dataset with **no rows** never folds or collapses ([zero-row datasets](../semantics/zero-rows.md)).
+- `is_missing` is strictly a missing value: over a column of `""` it folds to *false* (no finding);
+  over `""` mixed with missings it is row-dependent and does not fold.
+- The key is a **load error** on a rule that can never collapse: no `empty`-family leaf over a plain
+  column (outside `Keep_Row_Findings`), a `Sensitivity` other than `Record`, or a check that reads
+  the variable cursor (`varname()`, `value()`).
+
+## `Keep_Row_Findings`
+
+The columns a rule with `Message_Folded` still wants reported **per record** — the opt-out for a
+column whose blankness is a finding on every row (the Type 1 verdict of the authoring guidelines).
+
+```yaml
+Outcome:
+  Message_Folded: --STAT is not populated on any record.
+  Keep_Row_Findings: [--STAT]
+```
+
+`--` resolves like any variable reference. An entry the check does not read is a load error. The
+list is inert on a rule without `Message_Folded`.
+
 ## `Severity`
 
 ```yaml

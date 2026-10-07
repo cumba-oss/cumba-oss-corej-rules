@@ -489,7 +489,7 @@ class CrossStandardCollapseCorpusTest
         case Expr.Call call ->
         {
             if (!call.args().isEmpty()
-                    && Set.of("var_exists", "var_not_exists", "var_is_null").contains(call.name()))
+                    && Set.of("var_exists", "var_not_exists", "var_is_empty").contains(call.name()))
             {
                 String n = nameOf(call.args().get(0));
                 if (n != null && n.indexOf('.') < 0 && !n.startsWith("$"))

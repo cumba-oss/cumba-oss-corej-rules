@@ -1,0 +1,39 @@
+name: C7-COLLAPSE-ISMIS-MISSING
+kind: rule
+description: |
+  The is_missing control's positive half (D50): over a column that is a MISSING VALUE on every
+  record (fill MISSING; a `null` cell in this fixture is the missing marker) the leaf folds to
+  constant TRUE — ONE collapsed finding. With "" cells instead the sibling reports zero.
+python_source: PLAN-present-empty-column-fold (2026-10-06), the sensitivity arm of phase 3 — an inline rule; no shipped rule opts in
+rule:
+  id: c7-collapse-is-missing-all-missing
+  Core: {Id: C7-COLLAPSE-ISMIS-MISSING}
+  Description: "AEBDSYCD must not be a missing value."
+  Sensitivity: Record
+  Executability: Fully Executable
+  Scope:
+    Domains: {Include: [AE]}
+  Check:
+    expression: 'is_missing(AEBDSYCD)'
+  Outcome:
+    Message: AEBDSYCD is not populated (per record).
+    Message_Folded: AEBDSYCD is not populated on any record of the dataset.
+    Output_Variables: [AEBDSYCD]
+datasets:
+  AE:
+    row_key: [STUDYID, USUBJID, AESEQ]
+    rows:
+      - {STUDYID: S1, DOMAIN: AE, USUBJID: '001', AESEQ: 1, AEBODSYS: 'Cardiac', AEBDSYCD: null}
+      - {STUDYID: S1, DOMAIN: AE, USUBJID: '002', AESEQ: 1, AEBODSYS: 'Renal', AEBDSYCD: null}
+config:
+  standard: sdtmig
+  standard_version: '3.4'
+expected_status: EXECUTED
+expected_violations:
+  - rule_id: C7-COLLAPSE-ISMIS-MISSING
+    dataset: AE
+    row_key: {STUDYID: S1, USUBJID: '001', AESEQ: 1}
+    status: SUCCESS
+    output_variables: {}
+    name_only: [AEBDSYCD]
+expected_errors: []

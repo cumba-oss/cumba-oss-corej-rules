@@ -41,6 +41,11 @@ Check:
 
 **A grouped rule** sees zero rows, so it forms zero groups, so it reports nothing.
 
+**No fold, no collapse.** A record-level rule on no records reports no finding — the absent-column
+fold and the present-but-empty collapse ([`Message_Folded`](../authoring/outcome.md#message_folded))
+never turn that into one. (A column of a 0-row table reads as all-missing and single-valued,
+vacuously; the engine tests the row count before it folds.)
+
 ## What this means when you author
 
 **You do not need a row-count guard.** A check that reads rows is already inert on an empty

@@ -97,12 +97,12 @@ public final class IntentAbsenceOptOut
     /**
      * The registry function that yields a <b>nullity boolean</b>, so that {@code $id == true} is an
      * emptiness assertion about its operand rather than an ordinary value comparison (runbook W2a
-     * re-spelled the two {@code variable_is_null} operation sites as {@code var_is_null(X)}
+     * re-spelled the two {@code variable_is_null} operation sites as {@code var_is_empty(X)}
      * compiled bindings; the operation set went with the carrier in W8). Deliberately a closed,
      * tiny set: widening it silently widens the opt-out, and every id exempted here escapes the
      * SKIP semantics unadjudicated.
      */
-    private static final Set<String> NULL_FLAG_FUNCTIONS = Set.of("var_is_null");
+    private static final Set<String> NULL_FLAG_FUNCTIONS = Set.of("var_is_empty");
 
     private IntentAbsenceOptOut()
     {
@@ -313,7 +313,7 @@ public final class IntentAbsenceOptOut
                 {
                     return compiledDirect;
                 }
-                // Runbook W2a: `$flag: var_is_null(X)` is the compiled form of the retired
+                // Runbook W2a: `$flag: var_is_empty(X)` is the compiled form of the retired
                 // variable_is_null operation (CDISC-SEND-0105 / -0106), the same nullity flag.
                 if (compiled.expression() instanceof Expr.Call c
                         && NULL_FLAG_FUNCTIONS.contains(c.name()))

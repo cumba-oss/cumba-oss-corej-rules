@@ -1,0 +1,48 @@
+name: C7-COLLAPSE-NOT-OPTED-IN
+kind: rule
+description: |
+  The D6 control of C7-COLLAPSE-S1: the SAME check over the SAME all-blank column, WITHOUT
+  Message_Folded — the collapse is opt-in only, so the rule keeps one finding per record (D111's
+  per-row behaviour for a present column, unchanged for every rule that does not opt in).
+python_source: PLAN-present-empty-column-fold (2026-10-06), the sensitivity arm of phase 3 — an inline rule; no shipped rule opts in
+rule:
+  id: c7-collapse-not-opted-in
+  Core: {Id: C7-COLLAPSE-NOT-OPTED-IN}
+  Description: "AEBDSYCD must be populated."
+  Sensitivity: Record
+  Executability: Fully Executable
+  Scope:
+    Domains: {Include: [AE]}
+  Check:
+    expression: 'empty(AEBDSYCD)'
+  Outcome:
+    Message: AEBDSYCD is not populated (per record).
+    Output_Variables: [AEBDSYCD]
+datasets:
+  AE:
+    row_key: [STUDYID, USUBJID, AESEQ]
+    rows:
+      - {STUDYID: S1, DOMAIN: AE, USUBJID: '001', AESEQ: 1, AEBODSYS: 'Cardiac', AEBDSYCD: ''}
+      - {STUDYID: S1, DOMAIN: AE, USUBJID: '002', AESEQ: 1, AEBODSYS: 'Renal', AEBDSYCD: ''}
+      - {STUDYID: S1, DOMAIN: AE, USUBJID: '003', AESEQ: 1, AEBODSYS: 'Hepatic', AEBDSYCD: ''}
+config:
+  standard: sdtmig
+  standard_version: '3.4'
+expected_status: EXECUTED
+expected_violations:
+  - rule_id: C7-COLLAPSE-NOT-OPTED-IN
+    dataset: AE
+    row_key: {STUDYID: S1, USUBJID: '001', AESEQ: 1}
+    status: SUCCESS
+    output_variables: {AEBDSYCD: null}
+  - rule_id: C7-COLLAPSE-NOT-OPTED-IN
+    dataset: AE
+    row_key: {STUDYID: S1, USUBJID: '002', AESEQ: 1}
+    status: SUCCESS
+    output_variables: {AEBDSYCD: null}
+  - rule_id: C7-COLLAPSE-NOT-OPTED-IN
+    dataset: AE
+    row_key: {STUDYID: S1, USUBJID: '003', AESEQ: 1}
+    status: SUCCESS
+    output_variables: {AEBDSYCD: null}
+expected_errors: []

@@ -180,9 +180,26 @@
             "type": "string",
             "pattern": "^!?[^!].*$"
           }
+        },
+        "Message_Folded": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "PLAN-present-empty-column-fold D7: the message of a RECORD-level rule when its row findings fold or collapse to ONE dataset-level finding. Declaring it opts the rule into the present-but-empty collapse (D6): an empty-family leaf (empty / is_missing / non_empty / present / is_present) over a present column that is blank on every row makes the rule report once, under this message; the absent-column fold reports under it too when declared. A rule that can never collapse — no such leaf over a plain column reference outside Keep_Row_Findings, a non-Record Sensitivity, a variable-cursor Check — fails to load (R2)."
+        },
+        "Keep_Row_Findings": {
+          "type": [
+            "array",
+            "null"
+          ],
+          "items": {
+            "type": "string"
+          },
+          "description": "PLAN-present-empty-column-fold D9: the columns whose empty-family leaves never trigger the collapse — a Type 1 rule keeps its per-row findings on them. `--` resolves like any variable reference; a name the Check does not read (compared as written) is a load error. Inert without Message_Folded."
         }
       },
-      "description": "What a finding says and carries: the Message and the Output_Variables (the report columns). Closed to those two keys."
+      "description": "What a finding says and carries: the Message and the Output_Variables (the report columns), and the two opt-in keys of the present-but-empty collapse, Message_Folded and Keep_Row_Findings. Closed to those four keys."
     },
     "Bindings": {
       "description": "Phase 7b of PLAN-typed-expression-engine (owner rulings 2026-09-17): the bindings, each entry exactly name (the $-variable) + expression (any expression, compiled like the Check — runbook W8). The retired spellings - the Operations: block name, the id: entry key, and the whole field form (operator: + parameter fields) - are load errors naming the replacement; additionalProperties is false here for the same reason the loader's Binding deserializer rejects every stray key: a sibling field beside an expression was measured to be silently discarded (the FDA-SD1078 under-report shape).",

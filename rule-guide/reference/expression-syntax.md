@@ -464,7 +464,9 @@ listed under [Arguments](#arguments). **Every parameter can be given positionall
 | [`ds_exists(x)`](functions.md#ds_exists) | boolean | True when the named dataset is present in the run. A negated spelling `ds_not_exists(x)` exists; prefer `not ds_exists(x)`. |
 | [`empty(x)`](functions.md#empty) | boolean | True when the value is missing or `""`. (`is_missing` is true only for a genuine missing.) The positive spellings `non_empty` / `present` / `is_present` exist; prefer `not empty(x)`. |
 | [`var_exists(x)`](functions.md#var_exists) | boolean | True when the named column exists; accepts a `--` wildcard, a dotted cross-dataset name, a SUPP QNAM pivot, a `${…}` substitution and a computed name (`var_exists(concat("ADSL.TRT", printf("%02d", APERIOD), "P"))` — per row; a missing name makes `var_exists` and `var_not_exists` both false, so `not var_exists(…)` is true there: guard it with `not empty(…)`). Through a `$`-binding it answers as the binding's expression written in place. A negated spelling `var_not_exists(x)` exists; for a written name prefer `not var_exists(x)`. |
-| [`var_is_null(x)`](functions.md#var_is_null) | boolean | True when the column exists but no row in the dataset populates it |
+| [`var_is_empty(x)`](functions.md#var_is_empty) | boolean | True when the column is absent, or present and blank (`""` or missing) on every record (renamed from `var_is_null`) |
+| [`var_is_single_value(x)`](functions.md#var_is_single_value) | boolean | True when every row holds the same value in the column, over at least one row |
+| [`var_is_all_missing(x)`](functions.md#var_is_all_missing) | boolean | True when every cell of the column is a missing value (`""` is not missing) |
 
 ### Text
 

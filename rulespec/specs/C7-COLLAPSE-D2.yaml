@@ -1,0 +1,51 @@
+name: C7-COLLAPSE-D2
+kind: rule
+description: |
+  D2 negative control: only the empty family folds. The check's leaf over the all-blank AEBDSYCD
+  is `!=`, which is not row-constant by fill (D46 / D11), so it is never a collapse trigger; the
+  rule's only empty-family leaf is `not empty(AEBODSYS)` — and AEBODSYS is FILLED here, so nothing collapses and
+  the `!=` leaf fires per record: three row findings. (The rule needs an empty-family leaf over
+  a plain column to accept Message_Folded at all — R2 (a).)
+python_source: PLAN-present-empty-column-fold (2026-10-06), the sensitivity arm of phase 3 — an inline rule; no shipped rule opts in
+rule:
+  id: c7-collapse-d2-control
+  Core: {Id: C7-COLLAPSE-D2}
+  Description: "AEBDSYCD must be the expected code — a non-empty-family operator over the blank column."
+  Sensitivity: Record
+  Executability: Fully Executable
+  Scope:
+    Domains: {Include: [AE]}
+  Check:
+    expression: 'AEBDSYCD != "10001" and not empty(AEBODSYS)'
+  Outcome:
+    Message: AEBDSYCD is not populated (per record).
+    Message_Folded: AEBDSYCD is not populated on any record of the dataset.
+    Output_Variables: [AEBDSYCD]
+datasets:
+  AE:
+    row_key: [STUDYID, USUBJID, AESEQ]
+    rows:
+      - {STUDYID: S1, DOMAIN: AE, USUBJID: '001', AESEQ: 1, AEBODSYS: 'Cardiac', AEBDSYCD: ''}
+      - {STUDYID: S1, DOMAIN: AE, USUBJID: '002', AESEQ: 1, AEBODSYS: 'Renal', AEBDSYCD: ''}
+      - {STUDYID: S1, DOMAIN: AE, USUBJID: '003', AESEQ: 1, AEBODSYS: 'Hepatic', AEBDSYCD: ''}
+config:
+  standard: sdtmig
+  standard_version: '3.4'
+expected_status: EXECUTED
+expected_violations:
+  - rule_id: C7-COLLAPSE-D2
+    dataset: AE
+    row_key: {STUDYID: S1, USUBJID: '001', AESEQ: 1}
+    status: SUCCESS
+    output_variables: {AEBDSYCD: null, AEBODSYS: Cardiac}
+  - rule_id: C7-COLLAPSE-D2
+    dataset: AE
+    row_key: {STUDYID: S1, USUBJID: '002', AESEQ: 1}
+    status: SUCCESS
+    output_variables: {AEBDSYCD: null, AEBODSYS: Renal}
+  - rule_id: C7-COLLAPSE-D2
+    dataset: AE
+    row_key: {STUDYID: S1, USUBJID: '003', AESEQ: 1}
+    status: SUCCESS
+    output_variables: {AEBDSYCD: null, AEBODSYS: Hepatic}
+expected_errors: []

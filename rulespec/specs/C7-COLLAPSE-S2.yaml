@@ -1,0 +1,41 @@
+name: C7-COLLAPSE-S2
+kind: rule
+description: |
+  S2 (D5, the row-dependent residual): the empty leaf folds to constant TRUE (AEBDSYCD blank on
+  every record) and the residual `not empty(AEBODSYS)` holds on records 1 and 3 only — the
+  residual holds on at least one row, so ONE collapsed finding, anchored at the FIRST firing row
+  (record 1). Record 2 (blank AEBODSYS) contributes nothing and does not move the anchor.
+python_source: PLAN-present-empty-column-fold (2026-10-06), the sensitivity arm of phase 3 — an inline rule; no shipped rule opts in
+rule:
+  id: c7-collapse-s2-row-dependent
+  Core: {Id: C7-COLLAPSE-S2}
+  Description: "A coded AEBODSYS needs its AEBDSYCD."
+  Sensitivity: Record
+  Executability: Fully Executable
+  Scope:
+    Domains: {Include: [AE]}
+  Check:
+    expression: 'not empty(AEBODSYS) and empty(AEBDSYCD)'
+  Outcome:
+    Message: AEBDSYCD is not populated (per record).
+    Message_Folded: AEBDSYCD is not populated on any record of the dataset.
+    Output_Variables: [AEBDSYCD]
+datasets:
+  AE:
+    row_key: [STUDYID, USUBJID, AESEQ]
+    rows:
+      - {STUDYID: S1, DOMAIN: AE, USUBJID: '001', AESEQ: 1, AEBODSYS: 'Cardiac', AEBDSYCD: ''}
+      - {STUDYID: S1, DOMAIN: AE, USUBJID: '002', AESEQ: 1, AEBODSYS: '', AEBDSYCD: ''}
+      - {STUDYID: S1, DOMAIN: AE, USUBJID: '003', AESEQ: 1, AEBODSYS: 'Hepatic', AEBDSYCD: ''}
+config:
+  standard: sdtmig
+  standard_version: '3.4'
+expected_status: EXECUTED
+expected_violations:
+  - rule_id: C7-COLLAPSE-S2
+    dataset: AE
+    row_key: {STUDYID: S1, USUBJID: '001', AESEQ: 1}
+    status: SUCCESS
+    output_variables: {}
+    name_only: [AEBDSYCD, AEBODSYS]
+expected_errors: []

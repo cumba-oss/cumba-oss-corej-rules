@@ -85,6 +85,18 @@ A rule that reports a blank column will report the whole dataset when the column
 entirely. That is usually what you want from a completeness rule — but decide it rather than
 discover it.
 
+### Absent folds once; present-but-empty collapses only when you ask
+
+An **absent** column is decided before a row is read, so `empty(AEENDTC)` over an absent `AEENDTC`
+reports **one** dataset-level finding, not one per row — the absent-column fold. A column that is
+**present but blank on every record** is a data fact: the engine only knows after reading the rows,
+and it reports **per record** — unless the rule declares
+[`Outcome.Message_Folded`](../authoring/outcome.md#message_folded). Then an `empty`-family leaf over
+such a column makes the rule's row findings **collapse** to one dataset-level finding under that
+message (none when no record fires), and [`Keep_Row_Findings`](../authoring/outcome.md#keep_row_findings)
+keeps the per-row findings on a named column. A rule without the key keeps its row findings; a
+dataset with no rows never folds or collapses.
+
 ## Making absence visible
 
 Silence is invisible; a **skip** is auditable. That is what

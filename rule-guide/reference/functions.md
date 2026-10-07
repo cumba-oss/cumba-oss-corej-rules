@@ -316,22 +316,66 @@ is therefore **true** there — `not` flips the false — so a rule that reports
 column guards the name: `not empty($n) and not var_exists($n)`. A guard on the driver alone
 (`not empty(APERIOD)`) does not cover a driver the name cannot be built from.
 
-### var_is_null
+### var_is_empty
 
-`var_is_null(x)` → **boolean**
+`var_is_empty(x)` → **boolean**
 
-True when the column exists but no row in the dataset populates it
+True when the column is absent, or present and blank — `""` or missing — on every record (the column's content status is `EMPTY` or `MISSING`)
 
-A qualified name (`var_is_null(DM.DTHDTC)`, or the string `"DM.DTHDTC"`) reads the joined column through its `Match_Datasets` entry over every row of the evaluated dataset, exactly as the operand `DM.DTHDTC` reads it — an unmatched row reads the column's type default, and an absent column or an undeclared join the absent default. (Until 2026-10-01 the dotted text was looked up on the primary and the call answered `true`, silently.)
+**Renamed from `var_is_null`** (2026-10-06, owner D10): the old name contradicted the never-null doctrine (nothing is ever null — a cell is a value or a missing value). Same semantics; `var_is_null(…)` is now a **load error** with the hint *"var_is_null was renamed to var_is_empty"*, never an alias.
+
+A qualified name (`var_is_empty(DM.DTHDTC)`, or the string `"DM.DTHDTC"`) reads the joined column through its `Match_Datasets` entry over every row of the evaluated dataset, exactly as the operand `DM.DTHDTC` reads it — an unmatched row reads the column's type default, and an absent column or an undeclared join the absent default. (Until 2026-10-01 the dotted text was looked up on the primary and the call answered `true`, silently.)
+
+**An absent column** answers TRUE for either type: it is a present column holding its type's default — `""` for character, a missing value for numeric — on every row.
 
 | parameter | type | required | description |
 |---|---|---|---|
-| `name` | any | yes | The column to read |
+| `name` | any | yes | The column to read (a plain reference, a quoted name, or `varname()`) |
 
 **Example**
 
 ```yaml
-expression: 'varname() in $expected_variables and var_is_null(varname())'
+expression: 'varname() in $expected_variables and var_is_empty(varname())'
+```
+
+### var_is_single_value
+
+`var_is_single_value(x)` → **boolean**
+
+True when every row of the dataset holds the same value in the column (the column's uniformity is `SINGLE_VALUE`) and the dataset has at least one row
+
+Value equality is the store's: `""` is not a missing value, and `.A` is not `._` — a column of `""` on every row is single-valued, a column mixing `""` with missings is not, and two distinct missing markers are two values. Reads one dataset-wide fact, like `var_is_empty`, so a Check built only on it derives `Sensitivity: Dataset`. The same three argument shapes as `var_is_empty`.
+
+**An absent column** answers TRUE for either type (its type default on every row) — on a dataset with rows; on an empty dataset FALSE, like a present column.
+
+| parameter | type | required | description |
+|---|---|---|---|
+| `name` | any | yes | The column to read (a plain reference, a quoted name, or `varname()`) |
+
+**Example**
+
+```yaml
+expression: 'var_is_single_value(ARMCD) and ARMCD != "SCRNFAIL"'
+```
+
+### var_is_all_missing
+
+`var_is_all_missing(x)` → **boolean**
+
+True when every cell of the column is a missing value (the column's fill is `MISSING`); `""` is not missing, so a character column of empty strings answers FALSE
+
+The strict counterpart of `var_is_empty` (register D50: `is_missing` is for missing, `empty` for missing or `""`). Reads one dataset-wide fact; the same three argument shapes as `var_is_empty`.
+
+**An absent column** takes the type the **rule** expects for it (D76): TRUE when the rule reads the column as numeric (its default is a missing value on every row), FALSE otherwise — **no numeric expectation ⇒ character ⇒ `""` ⇒ FALSE**.
+
+| parameter | type | required | description |
+|---|---|---|---|
+| `name` | any | yes | The column to read (a plain reference, a quoted name, or `varname()`) |
+
+**Example**
+
+```yaml
+expression: 'var_is_all_missing(AESTDY) and not var_is_all_missing(AESTDTC)'
 ```
 
 ## Text
@@ -3045,7 +3089,7 @@ Bindings:
 - name: "$expected_variables"
   expression: 'get_dataset_filtered_variables(key_name="core", key_value="Exp")'
 Check:
-  expression: 'varname() in $expected_variables and var_is_null(varname())'
+  expression: 'varname() in $expected_variables and var_is_empty(varname())'
 ```
 
 **When there is nothing to answer** — **the empty set**. `X in $s` is then vacuously false; `X not in $s` is vacuously true and **fires**. Under the Define-XML fallback for an unreachable Library, an empty answer means the define could not answer and the rule is **SKIPPED** instead.

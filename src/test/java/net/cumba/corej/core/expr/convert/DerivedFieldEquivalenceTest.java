@@ -103,7 +103,7 @@ class DerivedFieldEquivalenceTest
             // the --STRESU COLUMN is not in the dataset — one dataset-level fact. The derivation
             // reads `Record` because the existential witness is a per-record leaf
             // (`--STRESC =~ /numeric/`), and there is no dataset-level predicate for "some row is
-            // numeric": `var_is_null` only answers "the whole column is null". So the per-record
+            // numeric": `var_is_empty` only answers "the whole column is null". So the per-record
             // reading would multiply one column-absence finding by the number of numeric results,
             // which is the flood these rules exist to replace. Authored `Dataset` is correct and
             // the derivation is documented-wrong for this shape.
