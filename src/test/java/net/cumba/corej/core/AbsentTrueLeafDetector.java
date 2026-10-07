@@ -23,7 +23,12 @@ import net.cumba.corej.core.expr.eval.BroadcastFold;
 import net.cumba.corej.core.expr.eval.EmptyColumnCollapse;
 import net.cumba.corej.core.expr.eval.FoldCapability;
 import net.cumba.corej.core.expr.typed.TypeExpectations;
+import net.cumba.corej.core.model.CheckCondition;
+import net.cumba.corej.core.model.CheckConditionAll;
+import net.cumba.corej.core.model.CheckConditionAny;
 import net.cumba.corej.core.model.CheckConditionExpression;
+import net.cumba.corej.core.model.CheckConditionNot;
+import net.cumba.corej.core.model.LevelCheck;
 import net.cumba.corej.core.model.Rule;
 import net.cumba.datatable.testkit.MockTable;
 
@@ -41,8 +46,13 @@ import net.cumba.datatable.testkit.MockTable;
  * leaf is <b>absent-true</b> when that verdict, negated once per enclosing {@code not}, is TRUE. A
  * pair is reported when the leaf has a sibling in its root (the fold of the root then reaches the
  * row path, where the absent leaf paints every row) and the column is neither gated
- * ({@code Requirements.Variables.All} / {@code Any}) nor guarded in the Check ({@code var_exists}
- * over it, or a {@code not empty(X)} conjunct — R-5.23's opt-out).
+ * ({@code Requirements.Variables.All} / {@code Any}) nor guarded FOR THAT LEAF (review round 1,
+ * HIGH-1): a positive {@code var_exists(X)} or a {@code not empty(X)} (R-5.23's opt-out) among the
+ * conjuncts of the leaf's And-ancestors, or a disjunct beside it that fires on X's absence (the
+ * authored fire-when-absent pattern {@code not var_exists(X) or …}). A guard in another disjunct
+ * guards nothing. The sibling must be ROW-level: another leaf reading a different column (or the
+ * cursor's {@code value()}); a dataset-level or same-column sibling leaves the Check decidable once
+ * per dataset.
  *
  * <h2>The two kinds of pair</h2> A pair is <b>mf-discharged</b> when its column is a live
  * {@code Message_Folded} trigger ({@link FoldCapability#triggers}: a polarity-live
@@ -287,11 +297,11 @@ final class AbsentTrueLeafDetector
         {
             List<Leaf> leaves = new ArrayList<>();
             collect(root, false, leaves);
-            if (leaves.size() < 2)
-            {
-                continue; // a bare leaf keeps its broadcast verdict: one finding, never a flood
-            }
-            Set<String> guards = guardedColumns(leaves);
+            // ⭐ guards are per LEAF (review round 1, HIGH-1): only a positive var_exists(X) /
+            // not empty(X) among the leaf's own And-ancestors' conjuncts silences it — a guard in
+            // ANOTHER disjunct does not (FDA-SE2352 / EXDOSE was invisible with root-wide guards)
+            java.util.IdentityHashMap<Expr, Set<String>> guards = new java.util.IdentityHashMap<>();
+            leafGuards(root, false, Set.of(), guards);
             for (Leaf leaf : leaves)
             {
                 Set<String> reads = FoldCapability.readColumnNames(leaf.expr());
@@ -302,7 +312,8 @@ final class AbsentTrueLeafDetector
                 String x = reads.iterator().next();
                 // a glob (`*DT`, `*`) binds only the columns a dataset HAS — a per-variable cursor
                 // over present names — so it is never absent and never floods
-                if (x.indexOf('*') >= 0 || !absentTrue(leaf, x, ctx, expectations))
+                if (x.indexOf('*') >= 0 || !hasRowLevelSibling(leaf, x, leaves)
+                        || !absentTrue(leaf, x, ctx, expectations))
                 {
                     continue;
                 }
@@ -310,11 +321,21 @@ final class AbsentTrueLeafDetector
                 String upperX = x.toUpperCase(Locale.ROOT);
                 boolean dotted = x.indexOf('.') > 0;
                 boolean gated = gates.contains(written.toUpperCase(Locale.ROOT));
-                out.putIfAbsent(written,
-                        new Pair(rule.getCore() == null ? "?" : rule.getCore().getId(), written,
-                                shapeOf(leaf.expr()), dotted, gated, supplementalDataset && !gated,
-                                guards.contains(upperX),
-                                declaresKey && !dotted && triggers.contains(upperX)));
+                Shape shape = shapeOf(leaf.expr());
+                Pair p = new Pair(rule.getCore() == null ? "?" : rule.getCore().getId(), written,
+                        shape, dotted, gated,
+                        // R-4.11b (c): a supplemental dataset delivers a QUALIFIER, which a rule
+                        // tests by an empty-family leaf (the SUPP-QNAM pivot's spelling)
+                        supplementalDataset && !gated && shape == Shape.EMPTY,
+                        guards.getOrDefault(leaf.expr(), Set.of()).contains(upperX),
+                        declaresKey && !dotted && triggers.contains(upperX));
+                // the same column in several leaves or levels: an unguarded leaf wins — one open
+                // leaf is enough to flood (review round 1: putIfAbsent kept the first, guarded one)
+                Pair prior = out.get(written);
+                if (prior == null || (prior.guarded() && !p.guarded()))
+                {
+                    out.put(written, p);
+                }
             }
         }
         return new ArrayList<>(out.values());
@@ -410,14 +431,43 @@ final class AbsentTrueLeafDetector
         {
             roots.add(spec.getCheckExpr());
         }
-        if (roots.isEmpty() && spec.getCheck() instanceof CheckConditionExpression ce)
+        if (roots.isEmpty())
         {
             // an ADaM template rule is compiled per expansion only (WildcardExpander), so its
-            // specialised form carries no compiled Check: the parsed authored expression is the
-            // one form there is — FoldCapability's own fallback, for the same rules
-            roots.add(ce.expr());
+            // specialised form carries no compiled Check: the parsed authored expression of EVERY
+            // level is the one form there is — FoldCapability's own fallback, for the same rules,
+            // with a nested all / any / not kept as its combinator
+            for (LevelCheck level : spec.effectiveCheckLevels().values())
+            {
+                Expr e = asExpr(level.condition());
+                if (e != null)
+                {
+                    roots.add(e);
+                }
+            }
         }
         return roots;
+    }
+
+
+    /** An authored condition as an expression, its {@code all} / {@code any} / {@code not} kept. */
+    private static @org.jspecify.annotations.Nullable Expr asExpr(
+            @org.jspecify.annotations.Nullable CheckCondition c)
+    {
+        return switch (c)
+        {
+        case CheckConditionExpression ce -> ce.expr();
+        case CheckConditionAll all -> new Expr.And(all.getConditions().stream()
+                .map(AbsentTrueLeafDetector::asExpr).filter(Objects::nonNull).toList());
+        case CheckConditionAny any -> new Expr.Or(any.getConditions().stream()
+                .map(AbsentTrueLeafDetector::asExpr).filter(Objects::nonNull).toList());
+        case CheckConditionNot not ->
+        {
+            Expr inner = asExpr(not.getCondition());
+            yield inner == null ? null : new Expr.Not(inner);
+        }
+        case null -> null;
+        };
     }
 
 
@@ -494,39 +544,156 @@ final class AbsentTrueLeafDetector
 
 
     /**
-     * The columns the Check guards, upper-cased: every {@code var_exists} / {@code var_not_exists}
-     * leaf's name, and every column read by an {@code empty} leaf under an odd number of
-     * {@code not}s (R-5.23's {@code not empty(X)} opt-out — FALSE on an absent column).
+     * The row-level sibling a flood needs: another leaf of the same root that reads a column OTHER
+     * than {@code x}. A dataset-level sibling (a presence test, a dataset fact — it reads no
+     * column) and a same-column sibling leave the root decidable at dataset level, so the absent
+     * leaf reports once, not once per record (review round 1).
      */
-    private static Set<String> guardedColumns(List<Leaf> leaves)
+    static boolean hasRowLevelSibling(Leaf leaf, String x, List<Leaf> leaves)
     {
-        Set<String> out = new HashSet<>();
-        for (Leaf leaf : leaves)
+        for (Leaf other : leaves)
         {
-            if (!(leaf.expr() instanceof Expr.Call c))
+            if (other != leaf && (FoldCapability.readColumnNames(other.expr()).stream()
+                    .anyMatch(n -> !n.equalsIgnoreCase(x)) || readsTheCursor(other.expr())))
             {
-                continue;
-            }
-            if (BroadcastFold.isExistsCall(c) && !c.args().isEmpty())
-            {
-                String name = switch (c.args().getFirst())
-                {
-                case Expr.Ref r -> r.name();
-                case Expr.Lit lit when lit.value() instanceof String s -> s;
-                default -> null;
-                };
-                if (name != null)
-                {
-                    out.add(name.toUpperCase(Locale.ROOT));
-                }
-            }
-            else if (leaf.negated() && ("empty".equals(c.name()) || "is_missing".equals(c.name()))
-                    && c.args().size() == 1 && c.args().getFirst() instanceof Expr.Ref r)
-            {
-                out.add(r.name().toUpperCase(Locale.ROOT));
+                return true;
             }
         }
-        return out;
+        return false;
+    }
+
+
+    /**
+     * Whether {@code e} reads the variable cursor's cell — {@code value()}, a row-level read the
+     * column-name census does not list (the {@code CDISC-AD0647} {@code TREMxxFL} shape).
+     */
+    private static boolean readsTheCursor(Expr e)
+    {
+        return switch (e)
+        {
+        case Expr.Call c -> "value".equals(c.name())
+                || c.args().stream().anyMatch(AbsentTrueLeafDetector::readsTheCursor);
+        case Expr.Binary b -> readsTheCursor(b.left()) || readsTheCursor(b.right());
+        default -> false;
+        };
+    }
+
+
+    /**
+     * Records, for every leaf, the columns its And-ancestors guarantee present: a positive
+     * {@code var_exists(X)} (or a negated {@code var_not_exists(X)}) or a {@code not empty(X)}
+     * among the conjuncts of an ancestor that acts as an {@code and} — an {@code And}, or an
+     * {@code Or} under an odd number of {@code not}s. A guard in another disjunct guards nothing.
+     */
+    static void leafGuards(Expr e, boolean negated, Set<String> inherited,
+            java.util.IdentityHashMap<Expr, Set<String>> out)
+    {
+        switch (e)
+        {
+        case Expr.Not n -> leafGuards(n.inner(), !negated, inherited, out);
+        case Expr.And a when !negated -> conjunction(a.parts(), negated, inherited, out);
+        case Expr.Or o when negated -> conjunction(o.parts(), negated, inherited, out);
+        case Expr.And a -> disjunction(a.parts(), negated, inherited, out);
+        case Expr.Or o -> disjunction(o.parts(), negated, inherited, out);
+        default -> out.put(e, inherited);
+        }
+    }
+
+
+    private static void conjunction(List<Expr> parts, boolean negated, Set<String> inherited,
+            java.util.IdentityHashMap<Expr, Set<String>> out)
+    {
+        Set<String> local = new HashSet<>(inherited);
+        parts.forEach(p -> guardsOf(p, negated, local));
+        parts.forEach(p -> leafGuards(p, negated, local, out));
+    }
+
+
+    /**
+     * A disjunction: no disjunct guards another — but a disjunct that fires on X's ABSENCE (the
+     * deliberate fire-when-absent pattern {@code not var_exists(X) or <predicate over X>}, R-4.30's
+     * presence half, or a branch of a decomposition such as {@code CDISC-CG0348}'s) makes the
+     * Check's absent reading of X AUTHORED: the rule says what an absent X means, so its other
+     * branches' leaves over X are not an unasked R-4.11b question. Those columns count as guarded
+     * for every leaf below this node (review round 1 fold — without it the per-leaf guards raised
+     * 55 such authored pairs as floods).
+     */
+    private static void disjunction(List<Expr> parts, boolean negated, Set<String> inherited,
+            java.util.IdentityHashMap<Expr, Set<String>> out)
+    {
+        Set<String> local = new HashSet<>(inherited);
+        parts.forEach(p -> absenceTests(p, negated, local));
+        parts.forEach(p -> leafGuards(p, negated, local, out));
+    }
+
+
+    /** The columns a branch tests for ABSENCE as one of its conjuncts (fires when X is absent). */
+    private static void absenceTests(Expr e, boolean negated, Set<String> out)
+    {
+        switch (e)
+        {
+        case Expr.Not n -> absenceTests(n.inner(), !negated, out);
+        case Expr.And a when !negated -> a.parts().forEach(p -> absenceTests(p, negated, out));
+        case Expr.Or o when negated -> o.parts().forEach(p -> absenceTests(p, negated, out));
+        case Expr.Call c when c.args().size() == 1 ->
+        {
+            String name = switch (c.args().getFirst())
+            {
+            case Expr.Ref r -> r.name();
+            case Expr.Lit lit when lit.value() instanceof String str -> str;
+            default -> null;
+            };
+            boolean absence = switch (c.name())
+            {
+            case "var_exists" -> negated;
+            case "var_not_exists" -> !negated;
+            default -> false;
+            };
+            if (name != null && absence)
+            {
+                out.add(name.toUpperCase(Locale.ROOT));
+            }
+        }
+        default ->
+        {
+            // a disjunct inside the branch decides nothing for every record
+        }
+        }
+    }
+
+
+    /** The columns a conjunct guarantees present when it holds. */
+    private static void guardsOf(Expr e, boolean negated, Set<String> out)
+    {
+        switch (e)
+        {
+        case Expr.Not n -> guardsOf(n.inner(), !negated, out);
+        case Expr.And a when !negated -> a.parts().forEach(p -> guardsOf(p, negated, out));
+        case Expr.Or o when negated -> o.parts().forEach(p -> guardsOf(p, negated, out));
+        case Expr.Call c when c.args().size() == 1 ->
+        {
+            String name = switch (c.args().getFirst())
+            {
+            case Expr.Ref r -> r.name();
+            case Expr.Lit lit when lit.value() instanceof String str -> str;
+            default -> null;
+            };
+            boolean guard = switch (c.name())
+            {
+            case "var_exists" -> !negated;
+            case "var_not_exists", "empty", "is_missing" -> negated;
+            default -> false;
+            };
+            if (name != null && guard)
+            {
+                out.add(name.toUpperCase(Locale.ROOT));
+            }
+        }
+        default ->
+        {
+            // an Or (a disjunct guarantees nothing), a comparison, a literal
+        }
+        }
     }
 
 

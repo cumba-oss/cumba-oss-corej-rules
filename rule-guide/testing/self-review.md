@@ -46,8 +46,9 @@ loud mistakes catch themselves.
       treat it as empty. Does the check mean to judge blank rows?
 - [ ] **A missing value.** `!=` against a literal **fires** on a missing value, and so does
       `not in`. Did you mean *"where a value is recorded and it is not X"*?
-- [ ] **An absent column.** A positive test reports nothing — but `empty()` and every negative
-      test (`!=`, `not in`, `!~`, `not is_…`) fire on **every row**, so a completeness rule reports
+- [ ] **An absent column.** A test asking for a value reports nothing — but `empty()`, a test a
+      blank satisfies (`== ""`), every negative test (`!=`, `not in`, `!~`, `not is_…`) and an
+      order comparison the missing satisfies (`X < 5` on a numeric read) fire on **every row**, so a completeness rule reports
       the whole dataset when its column is gone. Is each such column required, read under
       `Message_Folded`, or deliberately per row (see
       [Which columns to require](../authoring/requirements.md#which-columns-to-require))?

@@ -54,20 +54,19 @@ The position decides wherever the column is read (owner 2026-10-05,
 > value-level rule does not emit more than one finding per dataset for the sole reason that a
 > column is absent).
 
-## The usual consequence of a positive test: silence
+## The usual consequence of asking for a value: silence
 
-A **positive** test does not fire on an absent column, and that is usually correct.
+A test that asks for a **value** does not fire on an absent column, and that is usually correct.
 
-A [missing value](values-and-missing.md) fails `==`, `<`, `>`, a regex match and `in` — so a check
-built from positive tests judges nothing and reports nothing:
+The absent constant equals no literal, matches no regex and is in no list — so `X == "Y"`,
+`X =~ /re/` and `X in [...]` judge nothing and report nothing:
 
 ```yaml
 expression: 'AESTDY > AEENDY'      # AESTDY absent → no findings, no error
 ```
 
-⚠ **A negative test is the opposite.** `X != "Y"`, `X not in ["Y", "N"]`, `X !~ /re/`,
-`not is_integer(X)` and `not is_complete_date_part(X)` are **true** on the constant, so they fire on
-every row — see the next section.
+⚠ **Three kinds of test are the opposite** and fire on every row — see the next section: a
+negative test, a test a blank satisfies, and an order comparison the missing satisfies.
 
 > **Silence is the safe default, but it is still silence.** Nothing in the output distinguishes
 > *"the rule ran and the data was fine"* from *"the column was not there"*. If that distinction
@@ -75,8 +74,14 @@ every row — see the next section.
 
 ## The tests that do fire
 
-Two kinds of test are **true on every row** of an absent column: `empty(x)`, and every **negative**
-test.
+Three kinds of test are **true on every row** of an absent column:
+
+- `empty(x)`, and every other test a **blank** satisfies — `X == ""` among them, because the absent
+  column reads as `""` where the check reads it as text;
+- every **negative** test — `X != "Y"`, `X not in [...]`, `X !~ /re/`, `not is_integer(X)`;
+- an **order comparison the missing satisfies**: where the check reads the column as a number, the
+  absent column is the missing on every row, and a missing sorts **below** every value — so
+  `X < 5` and `5 > X` are true on every row (while `X > 5` is false).
 
 `empty(x)` reports **every row** of an absent column as empty. (`is_missing(x)` does not: it is
 true only for a genuine missing, so over an absent column it answers the column's default — false

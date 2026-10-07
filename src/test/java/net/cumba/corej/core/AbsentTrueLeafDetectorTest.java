@@ -156,6 +156,60 @@ class AbsentTrueLeafDetectorTest
                 "TRTxxPN", false, true);
         // 5. empty(X) on a rule WITHOUT the key -> flood (CDISC-SEND-0105.1 / SPECIES shape)
         assertPair("empty(LBORRES) and ZZROW == \"a\"", "", "", "LBORRES", false, false);
+        // 7. a guard in ANOTHER disjunct guards nothing (review round 1, HIGH-1: guards are per
+        // leaf, among its And-ancestors only) -> flood
+        assertPair("(var_exists(\"LBORRES\") and LBORRES == \"0\" or empty(LBORRES))"
+                + " and ZZROW == \"a\"", "", "", "LBORRES", false, false);
+    }
+
+
+    /**
+     * The dotted half of the runner agreement (review round 1): {@code DM} present, its
+     * {@code RFSTDTC} absent, read through a declared keyed join — the runner reads the absent
+     * dotted column as its type default, and the detector's stand-in fold must say the same.
+     */
+    @ParameterizedTest(name = "{0} → absent-true {1}")
+    @CsvSource(delimiter = '|', value =
+    {
+            "empty(DM.RFSTDTC)|true", "not empty(DM.RFSTDTC)|false", "DM.RFSTDTC != 'X'|true",
+            "DM.RFSTDTC == 'X'|false"
+    })
+    void aDottedLeafAgreesWithTheRunner(String leaf, boolean expected)
+    {
+        String check = leaf.replace('\'', '"') + " and ZZROW == \"a\"";
+        String req = ",\"Requirements\":{\"Variables\":{\"All\":[\"USUBJID\"],"
+                + "\"All_Or_None\":[[\"USUBJID\",\"DM.USUBJID\"]]}},"
+                + "\"Match_Datasets\":[{\"Name\":\"DM\",\"Keys\":[\"USUBJID\"]}]";
+        Rule r = rule("T-ATL-DOT", check, req, "");
+        IDataTable lb = MockTable.of().name("LB").col("USUBJID", "S1", "S2").col("ZZROW", "a", "b")
+                .build();
+        IDataTable dm = MockTable.of().name("DM").col("USUBJID", "S1", "S2").build();
+        DatasetResolver resolver = new DatasetResolver.WithInventory()
+        {
+
+            @Override
+            public @org.jspecify.annotations.Nullable IDataTable resolve(String name)
+            {
+                return "DM".equalsIgnoreCase(name) ? dm : "LB".equalsIgnoreCase(name) ? lb : null;
+            }
+
+
+            @Override
+            public Set<String> availableDatasets()
+            {
+                return Set.of("LB", "DM");
+            }
+        };
+        RuleExecutionResult result = RuleRunner.execute(r, lb, resolver, "LB", null, null, null, 50,
+                null, null, null, Set.of(), Set.of(), Severity.INFO);
+        assertEquals(RuleExecutionStatus.EXECUTED, result.getStatus(),
+                () -> check + ": " + result.getStatusMessage());
+        boolean runnerFires = result.getViolationCount() == 1;
+        boolean detectorSays = AbsentTrueLeafDetector.pairs(r, body(check, req, "")).stream()
+                .anyMatch(p -> "DM.RFSTDTC".equals(p.column()));
+        assertEquals(expected, runnerFires,
+                () -> check + ": the runner fired " + result.getViolationCount() + " time(s)");
+        assertEquals(runnerFires, detectorSays, check);
     }
 
 

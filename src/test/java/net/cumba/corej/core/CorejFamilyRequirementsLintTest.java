@@ -168,14 +168,21 @@ class CorejFamilyRequirementsLintTest
                 {
                     String k = RequirementLintSupport
                             .key(AbsentTrueLeafDetector.written(x, checkText));
+                    // an ADaM marker template or a glob (a lowercase marker, a `*`) is a wildcard
+                    // pair template, excluded by REQ-6 — decided on the name AS READ, before the
+                    // key
+                    // upper-cases it (review round 1: the old upper-case test after key() was dead)
+                    if (x.indexOf('*') >= 0 || !x.equals(x.toUpperCase(Locale.ROOT)))
+                    {
+                        excluded.add(k);
+                    }
                     (isPositive ? positive : notPositive).add(k);
                 }
             }
         }
         for (String k : positive)
         {
-            if (!notPositive.contains(k) && !excluded.contains(k) && !all.contains(k)
-                    && k.equals(k.toUpperCase(Locale.ROOT)) && !k.contains("XX"))
+            if (!notPositive.contains(k) && !excluded.contains(k) && !all.contains(k))
             {
                 out.add(s.id() + ": " + k + " is read only by positive top-level conjuncts and is"
                         + " not in Requirements.Variables.All (R-4.11, a MUST for COREJ)");

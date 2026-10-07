@@ -63,18 +63,20 @@ of five parts:
 | **trigger** | selects the records the obligation applies to | `AESER` in *"when `AESER` is `Y`, …"* |
 | **exemption** | excuses the record when it is populated | `--STAT` in *"… unless the test is marked NOT DONE"* |
 | **operand** | is compared with another column | both sides of `AGE != DM.AGE` |
-| **key** | groups, joins, or is a member of a unique set | `USUBJID` in `is_unique_set([USUBJID, --SEQ])` |
+| **key** | groups, or is a member of a unique set — a join's keys are declared with the join (below) | `USUBJID` in `is_unique_set([USUBJID, --SEQ])` |
 
 That is a reading of the rule's intent, not of its syntax, and it is the one judgement no tool makes
 for you.
 
 **Then decide, part by part:**
 
-1. **The subject is never required** (the rule above). If its absence is itself a defect, the rule
-   reports it: read the subject **ungated** and give the rule
-   [`Message_Folded`](outcome.md#message_folded) — an absent or entirely blank subject then reports
-   **once per dataset** instead of once per record. If the subject's absence simply means there is
-   nothing to check (the source says *"X present in dataset"*), require it.
+1. **A subject whose absence is the defect is not required** (the rule above). Read it
+   **ungated** and give the rule [`Message_Folded`](outcome.md#message_folded) — an absent or
+   entirely blank subject then reports **once per dataset** instead of once per record. Two cases
+   differ: where the source says *"X present in dataset"*, absence means there is nothing to check
+   and the subject IS required; and where another rule already reports the absence once (a
+   presence rule over the same column, in every package this rule ships into), require it and let
+   that rule report.
 2. **A subject the fold cannot reach** — tested by `!=`, `not in`, `!~`, a negated function, or
    through a joined dataset (`DM.X`) — is the one exception to point 1: `Message_Folded` folds only
    an `empty`-family test over the rule's own column. Require the subject on the rule, and report its
@@ -91,15 +93,19 @@ for you.
 6. **A top-level `or`** of conditions that could each be reported on their own is split into one rule
    per condition first. Where an `or` stays, never require a column only some of its branches read —
    that skips the branches that do not need it; columns every branch needs form one `Any` group.
-7. **A key** is not required by default: an absent key simply drops out of the grouping, which is
-   exact. Require it only where dropping it makes the rule fire where it otherwise would not — the
-   only member of a unique set, or a join that would manufacture duplicates.
+7. **A grouping or unique-set key** is not required by default: an absent key simply drops out of
+   the grouping, which is exact. Require it only where dropping it makes the rule fire where it
+   otherwise would not — the only member of a unique set, or a merge that would manufacture
+   duplicates. A **join key** is different: every keyed join declares its keys, as
+   [Joins](joins.md#-declare-the-key--required-for-every-keyed-join) shows.
 8. **A dataset** the check reads (`domain=`, a dotted name, `_matched_`, a join without keys) goes in
    `Datasets` when no part of the check says anything useful without it — and never when the rule
    reports that dataset's absence.
 
-⛔ **One bound over all of it: a requirement may turn silence into a skip, never a finding into a
-skip.** Require a column only where the rule would otherwise run and report nothing. And after you
+⛔ **One bound over all of it: a requirement may replace only findings that are artefacts of the
+absence — never a finding the rule exists to report.** A gate is right where the column's absence
+means there is nothing to check, or where the absence is reported once by something else (another
+rule, a companion rule, `Message_Folded`). And after you
 split a rule or rewrite its check, walk this list again for each resulting rule: the absent-column
 exposure moves with the conditions.
 
