@@ -3188,6 +3188,53 @@ The example above is the complete call.
 **When there is nothing to answer** — a row whose cell is blank, or names a parent no dataset of the study carries, reads **the empty set** (`QNAM in $s` is false; `not in` fires). ⚠ The rule is **SKIPPED**, an exception to the totality rule above, when **no** row's parent resolves a model list (*"Rule skipped — library returned no data for get_parent_model_column_order"*), and when a resolved parent's model list is *library not available* (no product declared, or the Library unreachable) — as [`get_model_column_order()`](#get_model_column_order) skips for its own dataset.
 
 
+### get_permitted_column_order
+
+`get_permitted_column_order()` → **value (a list)**
+
+The model column order of [`get_model_column_order()`](#get_model_column_order) with every **permitted additional variable** the dataset carries placed where the implementation guide puts it — the reference order the five variable-order rules (`CDISC-CG0330`, `CDISC-CG0664`, `FDA-SD1079`, `PMDA-SD1079`, `CDISC-SEND-0393`) compare a dataset against. The authority is SDTMIG section 4.1.1.4: *"Variables for the three general observation classes must be ordered with Identifiers first, followed by the Topic, Qualifier, and Timing variables. Within each role, variables must be ordered as shown in SDTM: Tables 2.2.1 … 2.2.5."* The IG applies the same rule to a variable added to a special-purpose dataset (DM Assumption 9), and SENDIG section 4.1.2 orders the variables of its domains the same way.
+
+- **Only special-purpose datasets get additions placed.** The class is the one the model order was built from (the product's class for the domain — never a Define-XML class): `Special-Purpose` (SDTMIG DM, CO, SE, SV, SM; SENDIG DM, CO, SE, SV, SJ). Every other dataset answers exactly `get_model_column_order()`.
+- **What counts as an addition**: a column of the dataset that is in the Findings-class model walk — the general-observation identifiers, the Findings topic and qualifiers, the timing variables — and not in the dataset's own model order. A column in neither is a sponsor variable and stays out, as it does today; whether an addition is *permitted* at all is the business of `CDISC-CG0013-A`..`D` and `FDA-SD0058`, not of this list.
+- **Where it goes.** Roles rank Identifier, Topic, any qualifier, Timing. An addition goes before the first own variable of its role whose position in the model's role table comes after it — or right after the last such variable; when the dataset has no own variable of its role, right after the last own variable of an equal or earlier role (the start, if none). Identifier and timing positions come from the general-observation table as all three general classes list it (so `SVSTDTC` places `EPOCH` before it at SDTMIG 3.4, although the Findings class does not carry `--STDTC` there). Additions never reorder one another or the dataset's own variables: the list restricted to the model order **is** the model order, so a dataset this order passes also passes the model order.
+- **Roles of the dataset's own variables** come from the implementation guide's row for the variable (whether or not the dataset carries it), else the model's.
+
+Worked examples (SDTMIG 3.3):
+
+| dataset | carries | reference (abridged) |
+|---|---|---|
+| SV | `EPOCH` | … `VISITDY` **`EPOCH`** `SVSTDTC` … |
+| SV | `SVSEQ` | … `USUBJID` **`SVSEQ`** `VISITNUM` … |
+| SE | `SESTDY`, `SEENDY` | … `SEENDTC` **`SESTDY` `SEENDY`** `SEUPDES` |
+| DM | `DMXFN`, `VISITNUM`, `VISIT`, `VISITDY` | … `COUNTRY` **`DMXFN` `VISITNUM` `VISIT` `VISITDY`** `DMDTC` `DMDY` |
+| CO (3.4) | `COGRPID`, `VISITNUM` | … `COSEQ` **`COGRPID`** `IDVAR` … `COEVALID` **`VISITNUM`** `CODTC` `CODY` |
+
+It is an **aggregate**: one list for the dataset, computed once per rule and dataset and read by every row; names are upper-cased. It needs the CDISC Library: without one the rule is **SKIPPED** (*"Rule skipped — no Library access"*).
+
+**Example**
+
+```yaml
+Bindings:
+- name: "$permitted_column_order"
+  expression: "get_permitted_column_order()"
+- name: "$permitted_column_order_upper"
+  expression: "upper($permitted_column_order)"
+- name: "$column_order_from_dataset_upper"
+  expression: "upper(get_column_order_from_dataset())"
+- name: "$not_in_reference"
+  expression: "minus($column_order_from_dataset_upper, subtract=$permitted_column_order_upper)"
+- name: "$known_order"
+  expression: "minus($column_order_from_dataset_upper, subtract=$not_in_reference)"
+Check:
+  expression: >-
+    not empty($permitted_column_order) and not is_ordered_subset_of($known_order,
+    $permitted_column_order_upper)
+```
+
+The example above is the shape of `CDISC-CG0330`: the dataset's columns the reference knows must appear in the reference's order.
+
+**When there is nothing to answer** — ⚠ **the rule is SKIPPED** exactly when [`get_model_column_order()`](#get_model_column_order) skips (no model list for the dataset). Every other missing input — no Findings role table, no implementation-guide rows — makes it answer the model order itself, never a skip.
+
 ### label_template
 
 `label_template([x,] "LIBRARY"[, stem="*DT"])` → **value**

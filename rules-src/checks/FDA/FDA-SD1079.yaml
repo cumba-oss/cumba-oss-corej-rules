@@ -10,32 +10,32 @@ Scope:
     Include:
     - "ALL"
 Bindings:
-- name: "$model_column_order"
-  expression: "get_model_column_order()"
-- name: "$model_column_order_upper"
-  expression: "upper($model_column_order)"
+- name: "$permitted_column_order"
+  expression: "get_permitted_column_order()"
+- name: "$permitted_column_order_upper"
+  expression: "upper($permitted_column_order)"
 - name: "$column_order_from_dataset"
   expression: "get_column_order_from_dataset()"
 - name: "$column_order_from_dataset_upper"
   expression: "upper($column_order_from_dataset)"
-- name: "$not_in_model"
-  expression: "minus($column_order_from_dataset_upper, subtract=$model_column_order_upper)"
+- name: "$not_in_reference"
+  expression: "minus($column_order_from_dataset_upper, subtract=$permitted_column_order_upper)"
 - name: "$known_order"
-  expression: "minus($column_order_from_dataset_upper, subtract=$not_in_model)"
+  expression: "minus($column_order_from_dataset_upper, subtract=$not_in_reference)"
 Check:
   expression: >-
-    not empty($model_column_order) and not is_ordered_subset_of($known_order,
-    $model_column_order_upper)
+    not empty($permitted_column_order) and not is_ordered_subset_of($known_order,
+    $permitted_column_order_upper)
 Outcome:
   Message: "Variables are not in the correct order as shown in the SDTM Model for\
     \ the observation class."
   Output_Variables:
   - "$column_order_from_dataset"
-  - "$model_column_order"
+  - "$permitted_column_order"
   - "!$column_order_from_dataset_upper"
-  - "!$model_column_order_upper"
+  - "!$permitted_column_order_upper"
   - "!$known_order"
-  - "!$not_in_model"
+  - "!$not_in_reference"
 Source:
   FDA_Validator_Rule_Message: "Variable is in wrong order within domain"
   FDA_Validator_Rule_Description: "Order of variables should reflect the order of\

@@ -616,6 +616,7 @@ listed under [Arguments](#arguments). **Every parameter can be given positionall
 | [`get_model_column_order()`](functions.md#get_model_column_order) | value | The column order of the standard's model for the dataset's class, as a list; SKIPPED when it has none |
 | [`get_model_filtered_variables(key_name=, key_value=, model_class=)`](functions.md#get_model_filtered_variables) | value | Model variables filtered by metadata (static string literals), not intersected; `model_class=` walks the **named** general-observation class's model table — SKIPPED when that class has no variables |
 | [`get_parent_model_column_order(name)`](functions.md#get_parent_model_column_order) | value | Per row, the model column order of the parent domain the column names (`RDOMAIN`); a split parent is the union of its members |
+| [`get_permitted_column_order()`](functions.md#get_permitted_column_order) | value | The model column order with the permitted additional variables of a special-purpose dataset placed by role (SDTMIG 4.1.1.4); SKIPPED when the model order is |
 | [`natural_key_variables()`](functions.md#natural_key_variables) | value | The natural-key-forming role variables present in the dataset, as a list |
 | [`required_variables()`](functions.md#required_variables) | value | The variables the CDISC Library marks Required for this dataset, as a list |
 | [`var_ccode(x, "DEFINE")`](functions.md#var_ccode) | value | The NCI C-code of the bound codelist; `DEFINE` and `LIBRARY` only |

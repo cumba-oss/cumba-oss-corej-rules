@@ -14,27 +14,27 @@ Bindings:
   expression: "get_column_order_from_dataset()"
 - name: "$dataset_order_upper"
   expression: "upper($dataset_order)"
-- name: "$model_order"
-  expression: "get_model_column_order()"
-- name: "$model_order_upper"
-  expression: "upper($model_order)"
-- name: "$not_in_model"
-  expression: "minus($dataset_order_upper, subtract=$model_order_upper)"
+- name: "$permitted_order"
+  expression: "get_permitted_column_order()"
+- name: "$permitted_order_upper"
+  expression: "upper($permitted_order)"
+- name: "$not_in_reference"
+  expression: "minus($dataset_order_upper, subtract=$permitted_order_upper)"
 - name: "$known_order"
-  expression: "minus($dataset_order_upper, subtract=$not_in_model)"
+  expression: "minus($dataset_order_upper, subtract=$not_in_reference)"
 Check:
   expression: >-
-    not empty($model_order) and not is_ordered_subset_of($known_order, $model_order_upper)
+    not empty($permitted_order) and not is_ordered_subset_of($known_order, $permitted_order_upper)
 Outcome:
   Message: "SDTM variables introduced for SEND use are not presented in the SDTM model\
     \ variable order."
   Output_Variables:
   - "$dataset_order"
-  - "$model_order"
+  - "$permitted_order"
   - "!$dataset_order_upper"
-  - "!$model_order_upper"
+  - "!$permitted_order_upper"
   - "!$known_order"
-  - "!$not_in_model"
+  - "!$not_in_reference"
 Source:
   Class: "ALL"
   Domain: "ALL"

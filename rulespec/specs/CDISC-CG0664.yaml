@@ -5,7 +5,9 @@ description: |
   observation class dataset must follow the SDTM Model order (FDA run-2 W10:
   the operation switched from get_column_order_from_library to
   `get_model_column_order`, building $model_column_order; the check fires when
-  $column_order_from_dataset is_not_ordered_subset_of the Model order). The
+  $column_order_from_dataset is_not_ordered_subset_of the Model order). Since
+  PLAN-permitted-addition-position (2026-10-07) the reference is get_permitted_column_order(),
+  bound as $permitted_column_order; AE is no special-purpose dataset, so it is the Model order itself. The
   AE dataset below lists AETERM (Topic) before USUBJID (Identifier), which is
   the reverse of the Model order, so the dataset order is not an ordered subset
   and the rule fires.
@@ -33,7 +35,7 @@ expected_violations:
     status: SUCCESS
     output_variables:
       $column_order_from_dataset: '[AESEQ, AETERM, DOMAIN, STUDYID, USUBJID]'
-      $model_column_order: '[AEACN, AEACNDEV, AEACNOTH, AEBDSYCD, AEBODSYS, AECAT, AECHDY, AECHENDY, AECHSTDY, AECNTMOD, AECONTRT, AEDECOD, AEDETECT, AEDIR, AEDTC, AEDUR, AEDY, AEELTM, AEENDTC,
+      $permitted_column_order: '[AEACN, AEACNDEV, AEACNOTH, AEBDSYCD, AEBODSYS, AECAT, AECHDY, AECHENDY, AECHSTDY, AECNTMOD, AECONTRT, AEDECOD, AEDETECT, AEDIR, AEDTC, AEDUR, AEDY, AEELTM, AEENDTC,
         AEENDY, AEENINT, AEENRF, AEENRTPT, AEENTPT, AEEPCHGI, AEEVINTX, AEEVLINT, AEGRPID, AEHLGT, AEHLGTCD, AEHLT, AEHLTCD, AELAT, AELLT, AELLTCD, AELNKGRP, AELNKID, AELOC,
         AEMODIFY, AENOMDY, AENOMLBL, AEOUT, AEPARTY, AEPATT, AEPORTOT, AEPRESP, AEPRTYID, AEPTCD, AERECID, AEREFID, AEREL, AERELNST, AERFTDTC, AERLDEV, AERLPRC, AERLPRT, AERPDY,
         AERPENDY, AERPSTDY, AESCAN, AESCAT, AESCONG, AESDISAB, AESDTH, AESEQ, AESER, AESEV, AESHOSP, AESINTV, AESLIFE, AESMIE, AESOC, AESOCCD, AESOD, AESPID, AESTDTC, AESTDY,
