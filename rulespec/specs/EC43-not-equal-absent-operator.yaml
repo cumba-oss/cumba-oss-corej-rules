@@ -31,6 +31,15 @@ description: |
   target is MISSING, not mis-cased. coreJ still routes the shape through
   `ExprCompiler.compileCaseInsensitiveEquality(negate=true)`; the fold now decides it at dataset
   level before any row is read.
+
+  ⚠⚠ WHAT CHANGED 2026-10-07 (Q6, PLAN-message-folded-corpus-alignment): the absent-column fold is
+  OPT-IN through `Outcome.Message_Folded`. This fixture rule declares no key, so the fold is
+  absent-blind, the leaf is evaluated per row (TSVAL reads as the type default "" on both rows,
+  `not equalsIgnoreCase("", "PLANNED")` fires on each), and the report is TWO row findings again —
+  the 2026-08-07 shape, now by ruling rather than by the pre-D111 engine. The one-finding report
+  is the opted-in rule's (`MessageFoldedLoadGateTest` / `AbsentFoldOptInRunnerTest` in the engine,
+  the 666 corpus rules carrying the key); the blank twin `EC43-absent-equals-blank-control` is
+  unchanged.
 python_notes: |
   `not_equal_to_case_insensitive` is not in the fork's `ABSENT_TARGET_AWARE_OPERATORS`, so EC-38 /
   `Fix #128`'s `_absent_target_as_missing` materialises TSVAL as "" and `_check_inequality` returns
@@ -53,12 +62,17 @@ config:
   standard_version: '3.4'
 expected_status: EXECUTED
 expected_violations:
-# ONE dataset-level finding (D111): the absent-column fact is decided before a row is read and
-# reported once per (rule, dataset), rendered with row 0's key columns.
+# TWO row findings (Q6, 2026-10-07): the rule declares no Message_Folded, so the absent column is
+# read per row as "" and the negative comparison fires on every record. (One dataset-level finding,
+# D111, from 2026-09-17 to 2026-10-07 — the opted-in shape now.)
 - rule_id: AUTO-EC43-not-equal-absent-operator
   dataset: TS
   row_key: {STUDYID: S1, TSPARMCD: PLANSUB, TSSEQ: 1}
   status: SUCCESS
-  output_variables: {}
-  name_only: [STUDYID, TSPARMCD, TSSEQ]
+  output_variables: {STUDYID: S1, TSPARMCD: PLANSUB, TSSEQ: '1'}
+- rule_id: AUTO-EC43-not-equal-absent-operator
+  dataset: TS
+  row_key: {STUDYID: S1, TSPARMCD: ACTSUB, TSSEQ: 2}
+  status: SUCCESS
+  output_variables: {STUDYID: S1, TSPARMCD: ACTSUB, TSSEQ: '2'}
 expected_errors: []

@@ -56,7 +56,7 @@ class UseCaseFilterSnapshotTest
      * the corpus changes, re-measure ({@code rg -l Use_Case rules-src}) and update it.
      */
     private static final Set<String> KNOWN_CARRIERS = Set.of("DRAFT-900001", "DRAFT-900002",
-            "DRAFT-900003", "DRAFT-900004", "DRAFT-900005", "DRAFT-900043", "DRAFT-900045");
+            "DRAFT-900003", "DRAFT-900004", "DRAFT-900005", "DRAFT-900043");
 
     @Test
     void theRunsUseCaseSkipsExactlyTheRulesThatNameAnotherOne() throws IOException

@@ -85,17 +85,24 @@ A rule that reports a blank column will report the whole dataset when the column
 entirely. That is usually what you want from a completeness rule — but decide it rather than
 discover it.
 
-### Absent folds once; present-but-empty collapses only when you ask
+### Both folds are opt-in: `Message_Folded`
 
-An **absent** column is decided before a row is read, so `empty(AEENDTC)` over an absent `AEENDTC`
-reports **one** dataset-level finding, not one per row — the absent-column fold. A column that is
-**present but blank on every record** is a data fact: the engine only knows after reading the rows,
-and it reports **per record** — unless the rule declares
-[`Outcome.Message_Folded`](../authoring/outcome.md#message_folded). Then an `empty`-family leaf over
-such a column makes the rule's row findings **collapse** to one dataset-level finding under that
-message (none when no record fires), and [`Keep_Row_Findings`](../authoring/outcome.md#keep_row_findings)
-keeps the per-row findings on a named column. A rule without the key keeps its row findings; a
-dataset with no rows never folds or collapses.
+A rule that declares [`Outcome.Message_Folded`](../authoring/outcome.md#message_folded) reports
+**one** dataset-level finding under that message where it would otherwise report per record:
+
+- an **absent** column is decided before a row is read — `empty(AEENDTC)` over an absent `AEENDTC`
+  is true on every record, so the rule folds to one finding (the absent-column fold);
+- a column that is **present but blank on every record** is a data fact the engine knows only
+  after reading the rows: an `empty`-family leaf over it makes the rule's row findings **collapse**
+  to one finding (none when no record fires), and the same holds for an `empty`-family leaf over an
+  absent column that leaves a per-record residual;
+- [`Keep_Row_Findings`](../authoring/outcome.md#keep_row_findings) keeps the per-record findings on a
+  named column; a dataset with no rows never folds or collapses.
+
+A rule **without** the key folds nothing (owner, 2026-10-05): on an absent column it is evaluated
+per record, the column reading as its type default, exactly like a column blank on every record.
+Every corpus rule the fold can decide or the collapse can report carries the key
+(`MessageFoldedCoverageLintTest`); a custom rule has to declare it to get one finding per dataset.
 
 ## Making absence visible
 

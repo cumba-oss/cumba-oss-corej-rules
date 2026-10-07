@@ -190,11 +190,12 @@ class RuleInsightCorpusTest
                     fda.stream().anyMatch(r -> "PMDA-SD0047".equals(r.coreId())
                             && "equivalence".equals(r.relation()) && r.via().startsWith("EQ-")),
                     fda.toString());
-            List<RelatedRule> minted = RuleInsight.related("CDISC-CG9672",
-                    full.referencesOf("CDISC-CG9672"), full);
-            assertTrue(minted.stream().anyMatch(
-                    r -> "CDISC-CG0425".equals(r.coreId()) && "minted-from".equals(r.relation())),
-                    minted.toString());
+            // (the absent-column sisters are retired — PLAN-message-folded-corpus-alignment —
+            // so the minted-from relation is shown on an R-5.25 split sibling)
+            List<RelatedRule> minted = RuleInsight.related("CDISC-SEND-0288-A",
+                    full.referencesOf("CDISC-SEND-0288-A"), full);
+            assertTrue(minted.stream().anyMatch(r -> "CDISC-SEND-0288".equals(r.coreId())
+                    && "minted-from".equals(r.relation())), minted.toString());
         }
     }
 

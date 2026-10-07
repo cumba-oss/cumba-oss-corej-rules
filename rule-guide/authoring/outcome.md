@@ -110,7 +110,8 @@ a way to hand-write the whole list, which the derivation already does.
 ## `Message_Folded`
 
 The message of a **record-level** rule when its findings are **folded or collapsed to one
-dataset-level finding** — and the opt-in for the present-but-empty collapse.
+dataset-level finding** — and the opt-in for **both** folds: the present-but-empty collapse and the
+absent-column fold.
 
 A column that is **present but blank on every record** makes an `empty`-family leaf (`empty`,
 `is_missing`, `non_empty` / `not empty`, `present`, `is_present`) answer the same on every row: the
@@ -132,17 +133,34 @@ every dataset-level finding). Without the key: 961 findings under `Message`.
 
 **Rules of the key.**
 
-- It is **opt-in**. A rule without it never collapses; nothing moves until an author writes it.
-- An **absent** column keeps the absent-column fold ([absent columns](../semantics/absent-columns.md));
-  a rule that declares `Message_Folded` reports that fold under it too.
+- It is **opt-in, for both folds**. A rule without it never collapses, and — since
+  `PLAN-message-folded-corpus-alignment` (owner, 2026-10-05: *"I would expect the absent fold does
+  not fire anymore if no Message_Folded is available. Like the all empty fold."*) — never folds on an
+  **absent** column either: it is evaluated per record, the absent column reading as its type default
+  ([absent columns](../semantics/absent-columns.md)). Nothing moves until an author writes the key.
+- With the key, an absent column the Check tests folds to **one** dataset-level finding under
+  `Message_Folded` — when the absent column decides the whole Check (`X != "N"` over an absent `X`
+  is true on every record), or when an `empty`-family leaf over the absent column is a collapse
+  trigger exactly as over a column blank on every record (it reads as all-missing). ⛔ Any **other**
+  operator over an absent column with a per-record residual stays per record: an absent *guard*
+  column (`X != "N"` in an `or`-branch, a qualifier the domain never carries) must not fold the
+  findings the other conditions locate per record.
+- A dataset-constant verdict (a metadata-only Check, `var_not_exists(X)` alone) is not a fold of
+  record findings: it reports under `Message`, with or without the key.
 - Only a **plain** column reference triggers the collapse: a joined `DM.X` or a SUPP-delivered
   qualifier is read per record and never folds.
+- Write the message for the **column(s) whose blankness or absence decides** the rule — a column
+  whose blankness makes the Check false (a `not empty(X)` guard) can never print it. The corpus
+  generates and reviews its texts per rule (`scripts/gen-message-folded.py`,
+  `registers/derivation/message-folded-review.tsv`); `MessageFoldedCoverageLintTest` demands the key
+  on every record-level rule the absent fold can decide or the collapse can report.
 - A dataset with **no rows** never folds or collapses ([zero-row datasets](../semantics/zero-rows.md)).
 - `is_missing` is strictly a missing value: over a column of `""` it folds to *false* (no finding);
   over `""` mixed with missings it is row-dependent and does not fold.
-- The key is a **load error** on a rule that can never collapse: no `empty`-family leaf over a plain
-  column (outside `Keep_Row_Findings`), a `Sensitivity` other than `Record`, or a check that reads
-  the variable cursor (`varname()`, `value()`).
+- The key is a **load error** on a rule that can never fold or collapse: no `empty`-family leaf over
+  a plain column (outside `Keep_Row_Findings`) **and** every column the check reads is required
+  present by `Requirements.Variables` (`All`, or a one-member `Any` group); a `Sensitivity` other
+  than `Record`; or a check that reads the variable cursor (`varname()`, `value()`).
 
 ## `Keep_Row_Findings`
 

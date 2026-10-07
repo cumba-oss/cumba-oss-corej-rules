@@ -109,7 +109,10 @@ class AuthoredGuardTaxonomyGateTest
     /** Non-vacuity floors (measured 2026-10-03: 3 461 rules, 20 / 15 carriers, 2 063 guarded). */
     private static final int MIN_RULES = 3_400;
 
-    private static final int MIN_ANY_CARRIERS = 20;
+    // 20 -> 7 on 2026-10-07 (PLAN-message-folded-corpus-alignment): the Any groups that hoisted a
+    // retired sister's X set dropped with the sisters (FDA/PMDA-SD0021/0022/0031/1118/1333/1380);
+    // the parents report the absence through Outcome.Message_Folded.
+    private static final int MIN_ANY_CARRIERS = 7;
 
     private static final int MIN_ALL_OR_NONE_CARRIERS = 15;
 

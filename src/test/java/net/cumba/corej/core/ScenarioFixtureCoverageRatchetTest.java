@@ -223,7 +223,9 @@ class ScenarioFixtureCoverageRatchetTest
     // (516 shipped CORE ids out, 21 phase-4 mints in). ⚠ A FLOOR, not a pin: set below the
     // measured 3 411 on purpose, because the corpus grows.
     // ⛔ MAX_UNCOVERED was NOT touched with it and needs nothing: measured 544 against 749.
-    private static final int MIN_SHIPPED = 3400;
+    // 3400 -> 3350 on 2026-10-07 (PLAN-message-folded-corpus-alignment phase 2): the 42 R-4.11c
+    // sisters retired, distinct shipped ids 3438 -> 3396.
+    private static final int MIN_SHIPPED = 3350;
 
     private static final Path SCENARIOS = Path
             .of("src/test/resources/net/cumba/corej/core/ruletestsuites");

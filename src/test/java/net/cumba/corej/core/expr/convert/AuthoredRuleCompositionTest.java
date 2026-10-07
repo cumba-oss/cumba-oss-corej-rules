@@ -57,7 +57,10 @@ class AuthoredRuleCompositionTest
      * (CDISC 4847, FDA 4583, PMDA 3392, DRAFT 84) and rounded down; a family absent from the
      * manifest fails too.
      */
-    private static final Map<String, Integer> MIN_PER_FAMILY = Map.of("CDISC", 4_800, "FDA", 4_500,
+    // FDA 4_500 -> 4_400 on 2026-10-07 (PLAN-message-folded-corpus-alignment phase 2): the 17 FDA
+    // R-4.11c sisters retired, 4 464 FDA rule x package entries measured (CDISC 4 809, PMDA 3 334,
+    // DRAFT 83 stay above their floors).
+    private static final Map<String, Integer> MIN_PER_FAMILY = Map.of("CDISC", 4_800, "FDA", 4_400,
             "PMDA", 3_300, "DRAFT", 80);
 
     @Test

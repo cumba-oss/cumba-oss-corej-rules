@@ -64,11 +64,13 @@ class ExpressionTextIdempotenceTest
     // 3700 -> 3403 (PLAN-retire-core-family phase 6): distinct shipped Core.Id, CORE's 516
     // gone. ⚠ NOT 3411 — this population is BackConversionScan.shippedExpressions(), i.e. the
     // rules carrying an expression, which is 8 fewer than the 3411 the manifest ships.
-    private static final int MIN_SHIPPED = 3403;
+    // 3403 -> 3350 on 2026-10-07 (PLAN-message-folded-corpus-alignment phase 2): the 42 R-4.11c
+    // sisters retired; 3377 shipped expressions, 3419 authored checks measured.
+    private static final int MIN_SHIPPED = 3350;
 
     // 3700 -> 3435 (PLAN-retire-core-family phase 6): rules-src/checks, CORE's 518 gone, the
     // 21 phase-4 mints added.
-    private static final int MIN_AUTHORED = 3435;
+    private static final int MIN_AUTHORED = 3400;
 
     @Test
     void p4aShippedExpressionsAreAFixedPointOfPrintAfterParse()

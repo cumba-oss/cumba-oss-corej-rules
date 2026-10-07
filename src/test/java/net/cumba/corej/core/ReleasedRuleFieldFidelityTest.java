@@ -62,7 +62,9 @@ class ReleasedRuleFieldFidelityTest
     // arm that failed) and :207 counts FAN-OUT entries (14903 -> 12818, which never came close).
     // Lowering it for the first arm therefore LOOSENS the second by the same amount — said here
     // because nothing else records it.
-    private static final int MIN_RULES = 3400;
+    // 3400 -> 3390 (PLAN-message-folded-corpus-alignment, 2026-10-07): 42 absent-column sisters
+    // retired, 3 396 distinct shipped ids.
+    private static final int MIN_RULES = 3390;
 
     /*
      * ⚑ The absent-OV CEILING that used to sit here ({@code MAX_DERIVED_OUTPUT_VARIABLE_ENTRIES},
@@ -251,7 +253,8 @@ class ReleasedRuleFieldFidelityTest
                 roster.add(t);
             }
         }
-        assertTrue(roster.size() >= 2600,
+        // 2 631 -> 2 599 on 2026-10-07: 32 retired absent-column sisters left the roster.
+        assertTrue(roster.size() >= 2590,
                 "the stripped roster holds only " + roster.size() + " rules (committed: 2 631)");
 
         Set<String> found = new TreeSet<>();

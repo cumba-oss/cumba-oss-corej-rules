@@ -66,7 +66,9 @@ class CanonicalTopOrderCoverageTest
         List<Path> files = yamlFiles();
         // 3700 -> 3435: the CORE family's 518 authored rules were deleted (PLAN-retire-core-family
         // phase 6). Re-derived from the walk, not adjusted by arithmetic.
-        assertTrue(files.size() >= 3435, "expected the full authored corpus, got " + files.size());
+        // 3435 -> 3400 on 2026-10-07 (PLAN-message-folded-corpus-alignment phase 2): the 42
+        // R-4.11c absent-column sisters retired, rules-src/checks 3461 -> 3419.
+        assertTrue(files.size() >= 3400, "expected the full authored corpus, got " + files.size());
         for (Path file : files)
         {
             JsonNode rule = YAML.readTree(file.toFile());

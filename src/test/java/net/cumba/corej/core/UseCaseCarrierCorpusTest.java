@@ -46,11 +46,12 @@ class UseCaseCarrierCorpusTest
     private static final ObjectMapper MAPPER = new ObjectMapper();
 
     /**
-     * Measured 2026-09-26 ({@code rg -l Use_Case rules-src}): all seven are DRAFT and all
+     * Measured 2026-09-26 ({@code rg -l Use_Case rules-src}): all six are DRAFT (DRAFT-900045, the
+     * seventh, was an absent-column sister retired by PLAN-message-folded-corpus-alignment) and all
      * {@code "INDH"}. If the corpus changes, re-measure and update — never loosen to a count.
      */
     private static final Set<String> KNOWN_CARRIERS = Set.of("DRAFT-900001", "DRAFT-900002",
-            "DRAFT-900003", "DRAFT-900004", "DRAFT-900005", "DRAFT-900043", "DRAFT-900045");
+            "DRAFT-900003", "DRAFT-900004", "DRAFT-900005", "DRAFT-900043");
 
     /** Every rule of every package in {@code packages.json} under {@code dir}, keyed by id. */
     private static Map<String, List<Rule>> carriers(Path dir) throws IOException

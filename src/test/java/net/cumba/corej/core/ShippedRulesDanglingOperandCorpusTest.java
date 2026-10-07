@@ -106,7 +106,9 @@ class ShippedRulesDanglingOperandCorpusTest
                 + packages + " packages");
         // 14035 entries today; the floor matches CrossCorpusDerivationTest's rather than the
         // looser >= 3000 of the sibling enum gate, which a 78%-truncated corpus would still clear.
-        assertTrue(rules > 12700,
+        // 12 690 on 2026-10-07 after PLAN-message-folded-corpus-alignment retired 42 absent-column
+        // sisters (one package entry each per package they shipped in).
+        assertTrue(rules > 12600,
                 "expected the full shipped corpus in " + folder + "/, saw " + rules + " rules");
         // ⚠ Ratchets at zero, with no expected-set escape hatch. Since Fix #159 there is no
         // Executability that would move a finding off this channel: `Not Executable` parks the

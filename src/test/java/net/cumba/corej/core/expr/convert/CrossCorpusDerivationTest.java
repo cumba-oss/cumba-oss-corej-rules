@@ -105,6 +105,12 @@ class CrossCorpusDerivationTest
      */
     private static final List<String> SENSITIVITY_OVERRIDES = List.of("CDISC-CG0001",
             "CDISC-CG0077", "CDISC-CG0535", "CDISC-SEND-0153", "CDISC-SEND-0249.1",
+            // 2026-10-07 (PLAN-message-folded-corpus-alignment): the 42 R-4.11c absent-column
+            // sisters left this list with the sisters (their parents report the absence under
+            // Outcome.Message_Folded). CDISC-SEND-9438 is the ONE sister kept — its parent
+            // CDISC-SEND-0397 gates FXRESCAT on purpose (the guard-column hazard of a wide P3),
+            // so the dataset-level absence is still the sister's, with its authored Sensitivity.
+            "CDISC-SEND-9438",
             // ⛔ 2026-09-19 (PLAN-retire-core-family phase 6): the five CORE entries went with the
             // family — CORE-000212 / -000365 / -000929 / -009705 / -009707. Kept in step with
             // DerivedFieldEquivalenceTest, the authored-corpus half, where the same five went and
@@ -113,64 +119,57 @@ class CrossCorpusDerivationTest
             // 8 -> 12 on 2026-08-19 (wave TA-6, review H2): the SV-scoped conditional TV
             // presence mints author `Dataset` because the derivation's `Study` would trip the
             // loader's unrestricted-scope gate; see DerivedFieldEquivalenceTest.
-            "CDISC-CG9671", "FDA-SD9713", "PMDA-SD9713",
-            // 12 -> 15 on 2026-09-07 (R-4.11b, the --STRESU presence sisters): the finding is that
-            // the --STRESU COLUMN is absent — one dataset-level fact — while the existential
-            // witness is a per-record leaf, so the derivation reads `Record` and the per-record
-            // reading would multiply the finding by the number of numeric results. Kept in step
-            // with DerivedFieldEquivalenceTest, which holds the rules-src half of the same list.
-            "CDISC-CG9672", "FDA-SD9715", "PMDA-SD9715",
-            // 15 -> 19 on 2026-09-11 (R-4.11c wave A, the M1/M13 presence sisters): the finding is
-            // that the --BODSYS / --TOX COLUMN is absent — one dataset-level fact — while the
-            // existential witness is a per-record leaf, so the derivation reads `Record`. The M19
-            // pair FDA/PMDA-SD9718 is deliberately absent: all-var_exists Checks derive `Dataset`
-            // on their own. Kept in step with DerivedFieldEquivalenceTest, which holds the
-            // rules-src half of the same list.
-            "FDA-SD9716", "PMDA-SD9716", "FDA-SD9717", "PMDA-SD9717",
-            // 19 -> 25 on 2026-09-11 (R-4.11c wave B, the M3/M11/M11b/M8 presence sisters): the
-            // finding is that the end- or start-timepoint COLUMN SET is absent — one
-            // dataset-level fact — while every trigger leaf is per-row, so the derivation reads
-            // `Record`. Kept in step with DerivedFieldEquivalenceTest, which holds the
-            // rules-src half of the same list.
-            "FDA-SD9719", "PMDA-SD9719", "FDA-SD9720", "PMDA-SD9720", "FDA-SD9721",
-            // 25 -> 31 on 2026-09-11 (R-4.11c wave C1, the M9/M10 presence sisters): the finding
-            // is that the ECDOSTXT (M9) or SEUPDES (M10) COLUMN is absent — one dataset-level
-            // fact — while every trigger leaf is per-row, so the derivation reads `Record`.
-            // Kept in step with DerivedFieldEquivalenceTest, which holds the rules-src half of
-            // the same list.
-            "CDISC-CG9673", "FDA-SD9722", "PMDA-SD9722", "CDISC-CG9674", "FDA-SD9723",
-            "PMDA-SD9723",
-            // 31 -> 36 on 2026-09-11 (R-4.11c wave C2, the M4/M7/M7b/M14/M18 presence sisters):
-            // the finding is that the AEENDTC/AEDUR (M14), --STINT/--ENINT (M4), --REASND
-            // (M7/M7b) or FXSTRESC/FXSTAT (M18) COLUMN SET is absent — one dataset-level fact —
-            // while every trigger leaf is per-row, so the derivation reads `Record`. Kept in
-            // step with DerivedFieldEquivalenceTest, which holds the rules-src half of the same
-            // list.
-            "FDA-SD9724", "PMDA-SD9724", "FDA-SD9725", "FDA-SD9726", "CDISC-SEND-9437",
-            "CDISC-SEND-9438",
-            // 36 -> 40 on 2026-09-11 (R-4.11c wave C3, the M16/M17 presence sisters): the finding
-            // is that the RDOMAIN (M16) or DSSCAT (M17) COLUMN is absent — one dataset-level
-            // fact — while every trigger leaf is per-row, so the derivation reads `Record`.
-            // DRAFT-900045 ships only into the draft packages, which this scan walks too. The M15
-            // pair FDA/PMDA-SD9727 is deliberately absent: all-var_exists Checks derive `Dataset`
-            // on their own. Kept in step with DerivedFieldEquivalenceTest, which holds the
-            // rules-src half of the same list.
-            "CDISC-CG9675", "FDA-SD9728", "PMDA-SD9728", "DRAFT-900045",
-            // 40 -> 41 on 2026-09-11 (wave D, the M10 SENDIG carry-over): CDISC-SEND-9439,
-            // sister of CDISC-SEND-0125.1 — the SEUPDES COLUMN absence is one dataset-level
-            // fact while the ETCD == "UNPLAN" trigger leaf is per-row, so the derivation
-            // reads `Record`. The four wave-D split siblings (FDA/PMDA-SD1017-A/-SD1018-A)
-            // are record-level by design and deliberately absent. Kept in step with
-            // DerivedFieldEquivalenceTest, which holds the rules-src half of the same list.
-            "CDISC-SEND-9439",
-            // +1 on 2026-10-02 (rule round 2026-10-02, owner): CDISC-CG9685, the --BDSYCD presence
-            // sister of CDISC-CG0082 - same rationale as the --STRESU set: one dataset-level fact
-            // (the column is absent) witnessed by a per-record leaf (not empty(--BODSYS)), so the
-            // derivation reads Record and would multiply one finding by the populated rows.
-            // Kept in step with the twin roster in the other test class.
-            "CDISC-CG9685",
-            // PMDA arm of CDISC-CG9685, same day and rationale.
-            "PMDA-SD9750");
+            "CDISC-CG9671", "FDA-SD9713", "PMDA-SD9713"
+    // 12 -> 15 on 2026-09-07 (R-4.11b, the --STRESU presence sisters): the finding is that
+    // the --STRESU COLUMN is absent — one dataset-level fact — while the existential
+    // witness is a per-record leaf, so the derivation reads `Record` and the per-record
+    // reading would multiply the finding by the number of numeric results. Kept in step
+    // with DerivedFieldEquivalenceTest, which holds the rules-src half of the same list.
+    // 15 -> 19 on 2026-09-11 (R-4.11c wave A, the M1/M13 presence sisters): the finding is
+    // that the --BODSYS / --TOX COLUMN is absent — one dataset-level fact — while the
+    // existential witness is a per-record leaf, so the derivation reads `Record`. The M19
+    // pair FDA/PMDA-SD9718 is deliberately absent: all-var_exists Checks derive `Dataset`
+    // on their own. Kept in step with DerivedFieldEquivalenceTest, which holds the
+    // rules-src half of the same list.
+    // 19 -> 25 on 2026-09-11 (R-4.11c wave B, the M3/M11/M11b/M8 presence sisters): the
+    // finding is that the end- or start-timepoint COLUMN SET is absent — one
+    // dataset-level fact — while every trigger leaf is per-row, so the derivation reads
+    // `Record`. Kept in step with DerivedFieldEquivalenceTest, which holds the
+    // rules-src half of the same list.
+    // 25 -> 31 on 2026-09-11 (R-4.11c wave C1, the M9/M10 presence sisters): the finding
+    // is that the ECDOSTXT (M9) or SEUPDES (M10) COLUMN is absent — one dataset-level
+    // fact — while every trigger leaf is per-row, so the derivation reads `Record`.
+    // Kept in step with DerivedFieldEquivalenceTest, which holds the rules-src half of
+    // the same list.
+    // 31 -> 36 on 2026-09-11 (R-4.11c wave C2, the M4/M7/M7b/M14/M18 presence sisters):
+    // the finding is that the AEENDTC/AEDUR (M14), --STINT/--ENINT (M4), --REASND
+    // (M7/M7b) or FXSTRESC/FXSTAT (M18) COLUMN SET is absent — one dataset-level fact —
+    // while every trigger leaf is per-row, so the derivation reads `Record`. Kept in
+    // step with DerivedFieldEquivalenceTest, which holds the rules-src half of the same
+    // list.
+    // 36 -> 40 on 2026-09-11 (R-4.11c wave C3, the M16/M17 presence sisters): the finding
+    // is that the RDOMAIN (M16) or DSSCAT (M17) COLUMN is absent — one dataset-level
+    // fact — while every trigger leaf is per-row, so the derivation reads `Record`.
+    // DRAFT-900045 ships only into the draft packages, which this scan walks too. The M15
+    // pair FDA/PMDA-SD9727 is deliberately absent: all-var_exists Checks derive `Dataset`
+    // on their own. Kept in step with DerivedFieldEquivalenceTest, which holds the
+    // rules-src half of the same list.
+    // 40 -> 41 on 2026-09-11 (wave D, the M10 SENDIG carry-over): CDISC-SEND-9439,
+    // sister of CDISC-SEND-0125.1 — the SEUPDES COLUMN absence is one dataset-level
+    // fact while the ETCD == "UNPLAN" trigger leaf is per-row, so the derivation
+    // reads `Record`. The four wave-D split siblings (FDA/PMDA-SD1017-A/-SD1018-A)
+    // are record-level by design and deliberately absent. Kept in step with
+    // DerivedFieldEquivalenceTest, which holds the rules-src half of the same list.
+    // +1 on 2026-10-02 (rule round 2026-10-02, owner): CDISC-CG9685, the --BDSYCD presence
+    // sister of CDISC-CG0082 - same rationale as the --STRESU set: one dataset-level fact
+    // (the column is absent) witnessed by a per-record leaf (not empty(--BODSYS)), so the
+    // derivation reads Record and would multiply one finding by the populated rows.
+    // Kept in step with the twin roster in the other test class.
+    // PMDA arm of CDISC-CG9685, same day and rationale.
+    // ⭐ 2026-10-07 (PLAN-message-folded-corpus-alignment): the 43 absent-column sisters of
+    // the R-4.11c waves above are RETIRED (their parents carry Message_Folded); the wave
+    // notes stay as the record of why the entries existed.
+    );
 
     /**
      * The plan's &sect;0 representative shapes, one per failure class: {@code FDA-SE2201}
@@ -205,7 +204,6 @@ class CrossCorpusDerivationTest
         Sensitivity authoredSensitivity = Sensitivity.fromJson(expectedSensitivity);
         assertNotNull(authoredSensitivity,
                 "unknown Sensitivity in the CsvSource: " + expectedSensitivity);
-
         // Form 1 — rules-src operator-leaf Check, operations declared.
         Rule src = YAML.readValue(
                 Files.readString(CHECKS_DIR.resolveSibling(srcFile), StandardCharsets.UTF_8),
@@ -214,7 +212,6 @@ class CrossCorpusDerivationTest
         // sees no operations at all and a `$`-consuming Check derives RECORD.
         RulePackageLoader.materialiseBindings(src);
         assertDerives(id + " [rules-src]", src, expectedDomain, authoredSensitivity);
-
         // Form 2 — rules/ native expression, single-use operations inlined into the Check. The
         // derived field is stripped in memory and the package is loaded through
         // RulePackageLoader, so the value on the loaded rule is exactly what the production
@@ -324,8 +321,10 @@ class CrossCorpusDerivationTest
                 }
             }
         }
-        // 13900 -> 12700 (PLAN-retire-core-family phase 6): fan-out 14903 -> 12818.
-        assertTrue(entries > 12700, "expected the whole shipped corpus, got " + entries);
+        // 13900 -> 12700 (PLAN-retire-core-family phase 6): fan-out 14903 -> 12818;
+        // 12700 -> 12600 (PLAN-message-folded-corpus-alignment, 42 R-4.11c sisters retired):
+        // fan-out 12818 -> 12690.
+        assertTrue(entries > 12600, "expected the whole shipped corpus, got " + entries);
         assertEquals(List.of(), loadErrors,
                 "stripping the derived fields must not break loading, and the shipped corpus"
                         + " must carry zero load warnings");
@@ -390,7 +389,6 @@ class CrossCorpusDerivationTest
         long variable = byId.values().stream().filter(Domain.VARIABLE::equals).count();
         long row = byId.values().stream().filter(Domain.ROW::equals).count();
         long cell = byId.values().stream().filter(Domain.CELL::equals).count();
-
         // Each routing class must be non-empty. A collapsed inference empties one of these, and
         // the emptied class is exactly the set of rules the engine would then mis-route.
         assertTrue(dataset > 0, "no rule routes as {} — RuleRunner's broadcast branch is now"
@@ -401,7 +399,6 @@ class CrossCorpusDerivationTest
                 + " unreachable for the whole corpus");
         assertTrue(cell > 0, "no rule routes as {VAR,ROW} — RuleRunner's per-(variable,row)"
                 + " branch is now unreachable for the whole corpus");
-
         // ... and none may swallow the corpus. Both directions are needed: an inference that
         // answers {ROW} for everything leaves every class above non-empty except by accident,
         // but drives this one over the line.
@@ -449,8 +446,10 @@ class CrossCorpusDerivationTest
                 }
             }
         }
-        // 13900 -> 12700 (PLAN-retire-core-family phase 6): fan-out 14903 -> 12818.
-        assertTrue(entries > 12700, "expected the whole shipped corpus, got " + entries);
+        // 13900 -> 12700 (PLAN-retire-core-family phase 6): fan-out 14903 -> 12818;
+        // 12700 -> 12600 (PLAN-message-folded-corpus-alignment, 42 R-4.11c sisters retired):
+        // fan-out 12818 -> 12690.
+        assertTrue(entries > 12600, "expected the whole shipped corpus, got " + entries);
         assertEquals(List.of(), offenders,
                 "rules/ must ship stripped: Rule_Type never, Sensitivity only on the documented"
                         + " override set");

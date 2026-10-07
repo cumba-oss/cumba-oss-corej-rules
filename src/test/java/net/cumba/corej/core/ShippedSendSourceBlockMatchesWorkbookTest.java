@@ -193,13 +193,15 @@ class ShippedSendSourceBlockMatchesWorkbookTest
 
     /**
      * The complete set of shipped {@code CDISC-SEND*} rules that resolve to <em>no</em> sheet row.
-     * All eight are coreJ-minted {@code 94xx} rules with no CDISC SEND row behind them; they carry
-     * no {@code Source} block and none is owed. Pinned exactly (not as a floor) so a rule that
+     * All are coreJ-minted {@code 94xx} rules with no CDISC SEND row behind them; they carry no
+     * {@code Source} block and none is owed. Pinned exactly (not as a floor) so a rule that
      * <em>should</em> resolve and silently stops cannot hide among them.
      */
     private static final List<String> MINTED_WITHOUT_A_SHEET_ROW = List.of("CDISC-SEND-9423",
-            "CDISC-SEND-9424", "CDISC-SEND-9425", "CDISC-SEND-9437", "CDISC-SEND-9438",
-            "CDISC-SEND-9439", "CDISC-SEND-9440", "CDISC-SEND-9441", "CDISC-SEND-9443");
+            "CDISC-SEND-9424", "CDISC-SEND-9425", "CDISC-SEND-9443");
+    // ⭐ Re-derived 2026-10-07, 9 -> 4 (PLAN-message-folded-corpus-alignment): the five
+    // absent-column sisters CDISC-SEND-9437..9441 are retired — their parents carry
+    // Outcome.Message_Folded and report the absence themselves.
     // ⭐ Re-derived 2026-09-30, 8 -> 9 (PLAN-rprfdy-offset-tp-join phase 4, D-MINT):
     // CDISC-SEND-9443,
     // the TP RPRFDY-disagreement rule minted beside CDISC-SEND-0401/0402/0403 (which read a phase's
