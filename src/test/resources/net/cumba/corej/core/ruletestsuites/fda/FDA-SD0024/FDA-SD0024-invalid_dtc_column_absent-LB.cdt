@@ -1,0 +1,17 @@
+#!RuleTest
+#test FDA-SD0024 expect=violation domain=LB
+#note "LBDTC is not present while LBENDTC is populated on rows 2 and 3. In Findings an interval is --DTC + --ENDTC (SDTMIG 3.3 §4.4.8; --STDTC is not used), so an end without a collection date/time is a finding even when the --DTC column is absent (owner 2026-10-07). Was expect=skipped while --DTC gated the rule in Requirements.Variables.All; --ENDTC alone gates it now. The absent LBDTC decides every record, so the rule folds to ONE dataset-level finding under Message_Folded instead of one per row, reported at row 2 (the first record meeting the rest of the condition)."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=2 nameOnly=LBENDTC
+dataset LB class=FINDINGS label="Laboratory Test Results"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col LBSEQ    type=Num  label="Sequence Number"
+col LBTESTCD type=Char label="Lab Test or Examination Short Name"
+col LBENDTC  type=Char label="End Date/Time of Specimen Collection"
+---
+CDISCPILOT01 | LB | 01-701-1015 | 1 | GLUC |
+CDISCPILOT01 | LB | 01-701-1015 | 2 | ALB  | 2020-02-01T09:00
+CDISCPILOT01 | LB | 01-701-1015 | 3 | CREAT | 2020-03-01T09:00
