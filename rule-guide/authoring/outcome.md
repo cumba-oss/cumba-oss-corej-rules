@@ -145,6 +145,13 @@ every dataset-level finding). Without the key: 961 findings under `Message`.
   operator over an absent column with a per-record residual stays per record: an absent *guard*
   column (`X != "N"` in an `or`-branch, a qualifier the domain never carries) must not fold the
   findings the other conditions locate per record.
+- **Only a polarity-live leaf triggers, and only when every one is decided** (owner, 2026-10-07):
+  a leaf is live when its column being absent or blank on every record can make the Check true —
+  `empty(X)` is, `not empty(X)` never is (it is false over a blank or absent `X`), and a column
+  merely absent elsewhere in the Check triggers nothing. The rule collapses only when **every** live
+  leaf is decided that way; while one live leaf's column is still filled on some record, it reports
+  per record (`FDA-SD0021` over an AE whose `AEENDTC` is filled on some records: per record; over an
+  MH with no end column at all: once).
 - A dataset-constant verdict (a metadata-only Check, `var_not_exists(X)` alone) is not a fold of
   record findings: it reports under `Message`, with or without the key.
 - Only a **plain** column reference triggers the collapse: a joined `DM.X` or a SUPP-delivered

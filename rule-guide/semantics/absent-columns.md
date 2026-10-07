@@ -95,7 +95,10 @@ A rule that declares [`Outcome.Message_Folded`](../authoring/outcome.md#message_
 - a column that is **present but blank on every record** is a data fact the engine knows only
   after reading the rows: an `empty`-family leaf over it makes the rule's row findings **collapse**
   to one finding (none when no record fires), and the same holds for an `empty`-family leaf over an
-  absent column that leaves a per-record residual;
+  absent column that leaves a per-record residual — but only for a polarity-live leaf (`empty(X)`,
+  never `not empty(X)`) and only when **every** live leaf of the Check is decided, its column absent
+  or blank on every record; one still filled on some record keeps the rule per record (owner,
+  2026-10-07);
 - [`Keep_Row_Findings`](../authoring/outcome.md#keep_row_findings) keeps the per-record findings on a
   named column; a dataset with no rows never folds or collapses.
 
