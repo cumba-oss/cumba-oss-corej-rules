@@ -91,7 +91,9 @@ A rule that declares [`Outcome.Message_Folded`](../authoring/outcome.md#message_
 **one** dataset-level finding under that message where it would otherwise report per record:
 
 - an **absent** column is decided before a row is read — `empty(AEENDTC)` over an absent `AEENDTC`
-  is true on every record, so the rule folds to one finding (the absent-column fold);
+  is true on every record, so the rule folds to one finding (the absent-column fold) — but only
+  when every other live leaf of the Check is decided too; one still filled on some record keeps the
+  rule per record (owner, 2026-10-07);
 - a column that is **present but blank on every record** is a data fact the engine knows only
   after reading the rows: an `empty`-family leaf over it makes the rule's row findings **collapse**
   to one finding (none when no record fires), and the same holds for an `empty`-family leaf over an
