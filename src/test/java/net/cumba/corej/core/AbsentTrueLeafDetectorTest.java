@@ -164,6 +164,38 @@ class AbsentTrueLeafDetectorTest
 
 
     /**
+     * The confirmation look's controls (MED-1, MED-2): a per-record sibling the column census does
+     * not list still makes the absent leaf a flood; a scalar binding does not; a CONDITIONAL
+     * absence branch guards nothing, a bare one does.
+     */
+    @Test
+    void siblingsAndAbsenceBranchesClassifyAsDefined()
+    {
+        String grouped = ",\"Bindings\":[{\"name\":\"$grouped\",\"expression\":"
+                + "\"record_count(group=[USUBJID])\"}]";
+        assertOpen("$grouped > 1 and empty(LBORRES)", grouped, "LBORRES", true);
+        assertOpen("not is_unique_set([USUBJID, LBORRES]) and LBORRES != \"v\"", "", "LBORRES",
+                true);
+        String first = ",\"Bindings\":[{\"name\":\"$first\",\"expression\":"
+                + "\"read_value(TSVAL, domain=TS, filter=(TSPARMCD == \\\"X\\\"), mode=\\\"FIRST\\\")\"}]";
+        assertOpen("$first == \"\" and empty(LBORRES)", first, "LBORRES", false);
+        assertOpen("(not var_exists(\"LBSTAT\") and ZZROW == \"a\") or (empty(LBSTAT) and"
+                + " ZZOTHER == \"b\")", "", "LBSTAT", true);
+        assertOpen("AESER != \"N\" and (not var_exists(\"LBSTAT\") or LBSTAT != \"Y\")", "",
+                "LBSTAT", false);
+    }
+
+
+    private static void assertOpen(String check, String extra, String column, boolean open)
+    {
+        List<AbsentTrueLeafDetector.Pair> pairs = AbsentTrueLeafDetector
+                .pairs(rule("T-ATL-SIB", check, extra, ""), body(check, extra, ""));
+        assertEquals(open, pairs.stream().anyMatch(p -> p.column().equals(column) && p.open()),
+                () -> check + " → " + pairs);
+    }
+
+
+    /**
      * The dotted half of the runner agreement (review round 1): {@code DM} present, its
      * {@code RFSTDTC} absent, read through a declared keyed join — the runner reads the absent
      * dotted column as its type default, and the detector's stand-in fold must say the same.

@@ -15,7 +15,9 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Stream;
+import net.cumba.corej.core.exec.Distinct;
 import net.cumba.corej.core.exec.EvaluationContext;
+import net.cumba.corej.core.exec.RecordCount;
 import net.cumba.corej.core.exec.RuleSpecialiser;
 import net.cumba.corej.core.expr.OperandKind;
 import net.cumba.corej.core.expr.ast.Expr;
@@ -28,6 +30,7 @@ import net.cumba.corej.core.model.CheckConditionAll;
 import net.cumba.corej.core.model.CheckConditionAny;
 import net.cumba.corej.core.model.CheckConditionExpression;
 import net.cumba.corej.core.model.CheckConditionNot;
+import net.cumba.corej.core.model.CompiledBinding;
 import net.cumba.corej.core.model.LevelCheck;
 import net.cumba.corej.core.model.Rule;
 import net.cumba.datatable.testkit.MockTable;
@@ -49,7 +52,8 @@ import net.cumba.datatable.testkit.MockTable;
  * ({@code Requirements.Variables.All} / {@code Any}) nor guarded FOR THAT LEAF (review round 1,
  * HIGH-1): a positive {@code var_exists(X)} or a {@code not empty(X)} (R-5.23's opt-out) among the
  * conjuncts of the leaf's And-ancestors, or a disjunct beside it that fires on X's absence (the
- * authored fire-when-absent pattern {@code not var_exists(X) or …}). A guard in another disjunct
+ * authored fire-when-absent pattern {@code not var_exists(X) or …}, or an absence branch whose
+ * other conjuncts the leaf's branch shares — never a conditional one). A guard in another disjunct
  * guards nothing. The sibling must be ROW-level: another leaf reading a different column (or the
  * cursor's {@code value()}); a dataset-level or same-column sibling leaves the Check decidable once
  * per dataset.
@@ -301,6 +305,7 @@ final class AbsentTrueLeafDetector
             // not empty(X) among the leaf's own And-ancestors' conjuncts silences it — a guard in
             // ANOTHER disjunct does not (FDA-SE2352 / EXDOSE was invisible with root-wide guards)
             java.util.IdentityHashMap<Expr, Set<String>> guards = new java.util.IdentityHashMap<>();
+            Map<String, Expr> bindingMap = bindings(spec);
             leafGuards(root, false, Set.of(), guards);
             for (Leaf leaf : leaves)
             {
@@ -312,7 +317,7 @@ final class AbsentTrueLeafDetector
                 String x = reads.iterator().next();
                 // a glob (`*DT`, `*`) binds only the columns a dataset HAS — a per-variable cursor
                 // over present names — so it is never absent and never floods
-                if (x.indexOf('*') >= 0 || !hasRowLevelSibling(leaf, x, leaves)
+                if (x.indexOf('*') >= 0 || !hasRowLevelSibling(leaf, x, leaves, bindingMap)
                         || !absentTrue(leaf, x, ctx, expectations))
                 {
                     continue;
@@ -544,17 +549,21 @@ final class AbsentTrueLeafDetector
 
 
     /**
-     * The row-level sibling a flood needs: another leaf of the same root that reads a column OTHER
-     * than {@code x}. A dataset-level sibling (a presence test, a dataset fact — it reads no
-     * column) and a same-column sibling leave the root decidable at dataset level, so the absent
-     * leaf reports once, not once per record (review round 1).
+     * The row-level sibling a flood needs: another leaf of the same root that reads, per record,
+     * something OTHER than {@code x}. A dataset-level sibling (a presence test, a dataset fact, a
+     * scalar binding — {@code read_value(…, mode="FIRST")}, a {@code distinct(…, domain=…)}) and a
+     * same-column sibling leave the root decidable once per dataset (review round 1). ⚠ Per-record
+     * reads the column-name census does not list count too (confirmation look MED-1): the members
+     * of a list literal ({@code is_unique_set([USUBJID, X])}), the cursor's {@code value()}, and a
+     * {@code $}-binding that is grouped ({@code record_count(group=…)}) or per-row
+     * ({@code dictionary_has_decode(CMTRT)}).
      */
-    static boolean hasRowLevelSibling(Leaf leaf, String x, List<Leaf> leaves)
+    static boolean hasRowLevelSibling(Leaf leaf, String x, List<Leaf> leaves,
+            Map<String, Expr> bindings)
     {
         for (Leaf other : leaves)
         {
-            if (other != leaf && (FoldCapability.readColumnNames(other.expr()).stream()
-                    .anyMatch(n -> !n.equalsIgnoreCase(x)) || readsTheCursor(other.expr())))
+            if (other != leaf && rowLevel(other.expr(), x, bindings, new HashSet<>()))
             {
                 return true;
             }
@@ -562,103 +571,232 @@ final class AbsentTrueLeafDetector
         return false;
     }
 
+    /** The calls whose result is one value per dataset, whatever their arguments read. */
+    private static final Set<String> DATASET_LEVEL_CALLS = Set.of("max", "min", "max_date",
+            "min_date", "earliest_date", "latest_date", "record_count", "distinct", "read_value",
+            "count", "dataset_names", "study_domains", "find_vars", "codelist_terms", "sum",
+            "mean");
 
     /**
-     * Whether {@code e} reads the variable cursor's cell — {@code value()}, a row-level read the
-     * column-name census does not list (the {@code CDISC-AD0647} {@code TREMxxFL} shape).
+     * Whether {@code e} reads something per record other than the column {@code x}: a column read
+     * (bare, templated or dotted), the cursor's {@code value()}, a list member that does, a grouped
+     * aggregate, or a binding whose own expression does. A whole-column aggregate over the primary
+     * (an ungrouped {@code max(X)}), a read of another table ({@code domain=}) and a literal are
+     * one value per dataset.
      */
-    private static boolean readsTheCursor(Expr e)
+    static boolean rowLevel(Expr e, String x, Map<String, Expr> bindings, Set<String> seen)
     {
         return switch (e)
         {
-        case Expr.Call c -> "value".equals(c.name())
-                || c.args().stream().anyMatch(AbsentTrueLeafDetector::readsTheCursor);
-        case Expr.Binary b -> readsTheCursor(b.left()) || readsTheCursor(b.right());
+        case Expr.Ref r when r.kind() == OperandKind.OPERATION_REF ->
+        {
+            String name = bindingName(r.name());
+            Expr b = bindings.get(name);
+            // a binding the engine derived dataset-level is a literal stand-in in the map
+            yield b != null && seen.add(name) && rowLevel(b, x, bindings, seen);
+        }
+        case Expr.Ref r when r.kind() == OperandKind.COLUMN
+                || r.kind() == OperandKind.WILDCARD_COLUMN
+                || r.kind() == OperandKind.DOTTED_REF -> !r.name().equalsIgnoreCase(x);
+        case Expr.Lit lit when lit.value() instanceof List<?> members -> members.stream()
+                .anyMatch(m -> m instanceof Expr me && rowLevel(me, x, bindings, seen));
+        case Expr.Call c ->
+        {
+            if ("value".equals(c.name()) || RecordCount.isGrouped(c) || Distinct.isGrouped(c))
+            {
+                yield true;
+            }
+            if (EmptyColumnCollapse.readsAnotherTable(c) || DATASET_LEVEL_CALLS.contains(c.name())
+                    || BroadcastFold.isExistsCall(c))
+            {
+                yield false;
+            }
+            yield c.args().stream().anyMatch(a -> rowLevel(a, x, bindings, seen))
+                    || c.kwargs().values().stream().anyMatch(a -> rowLevel(a, x, bindings, seen));
+        }
+        case Expr.Binary b -> rowLevel(b.left(), x, bindings, seen)
+                || rowLevel(b.right(), x, bindings, seen);
+        case Expr.And a -> a.parts().stream().anyMatch(p -> rowLevel(p, x, bindings, seen));
+        case Expr.Or o -> o.parts().stream().anyMatch(p -> rowLevel(p, x, bindings, seen));
+        case Expr.Not n -> rowLevel(n.inner(), x, bindings, seen);
         default -> false;
         };
     }
 
 
+    /** A binding's name as the binding map keys it ({@code $} stripped). */
+    static String bindingName(String ref)
+    {
+        return ref.startsWith("$") ? ref.substring(1) : ref;
+    }
+
+
     /**
-     * Records, for every leaf, the columns its And-ancestors guarantee present: a positive
-     * {@code var_exists(X)} (or a negated {@code var_not_exists(X)}) or a {@code not empty(X)}
-     * among the conjuncts of an ancestor that acts as an {@code and} — an {@code And}, or an
-     * {@code Or} under an odd number of {@code not}s. A guard in another disjunct guards nothing.
+     * The rule's bindings, name → expression, with the ENGINE's own level classification applied: a
+     * binding whose derived evaluation domain ({@code CompiledBinding.domain}, installed by the
+     * loader — SPEC §3.2, "a binding's level is derived") carries no row cursor is one value per
+     * dataset and stands in as a literal; a row-level one keeps its expression, so a binding that
+     * reads only {@code x} still counts as the same column.
+     */
+    static Map<String, Expr> bindings(Rule spec)
+    {
+        Map<String, Expr> out = new LinkedHashMap<>();
+        for (CompiledBinding b : spec.bindingOrder())
+        {
+            boolean datasetLevel = b.domain() != null && !b.domain().rowCursor();
+            out.put(bindingName(b.name()),
+                    datasetLevel ? new Expr.Lit(Expr.LitKind.BOOL, true) : b.expression());
+        }
+        return out;
+    }
+
+    /**
+     * A conjunct of a branch, with its polarity — compared structurally (the {@code Expr} records'
+     * own equality).
+     *
+     * @param expr
+     *            the conjunct, its {@code not}s stripped
+     * @param negated
+     *            whether an odd number of {@code not}s encloses it
+     */
+    record Conjunct(Expr expr, boolean negated)
+    {
+    }
+
+
+    /**
+     * An authored-absence guard of a disjunction: a branch fires on {@code column}'s absence when
+     * its {@code others} conjuncts hold too.
+     *
+     * @param column
+     *            the upper-cased column
+     * @param others
+     *            the absence branch's other conjuncts
+     */
+    record AbsenceGuard(String column, Set<Conjunct> others)
+    {
+    }
+
+    /**
+     * Records, for every leaf, the columns guaranteed present or whose absence is authored: a
+     * positive {@code var_exists(X)} (or a negated {@code var_not_exists(X)}) or a
+     * {@code not empty(X)} among the conjuncts of an ancestor that acts as an {@code and} (an
+     * {@code And}, or an {@code Or} under an odd number of {@code not}s); or an absence branch of
+     * an ancestor disjunction (below). A guard in another disjunct guards nothing.
      */
     static void leafGuards(Expr e, boolean negated, Set<String> inherited,
             java.util.IdentityHashMap<Expr, Set<String>> out)
     {
+        walk(e, negated, inherited, List.of(), out);
+    }
+
+
+    private static void walk(Expr e, boolean negated, Set<String> inherited,
+            List<AbsenceGuard> conditional, java.util.IdentityHashMap<Expr, Set<String>> out)
+    {
         switch (e)
         {
-        case Expr.Not n -> leafGuards(n.inner(), !negated, inherited, out);
-        case Expr.And a when !negated -> conjunction(a.parts(), negated, inherited, out);
-        case Expr.Or o when negated -> conjunction(o.parts(), negated, inherited, out);
-        case Expr.And a -> disjunction(a.parts(), negated, inherited, out);
-        case Expr.Or o -> disjunction(o.parts(), negated, inherited, out);
-        default -> out.put(e, inherited);
+        case Expr.Not n -> walk(n.inner(), !negated, inherited, conditional, out);
+        case Expr.And a when !negated -> conjunction(a.parts(), negated, inherited, conditional,
+                out);
+        case Expr.Or o when negated -> conjunction(o.parts(), negated, inherited, conditional, out);
+        case Expr.And a -> disjunction(a.parts(), negated, inherited, conditional, out);
+        case Expr.Or o -> disjunction(o.parts(), negated, inherited, conditional, out);
+        default ->
+        {
+            Set<String> g = new HashSet<>(inherited);
+            Conjunct self = new Conjunct(e, negated);
+            conditional.stream().filter(c -> !c.others().contains(self))
+                    .forEach(c -> g.add(c.column()));
+            out.put(e, g);
+        }
         }
     }
 
 
     private static void conjunction(List<Expr> parts, boolean negated, Set<String> inherited,
-            java.util.IdentityHashMap<Expr, Set<String>> out)
+            List<AbsenceGuard> conditional, java.util.IdentityHashMap<Expr, Set<String>> out)
     {
         Set<String> local = new HashSet<>(inherited);
         parts.forEach(p -> guardsOf(p, negated, local));
-        parts.forEach(p -> leafGuards(p, negated, local, out));
+        parts.forEach(p -> walk(p, negated, local, conditional, out));
     }
 
 
     /**
-     * A disjunction: no disjunct guards another — but a disjunct that fires on X's ABSENCE (the
-     * deliberate fire-when-absent pattern {@code not var_exists(X) or <predicate over X>}, R-4.30's
-     * presence half, or a branch of a decomposition such as {@code CDISC-CG0348}'s) makes the
-     * Check's absent reading of X AUTHORED: the rule says what an absent X means, so its other
-     * branches' leaves over X are not an unasked R-4.11b question. Those columns count as guarded
-     * for every leaf below this node (review round 1 fold — without it the per-leaf guards raised
-     * 55 such authored pairs as floods).
+     * A disjunction: no disjunct guards another — but a disjunct that fires on X's ABSENCE makes
+     * the Check's absent reading of X AUTHORED for a sibling branch that ASKS THE SAME QUESTION:
+     * the deliberate fire-when-absent pattern {@code not var_exists(X) or <predicate over X>} (a
+     * bare absence test always counts), or a decomposition branch whose other conjuncts are all
+     * conjuncts of the leaf's own branch too ({@code CDISC-CG0348}). A CONDITIONAL absence branch
+     * ({@code not var_exists(X) and C}, C not in the leaf's branch) speaks for other records and
+     * guards nothing (confirmation look MED-2). Measured at the fold: the clause removes 58 pairs.
      */
     private static void disjunction(List<Expr> parts, boolean negated, Set<String> inherited,
-            java.util.IdentityHashMap<Expr, Set<String>> out)
+            List<AbsenceGuard> conditional, java.util.IdentityHashMap<Expr, Set<String>> out)
     {
-        Set<String> local = new HashSet<>(inherited);
-        parts.forEach(p -> absenceTests(p, negated, local));
-        parts.forEach(p -> leafGuards(p, negated, local, out));
+        List<Set<Conjunct>> conj = new ArrayList<>();
+        parts.forEach(p -> conj.add(conjuncts(p, negated)));
+        for (int i = 0; i < parts.size(); i++)
+        {
+            List<AbsenceGuard> local = new ArrayList<>(conditional);
+            for (int j = 0; j < parts.size(); j++)
+            {
+                if (j == i)
+                {
+                    continue;
+                }
+                for (Conjunct c : conj.get(j))
+                {
+                    String column = absenceColumn(c);
+                    if (column == null)
+                    {
+                        continue;
+                    }
+                    Set<Conjunct> others = new LinkedHashSet<>(conj.get(j));
+                    others.remove(c);
+                    if (conj.get(i).containsAll(others))
+                    {
+                        local.add(new AbsenceGuard(column, others));
+                    }
+                }
+            }
+            walk(parts.get(i), negated, inherited, local, out);
+        }
     }
 
 
-    /** The columns a branch tests for ABSENCE as one of its conjuncts (fires when X is absent). */
-    private static void absenceTests(Expr e, boolean negated, Set<String> out)
+    /** The conjuncts of a branch: an and-acting node flattened, every other node one conjunct. */
+    static Set<Conjunct> conjuncts(Expr e, boolean negated)
     {
+        Set<Conjunct> out = new LinkedHashSet<>();
         switch (e)
         {
-        case Expr.Not n -> absenceTests(n.inner(), !negated, out);
-        case Expr.And a when !negated -> a.parts().forEach(p -> absenceTests(p, negated, out));
-        case Expr.Or o when negated -> o.parts().forEach(p -> absenceTests(p, negated, out));
-        case Expr.Call c when c.args().size() == 1 ->
+        case Expr.Not n -> out.addAll(conjuncts(n.inner(), !negated));
+        case Expr.And a when !negated -> a.parts().forEach(p -> out.addAll(conjuncts(p, negated)));
+        case Expr.Or o when negated -> o.parts().forEach(p -> out.addAll(conjuncts(p, negated)));
+        default -> out.add(new Conjunct(e, negated));
+        }
+        return out;
+    }
+
+
+    /** The column a conjunct tests for ABSENCE (fires when it is absent), else null. */
+    private static @org.jspecify.annotations.Nullable String absenceColumn(Conjunct c)
+    {
+        if (c.expr() instanceof Expr.Call call && call.args().size() == 1)
         {
-            String name = switch (c.args().getFirst())
+            String name = switch (call.args().getFirst())
             {
             case Expr.Ref r -> r.name();
             case Expr.Lit lit when lit.value() instanceof String str -> str;
             default -> null;
             };
-            boolean absence = switch (c.name())
-            {
-            case "var_exists" -> negated;
-            case "var_not_exists" -> !negated;
-            default -> false;
-            };
-            if (name != null && absence)
-            {
-                out.add(name.toUpperCase(Locale.ROOT));
-            }
+            boolean absence = "var_exists".equals(call.name()) ? c.negated()
+                    : "var_not_exists".equals(call.name()) && !c.negated();
+            return name != null && absence ? name.toUpperCase(Locale.ROOT) : null;
         }
-        default ->
-        {
-            // a disjunct inside the branch decides nothing for every record
-        }
-        }
+        return null;
     }
 
 
