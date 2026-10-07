@@ -140,8 +140,9 @@ absent-URI silence).
 `extract_metadata("encoding")` / `("encoding_source")` read the table-metadata
 keys `"Encoding"` / `"EncodingSource"` that every reader publishes: the charset
 it decoded the dataset's text with, and whether the file declared it
-(`DECLARED`), the format fixed it (`FORMAT`), a user chose it (`CONFIGURED`) or
-it is the reader's default (`DEFAULT`). A `.cdt` file is UTF-8 by the format,
+(`DECLARED`), the format fixed it (`FORMAT`), a charset other than the reader's
+default was chosen (`CONFIGURED`) or it is the reader's default or fallback
+(`DEFAULT`). A `.cdt` file is UTF-8 by the format,
 so a scenario reports `UTF-8` / `FORMAT` unless it declares otherwise — the way
 to simulate, say, an XPT read as latin1:
 
