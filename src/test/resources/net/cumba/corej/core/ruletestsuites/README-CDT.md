@@ -134,6 +134,29 @@ Worked examples: `cdisc/CDISC-SEND-0277/*` (an uppercase basename fires, a
 lowercase one does not, and a scenario with no `uri=` at all pins the
 absent-URI silence).
 
+#### Decode charset (`Encoding=`)
+
+`extract_metadata("encoding")` / `("encoding_source")` read the table-metadata
+keys `"Encoding"` / `"EncodingSource"` that every reader publishes: the charset
+it decoded the dataset's text with, and whether the file declared it
+(`DECLARED`), the format fixed it (`FORMAT`), a user chose it (`CONFIGURED`) or
+it is the reader's default (`DEFAULT`). A `.cdt` file is UTF-8 by the format,
+so a scenario reports `UTF-8` / `FORMAT` unless it declares otherwise — the way
+to simulate, say, an XPT read as latin1:
+
+```
+dataset AE class=EVENTS Encoding=ISO-8859-1 EncodingSource=CONFIGURED
+```
+
+- a declared `Encoding=` wins, with the declared `EncodingSource=`, else
+  `DECLARED`;
+- an `EncodingSource=` without an `Encoding=` is dropped: the two keys are one
+  unit;
+- the scenario loader and the data browser's `.cdt` reader answer alike;
+- `CdtWriter` never writes either key back (it skips every key with an
+  upper-case first letter), so a hand-written `Encoding=` does not survive a
+  save from the data browser.
+
 #### ADaM structure / subclass
 
 `Scope.Data_Structures` and `Scope.Subclasses` are normally **detected from the
