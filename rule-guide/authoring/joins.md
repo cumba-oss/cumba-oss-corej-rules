@@ -105,8 +105,8 @@ Two kinds of entry fix the join type themselves, and a value that could never ta
 
 - A keyed entry naming a supplemental-qualifier or relationship dataset — `SUPP…` (including
   `SUPP--`), `SQ…` or `RELREC` — always keeps every primary row (`left`). Write `left` or nothing;
-  `inner` there is a load error. (A `--` template such as `AE--` is resolved to its dataset first
-  and honours its `Join_Type`.)
+  `inner` there is a load error. (Any other `--` template — `XX--` for a domain `XX` — is resolved
+  to its dataset first and honours its `Join_Type`.)
 - An entry that builds no join at all — no `Keys` and neither `Child: true` nor the forward
   `RELREC` entry, or `Keys` without a `Name` — takes no `Join_Type`; any value is a load error.
 

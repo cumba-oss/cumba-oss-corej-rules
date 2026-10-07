@@ -34,9 +34,13 @@ import org.junit.jupiter.api.Test;
  * DM, CO, SE, SV, SM where the version has it, SJ in SENDIG-DART / -AR) of every stored SDTMIG and
  * SENDIG version, the reference for a dataset carrying its model order plus every Findings-walk
  * variable, so every placement is exercised. Pinned as an <b>exact</b> roster in
- * {@code permitted-column-order-roster.tsv}, produced at phase 0 by an independent model of the
- * plan's §2.3 (not by the engine): a disagreement is a defect in one of the two, never a
- * rebaseline.</li>
+ * {@code permitted-column-order-roster.tsv}, produced by an independent model of the plan's §2.3
+ * (not by the engine): a disagreement is a defect in one of the two, never a rebaseline. Regenerate
+ * it in the internal corpus with {@code scripts/gen-permitted-order-roster.sh}
+ * ({@code PermittedOrderStoreProbe} dumps the provider's inputs,
+ * {@code scripts/permitted-order-oracle.py} places them) and review the diff; the OSS twin receives
+ * the file, never the tooling. ⚠ The model is a second implementation of the SAME reading of §2.3,
+ * fed from the SAME provider seams: it catches coding errors, not a misread plan, IG or store.</li>
  * <li><b>CO, pinned by hand</b> — its model order is not in role order (M1).</li>
  * <li><b>The gate arm</b> (P5) — every other dataset of every version answers its model order
  * unchanged, whatever columns it carries: the class gate alone keeps the Findings role tables off
@@ -56,6 +60,28 @@ class PermittedColumnOrderStoreTest
             "sendig dart-1-1", "sendig ar-1-0", "sendig genetox-1-0");
 
     private static final DatasetResolver NO_RESOLVER = _ -> null;
+
+    /**
+     * The class gate's population BY NAME, per stored version (owner N3 (a), phase 0 step 0.5): the
+     * special-purpose datasets — SM only from SDTMIG 3.3, SJ only in SENDIG-DART / -AR (SDTMIG 3.3
+     * defines an SJ that is not special-purpose). The gate arm asserts the product class agrees
+     * with this list for every dataset and skips exactly these, so a dataset moving in or out of
+     * the class reds here rather than silently changing which datasets the arm covers.
+     */
+    private static java.util.Set<String> gatePopulation(String aPackage)
+    {
+        java.util.Set<String> base = new java.util.TreeSet<>(List.of("DM", "CO", "SE", "SV"));
+        if ("sdtmig 3-3".equals(aPackage) || "sdtmig 3-4".equals(aPackage))
+        {
+            base.add("SM");
+        }
+        if ("sendig dart-1-1".equals(aPackage) || "sendig ar-1-0".equals(aPackage))
+        {
+            base.add("SJ");
+        }
+        return base;
+    }
+
 
     private static StoreMetadataProviderFactory factory()
     {
@@ -225,7 +251,10 @@ class PermittedColumnOrderStoreTest
             MetadataProvider provider = provider(pkg);
             for (String name : Objects.requireNonNull(provider.getStandardDatasetNames()))
             {
-                if (specialPurpose(provider, name))
+                boolean listed = gatePopulation(pkg).contains(name);
+                assertEquals(listed, specialPurpose(provider, name),
+                        pkg + " " + name + ": the class gate's population, by name");
+                if (listed)
                 {
                     continue;
                 }
