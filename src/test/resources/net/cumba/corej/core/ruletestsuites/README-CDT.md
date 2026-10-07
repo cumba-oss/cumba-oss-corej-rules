@@ -1024,9 +1024,9 @@ variable, so both `#library-ref` scenarios skipped on every run
    store cannot be opened; or it does not hold the referenced product (IG / declared ADaM
    product) — `resolve()` answers empty. The skip message names which. The product is checked
    **before** the `ct=` pins below, so a store without the product skips rather than fails.
-2. **After the rule ran** (`ScenarioLibrarySupport.skipRefIfNotExecuted`): the provider was built
-   but the rule reported `SKIPPED`/`ERROR` (not applied to an `expect=skipped` scenario, whose
-   skip is the contract under test).
+2. **After the rule ran** (`ScenarioRunner.judge`, `REF_NOT_EXECUTED`): the provider was built
+   but the rule reported `SKIPPED` (not applied to an `expect=skipped` scenario, whose skip is the
+   contract under test); a rule that ERRORED is judged, not skipped.
 
 A **missing CT package is neither**: the store factory substitutes an empty package for it (a
 `WARNING` in the log; an ADaM ref's `sdtmct` fallback is dropped instead) and the rule runs

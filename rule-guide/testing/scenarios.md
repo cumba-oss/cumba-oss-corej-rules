@@ -65,6 +65,9 @@ The name says what the scenario is *for* — `-valid-`, `-invalid-`, or the shap
 run, and with its **error message** when it errored. So a scenario that quietly stops running tells
 you.
 
+On a primary dataset **outside the rule's scope** the rule never runs, so only `expect=skipped`
+passes there; `violation`, `noViolation` and `executionError` fail the scenario (`SCOPE`).
+
 ### `skipped` scenarios are built by withholding
 
 A `skipped` scenario proves a requirement is real. What you withhold depends on the facet:
