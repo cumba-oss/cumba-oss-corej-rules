@@ -18,13 +18,15 @@ Requirements:
   Variables:
     All:
     - "DSCAT"
-    - "DSSCAT"
 Check:
   expression: >-
     not is_unique_set([DSCAT, USUBJID, EPOCH]) and DSCAT == "DISPOSITION EVENT" and empty(DSSCAT)
 Outcome:
   Message: "DSSCAT is empty on a record with DSCAT = 'DISPOSITION EVENT' where the\
     \ subject has more than one DISPOSITION EVENT record per Epoch; DSSCAT is required\
+    \ to distinguish study-participation from study-treatment dispositions."
+  Message_Folded: "DSSCAT is absent or empty although a subject has more than one\
+    \ record per Epoch with DSCAT equal to 'DISPOSITION EVENT'; DSSCAT is required\
     \ to distinguish study-participation from study-treatment dispositions."
   Output_Variables:
   - "USUBJID"
