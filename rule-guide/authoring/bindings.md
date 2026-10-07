@@ -63,9 +63,11 @@ hold whatever the expression:
 
 - **A name is declared once.** A second binding with the same `name` is a load error.
 - **A binding reads only earlier bindings.** Reading a later one, or itself, is a load error.
-- **A set difference reads only dataset-level lists.** `minus` — written in the Check or in a
-  binding — that reads a per-row binding (`minus($a, subtract=$per_row)`) is a load error: its
-  operands have no row to pick the value at.
+- **A set difference or union reads only dataset-level lists.** `minus` / `union` — written in the
+  Check or in a binding — that reads a per-row operand, bound (`minus($a, subtract=$per_row)`) or
+  written inline (`minus($a, subtract=split_by(X, ","))`), is a load error with one message for both
+  spellings: the operand has no row to pick the value at. Any dataset-level list expression is an
+  operand, inline or through a binding — a binding is only a name for its expression.
 
 A **list** binding (a list literal, or a list-valued function such as `get_codelist_attributes`) is
 read with `in` / `not in`, `empty(…)` or by a list function such as `minus`; comparing it with `==` / `!=` / `<` … is a
