@@ -3388,7 +3388,7 @@ The example above is the complete call.
 
 `study_domains()` → **value (a list)**
 
-The distinct data-driven SDTM domain codes across the study — the `DOMAIN` cell of each dataset, not its member name — as a list: a split `LB` (`lbch` / `lbhe`) contributes one `LB`, which is what an `RDOMAIN` of `LB` matches; the no-domain datasets (`SUPP--`, `RELREC`) contribute `""`.
+The distinct data-driven SDTM domain codes across the study — the `DOMAIN` cell of each dataset, not its member name — as a list: a split `LB` (`lbch` / `lbhe`) contributes one `LB`, which is what an `RDOMAIN` of `LB` matches; the no-domain datasets (`SUPP--`, `RELREC`) contribute `""`. Each code is **upper-cased** and listed **once after upper-casing**: a `DOMAIN` cell spelled `lb` or `Lb` is the one `LB` in the list (dataset names match ignoring case). To compare a value that may itself be lower case, upper-case it too — `upper(RDOMAIN) not in $study_domains`.
 
 A **registry function** since wave 4 of the operations→functions programme (`PLAN-list-functions`). It takes **no column target** — the `name` / `names` rows of the retired operation are gone, and `study_domains(X)` fails to load. It is an **aggregate**: one list for the dataset, computed once per rule and dataset and read by every row. It reads the study inventory; a run whose dataset resolver cannot enumerate the study is a wiring defect and reports a rule **ERROR** (the retired operation answered the empty set there, silently).
 

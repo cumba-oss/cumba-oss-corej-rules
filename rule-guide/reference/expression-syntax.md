@@ -667,7 +667,7 @@ quantifier over a scalar predicate is that predicate (`any(p(X))` ≡ `p(X)`, `n
 | [`referenced_record_count(dataset, value, key_variable=[, keys=])`](functions.md#referenced_record_count) | value | How many records of the dataset **named in a column value** carry the row's pointer value in the column `key_variable` names, with the same-named `keys`; missing for an unknown dataset, `0` for an absent column |
 | [`split_sibling_length_mismatch()`](functions.md#split_sibling_length_mismatch) | value | The variables whose declared length differs across the dataset's split-family members, as a list (library-independent) |
 | [`standard_domains()`](functions.md#standard_domains) | value | The domain codes the standard publishes, as a list; SKIPPED when the Library publishes none |
-| [`study_domains()`](functions.md#study_domains) | value | The distinct `DOMAIN` codes present in the study, as a list (a split domain once; the no-domain datasets contribute `""`) |
+| [`study_domains()`](functions.md#study_domains) | value | The distinct `DOMAIN` codes present in the study, upper-cased, as a list (a split domain once; the no-domain datasets contribute `""`) |
 
 ### Variable metadata
 
