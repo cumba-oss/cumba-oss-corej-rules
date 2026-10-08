@@ -394,7 +394,10 @@ upper($required_variables)` — read by `contains_all` / `is_ordered_subset_of` 
 `shares_elements_with`; [`upper`](functions.md#upper) and [`lower`](functions.md#lower) fold a list
 element by element — a `$`-list, a per-row list, and the values of several columns read with
 [`values`](functions.md#values) (`upper(values([X, Y]))`; `upper([X, Y])` with bare names fails to
-load, since `[X, Y]` is a list of column *names*). A name **test** folds the name it tests: `ends_with(upper(varname()), "FL")`,
+load, since `[X, Y]` is a list of column *names*). The sixteen element-wise **predicates**
+(`is_valid_date`, `is_numeric`, … — [`functions.md`](functions.md#quantifiers-over-joined-rows)) lift
+the same way and answer a list of booleans for `any` / `all` / `none`:
+`any(is_valid_date(values([--STDTC, --ENDTC])))`. A name **test** folds the name it tests: `ends_with(upper(varname()), "FL")`,
 `upper(varname()) =~ /^ANL\d\dFL$/`, `prefix(upper(varname()), 2)`, with the literal or pattern
 spelled in upper case. A `QNAM` / `IDVAR` **cell** is a value like any other and is compared
 exactly (`QNAM == "AESOSP"`); `IDVAR not in $rdomain_variables and IDVAR not in
@@ -579,11 +582,22 @@ listed under [Arguments](#arguments). **Every parameter can be given positionall
 
 ### Quantifiers over joined rows
 
+The three quantifiers fold a **list of booleans** to one boolean per row. Two things produce such
+a list: `joined(c)` — the answers of a condition over the current record's joined rows — and an
+**element-wise predicate over a list** — `is_valid_date(values([X, Y]))`, one answer per cell (the
+sixteen lifting predicates are marked in [`functions.md`](functions.md#quantifiers-over-joined-rows);
+also over a per-row list such as `split_by(…)` or a `$`-list). The list may be bound and quantified
+later (`$ok: is_numeric(values([A, B]))`, `all($ok)`); anywhere else — a condition on its own, a
+comparison, `in`, another function's argument, `Output_Variables` — it fails the rule's load. A
+quantifier over a scalar predicate is that predicate (`any(p(X))` ≡ `p(X)`, `none(p(X))` ≡
+`not p(X)`); `any([])` is false, `all([])` and `none([])` are true.
+
 | function | returns | what it does |
 |---|---|---|
 | [`any(joined(c))`](functions.md#any) | boolean | Some evaluation row of the current record satisfies `c` — the rows a `Match_Datasets` entry added for this record. Legal only in a Check level expression (bare, or under `and` / `or` / `not`). |
 | [`all(joined(c))`](functions.md#all) | boolean | Every evaluation row of the current record satisfies `c`. |
 | [`none(joined(c))`](functions.md#none) | boolean | No evaluation row of the current record satisfies `c`; the same as `not any(joined(c))`. |
+| [`any(p(values([X, Y])))`](functions.md#any) | boolean | Some element of the per-row list satisfies the element-wise predicate `p` — `any(is_valid_date(values([--STDTC, --ENDTC])))`: at least one is a valid date; `all` / `none` likewise. |
 | [`joined(c)`](functions.md#joined) | list of booleans | The answers of `c` over the current record's rows; legal only as the direct argument of `any` / `all` / `none`, in a rule with a keyed or RELREC `Match_Datasets` entry. Its condition is written bare: `joined(A == 1 and empty(B))`. |
 
 ### Dataset and domain metadata

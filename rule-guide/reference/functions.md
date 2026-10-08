@@ -506,6 +506,15 @@ True when `x` contains any ASCII letter
 |---|---|---|---|
 | `x` | any | yes | The value to read |
 
+**List form (element-wise)** — over a list at `x` — the cells of several columns
+([`values`](#values): `has_alpha(values([X, Y]))`), a per-row list such as `split_by(…)`, or a
+`$`-list — the predicate answers **one boolean per element** (a list of booleans), consumed only by
+[`any`](#any) / [`all`](#all) / [`none`](#none), directly or through a binding (`$ok: has_alpha(values([X,
+Y]))`, then `all($ok)`); a missing element gets the predicate's own answer on a missing. Written as a
+condition on its own, compared, tested with `in`, passed to another function or reported, the list
+form fails the rule's load — quantify it. `[X, Y]` with bare names is a list of column *names*: read
+the values with `values([X, Y])`.
+
 **Example**
 
 ```yaml
@@ -521,6 +530,15 @@ True when `x` contains any ASCII digit
 | parameter | type | required | description |
 |---|---|---|---|
 | `x` | any | yes | The value to read |
+
+**List form (element-wise)** — over a list at `x` — the cells of several columns
+([`values`](#values): `has_digit(values([X, Y]))`), a per-row list such as `split_by(…)`, or a
+`$`-list — the predicate answers **one boolean per element** (a list of booleans), consumed only by
+[`any`](#any) / [`all`](#all) / [`none`](#none), directly or through a binding (`$ok: has_digit(values([X,
+Y]))`, then `all($ok)`); a missing element gets the predicate's own answer on a missing. Written as a
+condition on its own, compared, tested with `in`, passed to another function or reported, the list
+form fails the rule's load — quantify it. `[X, Y]` with bare names is a list of column *names*: read
+the values with `values([X, Y])`.
 
 **Example**
 
@@ -576,6 +594,15 @@ True when `x` is a valid uppercase SAS name of 1–8 characters
 |---|---|---|---|
 | `x` | any | yes | The value to read |
 
+**List form (element-wise)** — over a list at `x` — the cells of several columns
+([`values`](#values): `is_valid_name(values([X, Y]))`), a per-row list such as `split_by(…)`, or a
+`$`-list — the predicate answers **one boolean per element** (a list of booleans), consumed only by
+[`any`](#any) / [`all`](#all) / [`none`](#none), directly or through a binding (`$ok: is_valid_name(values([X,
+Y]))`, then `all($ok)`); a missing element gets the predicate's own answer on a missing. Written as a
+condition on its own, compared, tested with `in`, passed to another function or reported, the list
+form fails the rule's load — quantify it. `[X, Y]` with bare names is a list of column *names*: read
+the values with `values([X, Y])`.
+
 **Example**
 
 ```yaml
@@ -591,6 +618,15 @@ True when `x` is 1–8 characters starting with a letter or underscore
 | parameter | type | required | description |
 |---|---|---|---|
 | `x` | any | yes | The value to read |
+
+**List form (element-wise)** — over a list at `x` — the cells of several columns
+([`values`](#values): `is_valid_testcd(values([X, Y]))`), a per-row list such as `split_by(…)`, or a
+`$`-list — the predicate answers **one boolean per element** (a list of booleans), consumed only by
+[`any`](#any) / [`all`](#all) / [`none`](#none), directly or through a binding (`$ok: is_valid_testcd(values([X,
+Y]))`, then `all($ok)`); a missing element gets the predicate's own answer on a missing. Written as a
+condition on its own, compared, tested with `in`, passed to another function or reported, the list
+form fails the rule's load — quantify it. `[X, Y]` with bare names is a list of column *names*: read
+the values with `values([X, Y])`.
 
 **Example**
 
@@ -1068,6 +1104,15 @@ True when the value is a finite whole number. A negated spelling `is_not_integer
 |---|---|---|---|
 | `x` | any | yes | The value to read |
 
+**List form (element-wise)** — over a list at `x` — the cells of several columns
+([`values`](#values): `is_integer(values([X, Y]))`), a per-row list such as `split_by(…)`, or a
+`$`-list — the predicate answers **one boolean per element** (a list of booleans), consumed only by
+[`any`](#any) / [`all`](#all) / [`none`](#none), directly or through a binding (`$ok: is_integer(values([X,
+Y]))`, then `all($ok)`); a missing element gets the predicate's own answer on a missing. Written as a
+condition on its own, compared, tested with `in`, passed to another function or reported, the list
+form fails the rule's load — quantify it. `[X, Y]` with bare names is a list of column *names*: read
+the values with `values([X, Y])`. `is_not_integer(x)` lifts the same way.
+
 **Example**
 
 ```yaml
@@ -1085,6 +1130,15 @@ True when the value is a decimal number; there is no `is_not_numeric` — write 
 | parameter | type | required | description |
 |---|---|---|---|
 | `x` | any | yes | The value to read |
+
+**List form (element-wise)** — over a list at `x` — the cells of several columns
+([`values`](#values): `is_numeric(values([X, Y]))`), a per-row list such as `split_by(…)`, or a
+`$`-list — the predicate answers **one boolean per element** (a list of booleans), consumed only by
+[`any`](#any) / [`all`](#all) / [`none`](#none), directly or through a binding (`$ok: is_numeric(values([X,
+Y]))`, then `all($ok)`); a missing element gets the predicate's own answer on a missing. Written as a
+condition on its own, compared, tested with `in`, passed to another function or reported, the list
+form fails the rule's load — quantify it. `[X, Y]` with bare names is a list of column *names*: read
+the values with `values([X, Y])`.
 
 **Example**
 
@@ -1426,6 +1480,15 @@ True when every date component is present
 |---|---|---|---|
 | `x` | string | yes | The value to read |
 
+**List form (element-wise)** — over a list at `x` — the cells of several columns
+([`values`](#values): `is_complete_date(values([X, Y]))`), a per-row list such as `split_by(…)`, or a
+`$`-list — the predicate answers **one boolean per element** (a list of booleans), consumed only by
+[`any`](#any) / [`all`](#all) / [`none`](#none), directly or through a binding (`$ok: is_complete_date(values([X,
+Y]))`, then `all($ok)`); a missing element gets the predicate's own answer on a missing. Written as a
+condition on its own, compared, tested with `in`, passed to another function or reported, the list
+form fails the rule's load — quantify it. `[X, Y]` with bare names is a list of column *names*: read
+the values with `values([X, Y])`. `is_incomplete_date(x)` lifts the same way.
+
 **Example**
 
 ```yaml
@@ -1441,6 +1504,15 @@ True when the leading `YYYY-MM-DD` portion is complete, ignoring any time. A neg
 | parameter | type | required | description |
 |---|---|---|---|
 | `x` | string | yes | The value to read |
+
+**List form (element-wise)** — over a list at `x` — the cells of several columns
+([`values`](#values): `is_complete_date_part(values([X, Y]))`), a per-row list such as `split_by(…)`, or a
+`$`-list — the predicate answers **one boolean per element** (a list of booleans), consumed only by
+[`any`](#any) / [`all`](#all) / [`none`](#none), directly or through a binding (`$ok: is_complete_date_part(values([X,
+Y]))`, then `all($ok)`); a missing element gets the predicate's own answer on a missing. Written as a
+condition on its own, compared, tested with `in`, passed to another function or reported, the list
+form fails the rule's load — quantify it. `[X, Y]` with bare names is a list of column *names*: read
+the values with `values([X, Y])`. `is_not_complete_date_part(x)` lifts the same way.
 
 **Example**
 
@@ -1458,6 +1530,15 @@ True when the value is calendar-valid but has missing components. Also spelled `
 |---|---|---|---|
 | `x` | string | yes | The value to read |
 
+**List form (element-wise)** — over a list at `x` — the cells of several columns
+([`values`](#values): `is_partial_date(values([X, Y]))`), a per-row list such as `split_by(…)`, or a
+`$`-list — the predicate answers **one boolean per element** (a list of booleans), consumed only by
+[`any`](#any) / [`all`](#all) / [`none`](#none), directly or through a binding (`$ok: is_partial_date(values([X,
+Y]))`, then `all($ok)`); a missing element gets the predicate's own answer on a missing. Written as a
+condition on its own, compared, tested with `in`, passed to another function or reported, the list
+form fails the rule's load — quantify it. `[X, Y]` with bare names is a list of column *names*: read
+the values with `values([X, Y])`. `is_incomplete_date(x)` lifts the same way.
+
 **Example**
 
 ```yaml
@@ -1473,6 +1554,15 @@ True when the value is a calendar-valid ISO date at any precision. A negated spe
 | parameter | type | required | description |
 |---|---|---|---|
 | `x` | string | yes | The value to read |
+
+**List form (element-wise)** — over a list at `x` — the cells of several columns
+([`values`](#values): `is_valid_date(values([X, Y]))`), a per-row list such as `split_by(…)`, or a
+`$`-list — the predicate answers **one boolean per element** (a list of booleans), consumed only by
+[`any`](#any) / [`all`](#all) / [`none`](#none), directly or through a binding (`$ok: is_valid_date(values([X,
+Y]))`, then `all($ok)`); a missing element gets the predicate's own answer on a missing. Written as a
+condition on its own, compared, tested with `in`, passed to another function or reported, the list
+form fails the rule's load — quantify it. `[X, Y]` with bare names is a list of column *names*: read
+the values with `values([X, Y])`. `invalid_date(x)` lifts the same way.
 
 **Example**
 
@@ -1491,6 +1581,15 @@ True when the value is a valid ISO-8601 duration. A negated spelling `invalid_du
 | parameter | type | required | description |
 |---|---|---|---|
 | `x` | any | yes | The value to read |
+
+**List form (element-wise)** — over a list at `x` — the cells of several columns
+([`values`](#values): `is_valid_duration(values([X, Y]))`), a per-row list such as `split_by(…)`, or a
+`$`-list — the predicate answers **one boolean per element** (a list of booleans), consumed only by
+[`any`](#any) / [`all`](#all) / [`none`](#none), directly or through a binding (`$ok: is_valid_duration(values([X,
+Y]))`, then `all($ok)`); a missing element gets the predicate's own answer on a missing. Written as a
+condition on its own, compared, tested with `in`, passed to another function or reported, the list
+form fails the rule's load — quantify it. `[X, Y]` with bare names is a list of column *names*: read
+the values with `values([X, Y])`. `invalid_duration(x[, negative=])` lifts the same way (`negative=` applies to every element).
 
 **Example**
 
@@ -2481,6 +2580,27 @@ nothing (one partner per record, or an entry declared `n:1` / `1:1`) the record 
 combinations — the three quantifiers do not care how often a combination repeats. The logic is
 two-valued: a condition is true or false on every row, there is no missing boolean.
 
+**The second producer — an element-wise predicate over a list.** `joined(c)` is one way to make the
+list of booleans a quantifier folds; the other is one of the **element-wise predicates** over a
+list: `is_valid_date(values([--STDTC, --ENDTC]))` answers, per row, one boolean per element — the
+predicate's own answer on each cell — and `any(is_valid_date(values([--STDTC, --ENDTC])))` is "at
+least one of the two is a valid date", `none(invalid_date(values([--STDTC, --ENDTC, --DTC])))` "no
+invalid date among the three", written once instead of an `or` / `and` chain over sibling columns.
+The list may be the values of several columns ([`values`](#values)), a per-row list
+(`split_by(X, ",")`), or a `$`-list (`$l: ["2020-01-01", "x"]`, then quantified once for the
+dataset). The sixteen predicates that lift are marked **element-wise** in their sections:
+`is_valid_date`, `invalid_date`, `is_complete_date`, `is_incomplete_date`, `is_partial_date`,
+`is_complete_date_part`, `is_not_complete_date_part`, `is_valid_duration`, `invalid_duration`,
+`is_integer`, `is_not_integer`, `is_numeric`, `has_alpha`, `has_digit`, `is_valid_name`,
+`is_valid_testcd`. The list of booleans may also be **bound** and quantified later —
+`$ok: is_numeric(values([--ORRES, --STRESC]))` then `all($ok)` — and a quantifier over a scalar
+predicate or a scalar binding is simply that predicate (`any(is_valid_date(X))` is
+`is_valid_date(X)`, `none(…)` its negation). Every other use of such a list is a load error: written
+as a condition on its own (`is_valid_date(values([X, Y]))` — quantify it), compared (`$ok == true`),
+tested with `in`, passed to another function, or reported in `Output_Variables`; and the quantifiers
+take nothing else — `any(values([A, B]))` (cells, not answers) or `any($strings)` fail to load.
+A quantifier inside `joined(…)` stays refused.
+
 ⚠ The quantifiers are legal **only in a Check level expression** (bare, or under `and` / `or` /
 `not`), never in a binding, the Precondition, a comparison operand, a function argument or a
 `Match_Datasets` Filter; `joined(…)` is legal only as a quantifier's direct argument; and a rule
@@ -2495,12 +2615,15 @@ level) are a different thing: they combine whole conditions, they do not range o
 
 `any(list)` → **boolean**
 
-True when at least one element of the list is true. In the current language the list is always
-`joined(<condition>)`: some evaluation row of the current record satisfies the condition.
+True when at least one element of the list is true. The list is `joined(<condition>)` — some
+evaluation row of the current record satisfies the condition — or an element-wise predicate over a
+list — some element satisfies the predicate (`any(is_valid_date(values([X, Y])))`: at least one of
+the two cells is a valid date) — or a `$`-binding holding such a predicate's answer. `any([])` is
+false.
 
 | parameter | type | required | description |
 |---|---|---|---|
-| `list` | list of booleans | yes | The answers to fold — `joined(<condition>)` |
+| `list` | list of booleans | yes | The answers to fold — `joined(<condition>)`, an element-wise predicate over a list (`is_valid_date(values([X, Y]))`), or a `$`-binding holding one |
 
 **Example**
 
@@ -2516,16 +2639,25 @@ Check:
 > quantifier fires once per joined row of the record. Anchor it on a row conjunct (`not
 > empty(EPOCH) and …` above) to report the record once, where the finding belongs.
 
+**Example** — over the values of two columns, per row
+
+```yaml
+Check:
+  expression: 'not empty(--STDTC) and not any(is_valid_date(values([--STDTC, --ENDTC])))'
+```
+
 ### all
 
 `all(list)` → **boolean**
 
 True when every element of the list is true — every evaluation row of the current record satisfies
-the condition.
+the condition (`joined(c)`), or every element satisfies the predicate (`all(is_numeric(values([A,
+B])))`), or every answer in the bound list is true (`$ok: is_numeric(values([A, B]))`, then
+`all($ok)`). `all([])` is true.
 
 | parameter | type | required | description |
 |---|---|---|---|
-| `list` | list of booleans | yes | The answers to fold — `joined(<condition>)` |
+| `list` | list of booleans | yes | The answers to fold — `joined(<condition>)`, an element-wise predicate over a list, or a `$`-binding holding one |
 
 **Example**
 
@@ -2544,11 +2676,13 @@ Check:
 `none(list)` → **boolean**
 
 True when no element of the list is true — no evaluation row of the current record satisfies the
-condition. `none(joined(c))` and `not any(joined(c))` are the same condition.
+condition, or no element satisfies the predicate (`none(invalid_date(values([--STDTC, --ENDTC])))`:
+no invalid date among the two). `none(L)` and `not any(L)` are the same condition; `none([])` is
+true.
 
 | parameter | type | required | description |
 |---|---|---|---|
-| `list` | list of booleans | yes | The answers to fold — `joined(<condition>)` |
+| `list` | list of booleans | yes | The answers to fold — `joined(<condition>)`, an element-wise predicate over a list, or a `$`-binding holding one |
 
 **Example** — `CDISC-CG0218`'s `ERROR` level as shipped: the row condition anchors the finding on
 the element that contains the visit start (end-exclusive: the transition instant belongs to the
@@ -2582,7 +2716,8 @@ would count as a candidate and silence the finding
 
 The list of the condition's answers over every evaluation row that stands for the current record.
 Legal only as the direct argument of `any`, `all` or `none` — the engine evaluates the pair as one
-step, so the list is never a value a rule can bind, compare or report. The condition is written bare
+step, so the list is never a value a rule can bind, compare or report (the element-wise predicates
+are the other producer of such a list, and the one that may be bound — see the section intro). The condition is written bare
 inside the parentheses (`joined(A == 1 and empty(B))`), unlike a boolean handed to any other
 function, which needs its own parentheses (`filter=(A == 1)`). A reference inside the condition
 (`SE.EPOCH`) is reported, as an output variable, at the row the finding is anchored on.
