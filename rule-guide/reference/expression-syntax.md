@@ -722,6 +722,14 @@ expression: 'var_label("DEFINE") != var_label("LIBRARY")'
 `var_role` has no `DATA` reading; `var_format` has no `LIBRARY` reading. That is a support matrix,
 not a runtime miss — the rule fails to load rather than silently answering missing.
 
+**With no level an accessor reads `DATA`** — `ds_name()` is `ds_name("DATA")`, `var_label()` the
+`DATA` label of the variable being iterated, `var_label("AETERM")` that of `AETERM`. In the
+one-argument form a string is the variable's **name** unless it is a level (`"DATA"`, `"DEFINE"`,
+`"LIBRARY"`); the name is always a string — `var_label(AETERM)` fails to load, naming
+`var_label("AETERM")`. An attribute with no `DATA` reading must name its level (`var_role()` fails to
+load, naming `var_role("DEFINE")` and `var_role("LIBRARY")`), and a `ds_*` accessor given a dataset
+name needs the level too (`ds_name("DM")` fails to load, naming `ds_name("DM", "DATA")`).
+
 ## Builtin operands
 
 A builtin operand is a bare name you use where a value is expected, with **no call and no

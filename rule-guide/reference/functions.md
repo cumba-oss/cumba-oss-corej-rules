@@ -2675,7 +2675,7 @@ The example above is the complete call.
 
 ### ds_class
 
-`ds_class([x,] level)` → **value**
+`ds_class([[x,] level])` → **value**
 
 The dataset's observation class; available at every level
 
@@ -2684,7 +2684,7 @@ At `DATA` it takes no argument: the DATA-level class is the evaluated dataset's,
 | parameter | type | required | description |
 |---|---|---|---|
 | `x` | column | no | The column to read; defaults to the variable being iterated |
-| `level` | level | yes | Which metadata to read — supported here: `DATA/DEFINE/LIBRARY` |
+| `level` | level | no | Which metadata to read — supported here: `DATA/DEFINE/LIBRARY` — with no dataset name, an omitted level reads `DATA` (`ds_class()`); a dataset name needs its level |
 
 **Example**
 
@@ -2694,7 +2694,7 @@ expression: 'not empty(ds_class("DEFINE"))'
 
 ### ds_domain
 
-`ds_domain("DATA")` → **value**
+`ds_domain(["DATA"])` → **value**
 
 The dataset's domain as `Scope.Domains` resolves it — `SUPPLB`, not the parent, on a SUPP dataset; `DATA` only
 
@@ -2703,7 +2703,7 @@ At `DATA` an argument names the dataset read (`ds_domain("DM", "DATA")`), resolv
 | parameter | type | required | description |
 |---|---|---|---|
 | `x` | column | no | The column to read; defaults to the variable being iterated |
-| `level` | level | yes | Which metadata to read — supported here: `DATA` |
+| `level` | level | no | Which metadata to read — supported here: `DATA` — with no dataset name, an omitted level reads `DATA` (`ds_domain()`); a dataset name needs its level |
 
 **Example**
 
@@ -2713,7 +2713,7 @@ expression: 'ds_domain("DATA") == "AE"'
 
 ### ds_label
 
-`ds_label([x,] level)` → **value**
+`ds_label([[x,] level])` → **value**
 
 The dataset's label; available at every level
 
@@ -2722,7 +2722,7 @@ At `DATA` an argument names the dataset read (`ds_label("DM", "DATA")`), resolve
 | parameter | type | required | description |
 |---|---|---|---|
 | `x` | column | no | The column to read; defaults to the variable being iterated |
-| `level` | level | yes | Which metadata to read — supported here: `DATA/DEFINE/LIBRARY` |
+| `level` | level | no | Which metadata to read — supported here: `DATA/DEFINE/LIBRARY` — with no dataset name, an omitted level reads `DATA` (`ds_label()`); a dataset name needs its level |
 
 **Example**
 
@@ -2732,7 +2732,7 @@ expression: 'ds_label("DATA") != "Device-level Analysis Dataset"'
 
 ### ds_name
 
-`ds_name([x,] level)` → **value**
+`ds_name([[x,] level])` → **value**
 
 The dataset's name; available at every level
 
@@ -2741,7 +2741,7 @@ At `DATA` an argument names the dataset read (`ds_name("DM", "DATA")`), resolved
 | parameter | type | required | description |
 |---|---|---|---|
 | `x` | column | no | The column to read; defaults to the variable being iterated |
-| `level` | level | yes | Which metadata to read — supported here: `DATA/DEFINE/LIBRARY` |
+| `level` | level | no | Which metadata to read — supported here: `DATA/DEFINE/LIBRARY` — with no dataset name, an omitted level reads `DATA` (`ds_name()`); a dataset name needs its level |
 
 **Example**
 
@@ -2938,6 +2938,12 @@ name they take is written **bare**: a qualified literal (`var_label("DM.AGE", "D
 `var_core("DM.AGE", "LIBRARY")`) fails to load at every level, naming the bare spelling. Another
 dataset's DATA-level label, type, length or format is read with `dataset=`
 (`var_label("AGE", "DATA", dataset="DM")`), whose variable name matches in any letter case.
+With no level an accessor that has a `DATA` reading reads `DATA`: `var_label()` is the label of the
+variable being iterated, `var_label("AETERM")` that of `AETERM` (in the one-argument form a string
+is the name unless it is a level — `"DATA"`, `"DEFINE"`, `"LIBRARY"`). The name is a **string**: a
+bare column, `var_label(AETERM)`, fails to load in either form, naming `var_label("AETERM")`. An
+accessor with no `DATA` reading (`var_role`, `var_core`, …) must name its level — `var_role()` fails
+to load, naming `var_role("DEFINE")` and `var_role("LIBRARY")`.
 (Until 2026-10-01 a qualified literal was looked up verbatim and answered a missing — at `LIBRARY`
 a false finding on every row of `var_core("DM.AGE", "LIBRARY") != "Req"`.)
 
@@ -3513,14 +3519,14 @@ expression: 'var_external_dictionary_version(varname(), "DEFINE")'
 
 ### var_format
 
-`var_format([x,] level)` → **value**
+`var_format([x,] [level])` → **value**
 
 The variable's display format; `DATA` and `DEFINE` only
 
 | parameter | type | required | description |
 |---|---|---|---|
 | `x` | column | no | The column to read; defaults to the variable being iterated |
-| `level` | level | yes | Which metadata to read — supported here: `DATA/DEFINE` |
+| `level` | level | no | Which metadata to read — supported here: `DATA/DEFINE` — omitted, it reads `DATA` (`var_format()`, `var_format("AETERM")`) |
 
 **Example**
 
@@ -3581,14 +3587,14 @@ expression: 'var_has_method("DEFINE") == false'
 
 ### var_label
 
-`var_label([x,] level)` → **value**
+`var_label([x,] [level])` → **value**
 
 The variable's label; available at every level
 
 | parameter | type | required | description |
 |---|---|---|---|
 | `x` | column | no | The column to read; defaults to the variable being iterated |
-| `level` | level | yes | Which metadata to read — supported here: `DATA/DEFINE/LIBRARY` |
+| `level` | level | no | Which metadata to read — supported here: `DATA/DEFINE/LIBRARY` — omitted, it reads `DATA` (`var_label()`, `var_label("AETERM")`) |
 
 **Example**
 
@@ -3602,14 +3608,14 @@ expression: 'var_label("DATA") =~ /^[a-z]/'
 
 ### var_length
 
-`var_length([x,] level)` → **value**
+`var_length([x,] [level])` → **value**
 
 The variable's declared length; available at every level
 
 | parameter | type | required | description |
 |---|---|---|---|
 | `x` | column | no | The column to read; defaults to the variable being iterated |
-| `level` | level | yes | Which metadata to read — supported here: `DATA/DEFINE/LIBRARY` |
+| `level` | level | no | Which metadata to read — supported here: `DATA/DEFINE/LIBRARY` — omitted, it reads `DATA` (`var_length()`, `var_length("AETERM")`) |
 
 **Example**
 
@@ -3636,14 +3642,14 @@ expression: 'var_mandatory(varname(), "DEFINE") == "Yes"'
 
 ### var_name
 
-`var_name([x,] level)` → **value**
+`var_name([x,] [level])` → **value**
 
 The variable's name; available at every level
 
 | parameter | type | required | description |
 |---|---|---|---|
 | `x` | column | no | The column to read; defaults to the variable being iterated |
-| `level` | level | yes | Which metadata to read — supported here: `DATA/DEFINE/LIBRARY` |
+| `level` | level | no | Which metadata to read — supported here: `DATA/DEFINE/LIBRARY` — omitted, it reads `DATA` (`var_name()`, `var_name("AETERM")`) |
 
 **Example**
 
@@ -3655,14 +3661,14 @@ expression: 'not empty(var_name("DEFINE"))'
 
 ### var_ordinal
 
-`var_ordinal([x,] level)` → **value**
+`var_ordinal([x,] [level])` → **value**
 
 The variable's position in the declared column order; available at every level
 
 | parameter | type | required | description |
 |---|---|---|---|
 | `x` | column | no | The column to read; defaults to the variable being iterated |
-| `level` | level | yes | Which metadata to read — supported here: `DATA/DEFINE/LIBRARY` |
+| `level` | level | no | Which metadata to read — supported here: `DATA/DEFINE/LIBRARY` — omitted, it reads `DATA` (`var_ordinal()`, `var_ordinal("AETERM")`) |
 
 **Example**
 
@@ -3708,14 +3714,14 @@ expression: 'not empty(var_role("DEFINE"))'
 
 ### var_type
 
-`var_type([x,] level)` → **value**
+`var_type([x,] [level])` → **value**
 
 The variable's data type; available at every level
 
 | parameter | type | required | description |
 |---|---|---|---|
 | `x` | column | no | The column to read; defaults to the variable being iterated |
-| `level` | level | yes | Which metadata to read — supported here: `DATA/DEFINE/LIBRARY` |
+| `level` | level | no | Which metadata to read — supported here: `DATA/DEFINE/LIBRARY` — omitted, it reads `DATA` (`var_type()`, `var_type("AETERM")`) |
 
 **Example**
 
