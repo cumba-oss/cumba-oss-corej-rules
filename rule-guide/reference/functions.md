@@ -671,12 +671,12 @@ expression: 'not empty(--TESTCD) and not is_valid_testcd(--TESTCD)'
 
 `len(x[, unit=, encoding=])` → **value**
 
-Length of the value in characters; `len("") = 0`. Also spelled `length`. With `unit="bytes"` the number of bytes the value takes when encoded.
+Length of the value in characters — Unicode code points, so a character outside the Basic Multilingual Plane (an emoji, a rare CJK ideograph) counts one, as `max_value_length` counts it; `len("") = 0`. Also spelled `length`. With `unit="bytes"` the number of bytes the value takes when encoded.
 
 | parameter | type | required | description |
 |---|---|---|---|
 | `x` | any | yes | The value to read |
-| `unit` | string | no | `"chars"` (the default) counts characters; `"bytes"` counts the value encoded in `encoding`. A static string literal |
+| `unit` | string | no | `"chars"` (the default) counts characters (code points); `"bytes"` counts the value encoded in `encoding`. A static string literal |
 | `encoding` | string | no | The charset a byte count encodes with (`"UTF-8"`, `"windows-1252"`, …), a static string literal; an unknown name fails the load. Omitted, the table's own `Encoding` (what `extract_metadata("encoding")` reads) — a table declaring none, or `MIXED`, makes the byte count **missing** |
 
 **Example**
@@ -685,7 +685,7 @@ Length of the value in characters; `len("") = 0`. Also spelled `length`. With `u
 expression: 'len(ETCD) > 8'
 ```
 
-**Bytes** — `len(X, unit="bytes", encoding="UTF-8") > 200` asks per row whether the value would fit a 200-byte XPT column once encoded in UTF-8, whatever the data was read from. `len(X, unit="bytes")` counts in the table's own charset, which for an XPT reproduces the stored byte count; a table without a declared `Encoding` (or with `MIXED`, several charsets in one library) has no single byte count, so the answer is missing and nothing fires — write `encoding=` to count in a charset of your choice. `unit="chars"` keeps counting characters as before.
+**Bytes** — `len(X, unit="bytes", encoding="UTF-8") > 200` asks per row whether the value would fit a 200-byte XPT column once encoded in UTF-8, whatever the data was read from. `len(X, unit="bytes")` counts in the table's own charset, which for an XPT reproduces the stored byte count; a table without a declared `Encoding` (or with `MIXED`, several charsets in one library) has no single byte count, so the answer is missing and nothing fires — write `encoding=` to count in a charset of your choice. `unit="chars"` counts characters (code points), as `len(X)` does.
 
 **Missing and empty** — `len("")` is **0** — an empty string is a present value of length zero. A genuine missing value yields **that missing value**, not 0 — identity kept (`len(.A)` is `.A`, rulings register `D85c`). An absent character column reads as all-`""`, so `len(x) == 0` is true for it.
 

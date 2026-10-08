@@ -542,7 +542,7 @@ listed under [Arguments](#arguments). **Every parameter can be given positionall
 | [`imatches(x, /re/)`](functions.md#imatches) | boolean | Case-insensitive unanchored regex search |
 | [`is_valid_name(x)`](functions.md#is_valid_name) | boolean | True when `x` is a valid uppercase SAS name of 1–8 characters |
 | [`is_valid_testcd(x)`](functions.md#is_valid_testcd) | boolean | True when `x` is 1–8 characters starting with a letter or underscore |
-| [`len(x[, unit=, encoding=])`](functions.md#len) | value | Length of the value in characters; `len("") = 0`. Also spelled `length`. `unit="bytes"` counts the value encoded in `encoding=` (default: the table's own `Encoding`; none or `MIXED` ⇒ missing) |
+| [`len(x[, unit=, encoding=])`](functions.md#len) | value | Length of the value in characters (Unicode code points); `len("") = 0`. Also spelled `length`. `unit="bytes"` counts the value encoded in `encoding=` (default: the table's own `Encoding`; none or `MIXED` ⇒ missing) |
 | [`lower(x)`](functions.md#lower) | value | The value lower-cased. Also spelled `lowcase`. |
 | [`max_value_length([name][, unit=, encoding=])`](functions.md#max_value_length) | value | The longest value stored in the column, across all rows — characters, or with `unit="bytes"` bytes once encoded (`encoding=`, default the table's own `Encoding`; none or `MIXED` ⇒ missing) |
 | [`normalize_space(x)`](functions.md#normalize_space) | value | Trims the value and collapses each run of internal whitespace to a single space |
