@@ -2771,7 +2771,7 @@ True when the target is sorted by `by=`; authored under `not`, it fires the whol
 | parameter | type | required | description |
 |---|---|---|---|
 | `target` | column reference (bare, or a `--`prefix reference) | yes | The column the function is about — a quoted literal is a load error |
-| `by` | list of sort keys: `asc(COL)`, `desc(COL)`, or a bare `COL` (= `asc`, the SQL default — runbook W1b SK) | yes | Sort keys — `COL` is bare (or `--`prefix); the quoted `asc("COL")` the engine used to require is a string literal since runbook W8 and fails to load. A key may be a `$`-reference to a dataset-level list of column names (`by=$keys`) or a string naming one column inside a descriptor (`asc($c)`), or the expression such a binding holds, written in place — spliced once per run (a per-row binding or expression is a load error). ⚠ The `asc`/`desc` direction itself is still declarative only — `ExprCompiler.compileTargetIsNotSortedBy` reads only the ordered column names and ignores it, matching the legacy operator (W2 `PLAN-is-sorted-by-direction` honours it); a descriptor may carry `nulls=` (`asc(COL, nulls="first")`): no |
+| `by` | list of sort keys: `asc(COL)`, `desc(COL)`, or a bare `COL` (= `asc`, the SQL default — runbook W1b SK) | yes | Sort keys — `COL` is bare (or `--`prefix); the quoted `asc("COL")` the engine used to require is a string literal since runbook W8 and fails to load. A key may be a `$`-reference to a dataset-level list of column names (`by=$keys`) or a string naming one column inside a descriptor (`asc($c)`), or the expression such a binding holds, written in place — spliced once per run (a per-row binding or expression is a load error). Each key is ordered in its own direction — `desc(COL)` reverses it (runbook W2 SB1, `PLAN-is-sorted-by-direction`; before, the direction was ignored and every key read as `asc`). A blank or missing key cell sorts **first** unless the descriptor says `nulls="last"` (`asc(COL, nulls="last")`), and under `desc` too — the placement is independent of the direction; two blank or missing cells tie (file order). Other key cells compare as text |
 | `within` | one column reference, or a one-element list (bare, or `--`prefix) | no | The column that partitions the rows — a quoted literal is a load error, and so is a list of two or more columns (it used to run ungrouped). May be a `$`-reference to a dataset-level string or one-element list of column names, or the expression such a binding holds, written in place — spliced as [`record_count`](#record_count)'s `group=` splices it (a per-row binding or expression is a load error; two or more spliced names make the rule ERROR: the slot takes one column). |
 | `keep_missings` | boolean | no | Whether a row with a missing key stays in its group |
 
@@ -2789,7 +2789,7 @@ Check:
   expression: 'not is_sorted_by(VISITNUM, by=[asc(VISITNUM)])'
 ```
 
-**Missing and empty** — `keep_missings=` decides whether a row with a missing sort key stays in its group.
+**Missing and empty** — `keep_missings=` decides whether a row with a missing `within=` key stays in its group; a blank or missing **sort**-key cell sorts first (`nulls="last"` puts it last), whatever the key's direction.
 
 
 ### shares_elements_with
