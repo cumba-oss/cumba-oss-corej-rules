@@ -197,8 +197,8 @@ operators (and `!=` fires), exactly as for dates; `is_valid_duration` is the sam
 hull". The family is selected by the **written marker** only: `--STINT > --ENINT` without it is a
 text comparison, and `relation=` on `has_next_corresponding_record` reads durations only where both
 operands are written `duration(COL)` — the engine never guesses from a cell's content.
-`duration_between(start, end)` is a value of this family (a point for two complete instants, a range
-`lower/upper` where one is partial), and `earliest_possible` / `latest_possible` over a
+`duration_between(start, end)` is a value of this family (each instant its own hull, so a range
+`lower/upper` — a point only for two instants at second precision), and `earliest_possible` / `latest_possible` over a
 `duration(…)` operand are the hull's ends as point durations (`P1M` ⇒ `P28D` / `P31D`).
 
 ### `date_part` and `time_part` compare one part

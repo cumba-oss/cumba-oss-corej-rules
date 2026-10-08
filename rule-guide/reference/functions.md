@@ -1389,13 +1389,18 @@ expression: 'is_complete_date(AESTDTC) and day(AESTDTC) > 28'
 The duration from one ISO-8601 instant to another — `end − start` — as a value of the
 [`duration`](#duration) family, so it compares under the hull rule from either side:
 `duration(--DUR) != duration_between(--DTC, --ENDTC)` fires only where `--DUR` is *definitely* not
-the difference (SENDIG 3.1.1 §4.4.3: `--DUR` is the difference between `--ENDTC` and `--DTC`). Two
-complete instants give a point, taken at the coarser of their precisions as [`date`](#date)
-compares complete values (`2020-01-01` to `2020-01-03` is `P2D`; `2020-01-01T00:00` to
-`2020-01-02T12:00` is `P1DT12H`; an end before the start is negative, `-P2D`). A **partial** instant
-on either side gives the **range** of durations the two could span — `2020-01` to `2020-02-15` is
-anything from `P14DT1S` to `P45DT23H59M59S` — written `lower/upper`, the family's own carrier
-(not itself a valid ISO duration for `is_valid_duration`).
+the difference (SENDIG 3.1.1 §4.4.3: `--DUR` is the difference between `--ENDTC` and `--DTC`). Each
+instant is **its own hull** — a date spans its day, a minute-precision datetime its minute, a
+partial date its month or year — so the answer is the **range** of durations the two could span,
+written `lower/upper`, the family's own carrier: `2020-01-01` to `2020-01-03` is anything from
+`P1DT1S` to `P2DT23H59M59S`, `2020-01-01` to `2020-01-02T10:00` from `PT10H1S` to `P1DT10H59S`
+(so `PT34H` is not *definitely* different from it), `2020-01` to `2020-02-15` from `P14DT1S` to
+`P45DT23H59M59S`; an end before the start is negative. Only two instants at **second** precision
+give a point (`2020-01-01T00:00:00` to `2020-01-02T12:00:00` is `P1DT12H`), so `==` against
+`duration_between` holds only there — `!=` is the comparison that reads the rule's intent. The
+carrier is read as a range only where it is `duration_between`'s own result (written in place,
+inside `duration(…)` or through a binding holding it); it is not a valid ISO duration for
+`is_valid_duration`, and a data cell spelled `PT1H/PT2H` is junk to the family.
 
 | parameter | type | required | description |
 |---|---|---|---|
@@ -2271,13 +2276,13 @@ behave as there. Without `group=` it is **one list for the dataset**. Read it wi
 | `domain` | dataset reference | no | The dataset to read, as [`distinct`](#distinct)'s: `TA` or `"TA"`; absent ⇒ the dataset under evaluation; with `domain`, every column argument names a column of that dataset |
 | `filter` | boolean over the target dataset's columns | no | Which rows are read, in parentheses — as [`distinct`](#distinct)'s `filter=` |
 | `group` | list of columns | no | Columns whose combined value defines a group, as [`distinct`](#distinct)'s — spliced, [qualified](#qualified-group-members) with `domain`, or **sided** (`[{left: ACTARMCD, right: ARMCD}]`: this row's `ACTARMCD` keys the other table's `ARMCD` groups) |
-| `by` | list of sort keys: `asc(COL)`, `desc(COL)`, or a bare `COL` (= `asc`) | no | The order inside a group — the SQL default is ascending, so `by=[SESTDTC]` is `by=[asc(SESTDTC)]`; a tie keeps file order; absent ⇒ file order. Cells order **by content**: numbers numerically, ISO dates and datetimes chronologically (a partial before the complete values it contains, a date before its datetimes), other text as text, a blank and a missing last — `desc` reverses it. A key may be a `$`-reference to a dataset-level list of column names (`by=$keys`, each key ascending) or a string naming one column inside a descriptor (`asc($c)`), or the expression such a binding holds, written in place — spliced once per run (a per-row binding or expression is a load error) |
+| `by` | list of sort keys: `asc(COL)`, `desc(COL)`, or a bare `COL` (= `asc`) | no | The order inside a group — the SQL default is ascending, so `by=[SESTDTC]` is `by=[asc(SESTDTC)]`; a tie keeps file order; absent ⇒ file order. Each key is **classified over its cells**: a key whose every present cell is a number orders numerically (`9` before `10`); any other key orders ISO dates and datetimes chronologically (a partial before the complete values it contains, a date before its datetimes, a four-digit cell as a **year** — `2021` after `2020-06-15`), then other text as text; a blank and a missing last — `desc` reverses it. A key may be a `$`-reference to a dataset-level list of column names (`by=$keys`, each key ascending) or a string naming one column inside a descriptor (`asc($c)`), or the expression such a binding holds, written in place — spliced once per run (a per-row binding or expression is a load error) |
 | `keep_missings` | boolean | no | Whether a row with a missing group key stays in its group (default `true`). Requires `group=` |
 
 **What is a value.** A present cell contributes its **text** (a numeric cell its canonical text,
 as `distinct` lists it); a **missing cell stays at its position** as that missing — the list of a
-group with a missing `SEDY` has a hole, which [`is_increasing`](#is_increasing) answers `false`
-on; a blank `""` is a value. Every cell of the group counts, duplicates included:
+group with a missing `SEDY` has a hole, which [`is_increasing`](#is_increasing) answers `true`
+on (no finding); a blank `""` is a value. Every cell of the group counts, duplicates included:
 `sequence(EPOCH, group=[ARMCD], by=[asc(TAETORD)])` lists `SCREENING, TREATMENT, TREATMENT, FOLLOW-UP`.
 
 **Example — the subject's elements against its arm's plan** (SDTMIG §5.2, assumption 4c.ii)
@@ -2658,7 +2663,8 @@ else as text; an empty or one-element list is increasing; a list holding a **mis
 answers `true` — vacuously, as the empty list does — so the authored `not is_increasing(…)` gives
 **no finding** on it (the owner ruled a missing element *"answers missing, so no finding"*; the
 BOOLEAN functions are two-valued, and `true` is the answer that fires nothing — coordinator D22,
-runbook W1b P5a; until then it answered `false`). Over a per-row list ([`sequence`](#sequence)'s
+runbook W1b P5a; until then it answered `false`). A **missing list** — `split_by` of a blank cell —
+answers `true` the same way (owner O22, runbook W1b fold). Over a per-row list ([`sequence`](#sequence)'s
 output) and a dataset-level list alike.
 
 | parameter | type | required | description |
@@ -2669,13 +2675,15 @@ output) and a dataset-level list alike.
 
 ```yaml
 Bindings:
-- name: "$mids"
-  expression: 'sequence(MIDS, group=[USUBJID, MIDSTYPE], by=[asc(SMSTDTC)], filter=(MIDS =~ /[0-9]$/))'
 - name: "$nums"
-  expression: 'num($mids ~ /^.*?([0-9]+)$/$1/)'
+  expression: 'sequence(MIDS ~ /^.*?([0-9]+)$/$1/, group=[USUBJID, MIDSTYPE], by=[asc(SMSTDTC)], filter=(MIDS =~ /[0-9]$/))'
 Check:
   expression: 'not is_increasing($nums)'
 ```
+
+The digits are extracted in `sequence`'s value target and stay text; `is_increasing` reads them as
+numbers because every element is one. A year-only `SMSTDTC` sorts as the year among the dates
+(`2021` after `2020-06-15`).
 
 ### is_ordered_subset_of
 
@@ -3175,7 +3183,7 @@ which never read its target.
 | parameter | type | required | description |
 |---|---|---|---|
 | `name` | column | yes | The column naming a dataset (`RDOMAIN`) |
-| `qualifiers` | boolean literal | no | `true` adds the `QNAM` values of the dataset's `SUPP--` companion(s) after its columns; default `false` |
+| `qualifiers` | dataset-level boolean | no | `true` adds the `QNAM` values of the dataset's `SUPP--` companion(s) after its columns; default `false` |
 
 `name` is a **column reference** and is required — the former implicit `RDOMAIN` read is spelled
 out. Per row the answer is the column-name list of every dataset member whose domain is the value
@@ -3191,7 +3199,8 @@ merged evaluation table reads — after the columns, in sorted order. It is what
 hold when `SRCDOM` names a domain whose source is a supplemental qualifier (ADaMIG 1.1 and later):
 `upper(SRCVAR) not in referenced_dataset_variables(SRCDOM, qualifiers=true)` fires on a `SRCVAR`
 that is neither a column nor a qualifier of `SRCDOM`. A dataset without a `SUPP--` answers its
-columns alone. The flag is a boolean literal, read once per call.
+columns alone. The flag is a dataset-level boolean — a literal, or any expression that does not
+vary per row — read once per call; a per-row operand is a load error.
 
 **Example**
 
@@ -3254,8 +3263,8 @@ here.
 |---|---|---|---|
 | `dataset` | value | yes | The dataset name, per row — a column (`RDOMAIN`, `SRCDOM`) or a string naming one dataset |
 | `value` | value | yes | The pointer value, per row (`IDVARVAL`, `SRCSEQ`) |
-| `key_variable` | value or list of strings | yes | The column of the referenced dataset the pointer is looked up in: a per-row name (`IDVAR`), or a list of **candidate templates** resolved against the referenced dataset (`["--SEQ", "ASEQ"]` — a leading `--` is the referenced dataset's domain prefix; the first candidate it carries wins) |
-| `keys` | list of columns | no | The same-named key columns that must agree on both sides (`[USUBJID]`, or `[STUDYID, USUBJID]`); a `$`-binding of names splices as in `group=` |
+| `key_variable` | value or list of strings | yes | The column of the referenced dataset the pointer is looked up in: a per-row name (`IDVAR`), or a list of **candidate templates** resolved against the referenced dataset (`["--SEQ", "ASEQ"]` — a leading `--` is the referenced dataset's domain prefix; the first candidate it carries wins); one string is the one-candidate list (`"--SEQ"` is `["--SEQ"]`) |
+| `keys` | list of columns | no | The same-named key columns that must agree on both sides (`[USUBJID]`, or `[STUDYID, USUBJID]`), written unqualified (a qualified `DM.USUBJID` is a load error: the referenced dataset is read without a join); a `$`-binding of names splices as in `group=` |
 
 **What answers what.** A missing or blank `dataset`, `value` or column name answers **missing**; a
 `dataset` value no study dataset carries answers **missing** (an unloaded dataset is
@@ -3308,8 +3317,10 @@ and the declaration is checked against that dataset.
 
 The policy is `is_unique_set`'s: `""` and a missing are real, distinct key components; a column the
 referenced dataset lacks is **dropped** from the tuple — a stated answer over the columns it has
-(with none present every record shares the empty key). A split family is judged member by member: a
-duplicate inside any member is `false`. A missing or blank `dataset` or column name, or a dataset no
+(with none present every record shares the empty key). A split family is judged as the **one
+domain** it is (SDTMIG: `--SEQ` is unique across a split domain's datasets): a key carried twice —
+inside one member or by two members (`lbch` and `lbhe` both holding subject `A`'s `LBSEQ` 1) — is
+`false`, as `referenced_record_count` sums the members. A missing or blank `dataset` or column name, or a dataset no
 study dataset carries, answers **missing**. A boolean value, not a predicate: compare it
 (`== false`).
 
@@ -5281,7 +5292,8 @@ expression: 'not empty(--STINT) and not empty(--ENINT) and duration(--STINT) > d
 ```
 
 **Missing and empty** — A missing input yields **that missing value**. A value that is not a valid
-duration (`is_valid_duration` is the same test: `""`, `P`, malformed text, a date) is not an error:
+duration (`is_valid_duration` is the same test: `""`, `P`, malformed text, a date, a number such
+as `5`, the `lower/upper` spelling in a data cell) is not an error:
 every comparison over it answers false, and `!=` fires — exactly as [`date`](#date) treats junk — so
 guard it with `is_valid_duration(…)` or `not empty(…)` when that is not what you want.
 
