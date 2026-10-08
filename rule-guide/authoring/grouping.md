@@ -128,6 +128,23 @@ allows a rule to set the parameter with no variables at all — meaningless, and
 > ⛔ **Declaring both shapes on one rule is a load error.** If you are converting a rule to the
 > block form, remove the flat key in the same edit.
 
+## Comparing groups with each other
+
+`Grouping` judges each partition on its own. When the requirement compares one group's *set* with
+another's — *"no two `POOLID`s may pool the same set of subjects"*, *"no two `NHOID`s may carry the
+same taxonomy"* — write the check with
+[`is_not_unique_member_set`](../reference/functions.md#is_not_unique_member_set) instead, without a
+`Grouping` block:
+
+```yaml
+Check:
+  expression: 'is_not_unique_member_set(members=[USUBJID], group=[POOLID])'
+```
+
+Every row of each group whose member set another group shares is a finding; a subject listed in
+two different pools is not (the sets differ). A row repeated inside one pool is a different defect
+— `not is_unique_set([POOLID, USUBJID])`.
+
 ## What grouping does not do
 
 **It does not filter.** Every row still participates unless `keep_missings` removes it or the

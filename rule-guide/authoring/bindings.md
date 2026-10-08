@@ -84,7 +84,9 @@ place a `$` stands inside a list is a splice of **column names** into a list of 
 `qualifying_any_populated=`), every `keys=` of column names
 ([`is_unique_relationship`](../reference/functions.md#is_unique_relationship),
 [`is_inconsistent_across_dataset`](../reference/functions.md#is_inconsistent_across_dataset)),
-[`is_unique_set`](../reference/functions.md#is_unique_set)'s members,
+[`is_unique_set`](../reference/functions.md#is_unique_set)'s members (where a **per-row** binding
+is a value key component instead, bound or inline alike),
+[`is_not_unique_member_set`](../reference/functions.md#is_not_unique_member_set)'s `members=` and `group=`,
 [`values`](../reference/functions.md#values)' columns, every `within=` and the single
 `ordering=` / `by=` and `group` slots of the partitioning operators (a string or a one-element
 list there), and the sort keys of [`is_sorted_by`](../reference/functions.md#is_sorted_by) and

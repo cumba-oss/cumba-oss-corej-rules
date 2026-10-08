@@ -606,7 +606,8 @@ listed under [Arguments](#arguments). **Every parameter can be given positionall
 | [`inconsistent_enumerated_columns(name)`](functions.md#inconsistent_enumerated_columns) | boolean | True when the numbered series `name`, `name1`, `name2` … has a gap |
 | [`is_inconsistent_across_dataset(name, keys=[…], include_empty=)`](functions.md#is_inconsistent_across_dataset) | boolean | True on the minority rows of a group that disagrees; blank targets excluded unless `include_empty=true` |
 | [`is_unique_relationship(a, b)`](functions.md#is_unique_relationship) | boolean | True when `a` and `b` are in a strict one-to-one relationship. A negated spelling `is_not_unique_relationship(a, b)` exists; prefer `not is_unique_relationship(a, b)`. A blank key or value is excluded. |
-| [`is_unique_set([V1, V2, …])`](functions.md#is_unique_set) | boolean | True when the tuple of the listed columns occurs exactly once. A negated spelling `is_not_unique_set([…])` exists; prefer `not is_unique_set([…])`. An absent member is dropped, `""` is a real component. |
+| [`is_unique_set([V1, V2, …])`](functions.md#is_unique_set) | boolean | True when the tuple of the listed columns occurs exactly once. A negated spelling `is_not_unique_set([…])` exists; prefer `not is_unique_set([…])`. An absent member is dropped, `""` is a real component; a per-row expression member is a value key component, a `duration(X)` member keys by its hull. |
+| [`is_not_unique_member_set(members=[…], group=[…])`](functions.md#is_not_unique_member_set) | boolean | True on every row of a group whose set of distinct `members` tuples equals another group's — two pools with the same subjects, two taxonomies with the same pairs |
 | [`is_unique_value(name)`](functions.md#is_unique_value) | boolean | True when the value occurs exactly once in the column. A negated spelling `is_not_unique_value(name)` exists; prefer `not is_unique_value(name)`. |
 
 ### Sets and ordering

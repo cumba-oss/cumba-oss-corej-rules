@@ -2462,6 +2462,28 @@ Check:
 **Missing and empty** — A blank target is **excluded** unless `include_empty=true`.
 
 
+### is_not_unique_member_set
+
+`is_not_unique_member_set(members=[…], group=[…])` → **boolean**
+
+True on every row whose group (by `group`) has a **member set** — the set of distinct `members` tuples over its rows — equal to the member set of at least one **other** group: two `POOLID`s pooling the same subjects, two `NHOID`s with the same (`OIPARMCD`, `OIVAL`) taxonomy. The comparison is set against set: a tuple repeated inside one group counts once, the row order is irrelevant, and the whole set must agree (one differing pair is a different set; a subject in two different pools is no finding). There is no positive twin — a rule writes `is_not_unique_member_set(…)` directly. Both lists splice as [`is_unique_set`](#is_unique_set)'s members do (a `$` name list or the expression it holds; a per-row member fails the rule's load).
+
+| parameter | type | required | description |
+|---|---|---|---|
+| `members` | list of columns | yes | The columns whose distinct tuples form a group's member set |
+| `group` | list of columns | yes | The columns that identify a group |
+| `keep_missings` | boolean | no | Whether a row with a missing group key stays in its group |
+
+**Example**
+
+```yaml
+Check:
+  expression: 'is_not_unique_member_set(members=[USUBJID], group=[POOLID])'
+```
+
+**Missing and empty** — `""` and a missing are real, distinct components of a member tuple and of the group key (the [`is_unique_set`](#is_unique_set) policy); with `keep_missings=false` a row whose group key is missing takes no part. An absent `members` column is dropped wherever it sits; an absent `group` column partitions nothing — one group, nothing to compare, no finding.
+
+
 ### is_unique_relationship
 
 `is_unique_relationship(a, b)` → **boolean**
@@ -2495,7 +2517,7 @@ Check:
 
 `is_unique_set([V1, V2, …])` → **boolean**
 
-True when the tuple of the listed columns occurs exactly once. A negated spelling `is_not_unique_set([…])` exists; prefer `not is_unique_set([…])`. An absent member is dropped, `""` is a real component. A member is a column of the dataset under evaluation, written bare. A `$` member — or the dataset-level expression such a binding holds, written as the member (`is_unique_set([USUBJID, --TESTCD, natural_key_variables()])`) — splices exactly as [`record_count`](#record_count)'s `group=` does: a list of names element by element, a single name as one member; a per-row binding or expression, or one typed as a number, fails the rule's load; a value that is neither, or a **qualified** name, makes the rule **ERROR** when it runs (until 2026-10-01 such a member was dropped silently as absent). The bare operand `is_unique_set($keys)` (or `is_unique_set(natural_key_variables())`) reads as the one-member list `is_unique_set([$keys])`; the list is the canonical spelling.
+True when the tuple of the listed columns occurs exactly once. A negated spelling `is_not_unique_set([…])` exists; prefer `not is_unique_set([…])`. An absent member is dropped, `""` is a real component. A member is a column of the dataset under evaluation, written bare. A `$` member — or the dataset-level expression such a binding holds, written as the member (`is_unique_set([USUBJID, --TESTCD, natural_key_variables()])`) — splices exactly as [`record_count`](#record_count)'s `group=` does: a list of names element by element, a single name as one member; one typed as a number fails the rule's load; a value that is neither a list of names nor a name, or a **qualified** name, makes the rule **ERROR** when it runs (until 2026-10-01 such a member was dropped silently as absent). A **per-row** expression — `coalesce(PCDTC, PCELTM)`, `upper(AETERM)`, or a `$` binding holding one — is a **value** member: its per-row value is a key component with the identity a column cell has (`""` and each missing distinct), so `not is_unique_set([USUBJID, PCTESTCD, coalesce(PCDTC, PCELTM)])` keys on the observation time whichever column carries it (since 2026-10-08; before, a per-row member failed the rule's load). The **level** decides, never the value's content: a dataset-level `$` or expression splices names, a per-row one is a value. A `duration(X)` member keys by the duration's **hull** — `P1W` and `P7D` are one key, `P1M` (28–31 days) is not `P30D`; an unpositionable text keys by its text. A per-row **list** is not a key component (a load error), and `regex=` applies to column members only — beside a value member it is a load error: write the normalisation as the member (`substring(…)`, `prefix(…)`). The bare operand `is_unique_set($keys)` (or `is_unique_set(natural_key_variables())`) reads as the one-member list `is_unique_set([$keys])`; the list is the canonical spelling.
 
 | parameter | type | required | description |
 |---|---|---|---|
@@ -2517,7 +2539,7 @@ Check:
   expression: 'not is_unique_set([USUBJID, --SEQ])'
 ```
 
-**Missing and empty** — `""` is a real component of the tuple; an absent member is dropped wherever it sits.
+**Missing and empty** — `""` is a real component of the tuple; an absent member is dropped wherever it sits; a value member's `""` and missing keep the identity the cell has.
 
 
 ### is_unique_value
