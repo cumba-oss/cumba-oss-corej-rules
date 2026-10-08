@@ -146,7 +146,9 @@ class ScopeMatcherShippedRuleScopeTest
         assertEquals("SUPPAE", engineBase("SUPPQUAL"),
                 "the data-derived base is SUPP + row-0 RDOMAIN");
         assertNotEquals("SUPPQUAL", engineBase("SUPPQUAL"), "so SUPPQUAL is a split dataset");
-        assertEquals("SUPPQUA", SplitDatasetUtil.unsplitName("SUPPQUAL"),
+        // runbook W1b unit CL (coordinator D8): the NAME heuristic no longer cuts the generic
+        // SUPPQUAL to SUPPQUA — it calls it no split at all, which still disagrees with the data
+        assertEquals("SUPPQUAL", SplitDatasetUtil.unsplitName("SUPPQUAL"),
                 "and the NAME heuristic answers something else again — the disagreement is the "
                         + "reason this guard must ask on the data-derived path");
         // SUPPAE is not a split on either derivation: RDOMAIN=AE reproduces the name.

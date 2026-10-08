@@ -5,7 +5,7 @@
      the sealed Expr AST) — 276 tokens. There is no operation category: runbook W8 deleted the
      Operation surface, and every former operation is a function of the same name.
      Grammar and precedence: CheckExpressionParser.java (or > and > not > comparison > sum >
-     product > atom). Lexer: ExpressionLexer.java (double-quoted strings, /regex/, `quoted refs`,
+     product > postfix `~ /pattern/replacement/` > atom). Lexer: ExpressionLexer.java (double-quoted strings, /regex/, `quoted refs`,
      bare &NAME& expansion tokens inside a name (grammar: ExpansionTokens), && and || accepted). Types: ExprType.java (6 value types + 3 parameter-only; `missing` is a
      bottom inhabiting every type, `unknown` is stage-A's not-yet-known).
      The six comparison tokens: ExprCompiler.comparisonMarkers() = CONVERSIONS {num,date,time}
@@ -145,6 +145,7 @@ A value the engine supplies directly, without a call — see
 | number | `18`, `-3.5` | |
 | boolean | `true`, `false` | |
 | regex | `/^AE.*$/` | between slashes |
+| substitution | `/^(.*)DTC$/$1/` | a pattern and a replacement, three slashes; only ever the right side of [`~`](#substitution) |
 | list | `["Y", "N"]` | **square** brackets; used with `in` / `not in`. ⛔ A `$` binding is never an element — `AETERM in ["A", $codes]` is a load error (it would read as the text `"$codes"`); write `$codes` alone as the operand. The one exception is a **splice** of column names into [`record_count`](functions.md#record_count)'s `group=`, [`is_unique_set`](functions.md#is_unique_set)'s members and [`values`](functions.md#values)' columns (a `$` holding a dataset-level list of names — a name-list binding `$keys: [STUDYID, USUBJID]` or a string list — or that expression written in place; see [bindings](../authoring/bindings.md)) |
 
 > ⚠ **Single quotes are not string delimiters.** You will see them in `Source` blocks, because
@@ -443,6 +444,35 @@ A missing value matches **no** regex, including one that would match the empty s
 Date columns *are* character, so a regex reads their raw ISO text — which makes
 `--DTC =~ /^\d{4}$/` a legitimate precision test. Prefer the date predicates
 (`is_complete_date`, `is_partial_date`) where one says the same thing.
+
+### Substitution
+
+| operator | |
+|---|---|
+| `~` | replace the first match: `X ~ /pattern/replacement/` |
+
+The one operator that hands on what a regular expression **captures** — the part of a value a
+pattern matches, or the groups inside it — as a **string** you can compare, convert or aggregate:
+
+```yaml
+expression: 'AESTDTC ~ /(?i)^(.*)DTC$/$1/ == "AEST"'          # "AESTDTC" -> "AEST"
+expression: 'num(MIDS ~ /^.*?([0-9]+)$/$1/) > 0'              # "HYPO3" -> 3
+expression: 'coalesce(MIDS ~ /-/ /, MIDS) == "HYPO 3"'       # replace the first "-" by a space, keep MIDS when there is none
+```
+
+| aspect | rule |
+|---|---|
+| form | `X ~ /pattern/replacement/` — the right side is always one substitution literal, written directly after `~` |
+| pattern | exactly the regex literal of `=~`: the same escapes (`\/` for a slash, `\\` for a backslash, every other backslash sequence verbatim), Java syntax, inline flags such as `(?i)` |
+| matching | a **find** of the **first** match, as `=~` — anchor with `^` and `$` to extract from the whole value |
+| replacement | Java `Matcher` replacement syntax: `$1` … `$n` and `${name}` insert a group, `$0` the whole match, `\$` a literal dollar, `\/` a literal slash; an empty replacement `/a//` deletes the match. Only the first match is replaced — there is no global form |
+| result | a string: the value with its first match replaced |
+| no match | **missing** — never the input, so an extract never passes a `not empty(…)` guard by returning its subject. Replace-or-keep is `coalesce(X ~ /a/b/, X)` |
+| missing subject | missing (identity kept) |
+| subject | character only — a numeric column is an **error**, exactly as for `=~` |
+| list subject | **element-wise**: `$list ~ /re/repl/`, `split_by(X, ",") ~ /re/repl/` and `values([A, B]) ~ /re/repl/` apply to every element and answer a list of the same length; a missing element, or an element the pattern does not match, is missing at its position |
+| precedence | tighter than everything else, a postfix on its subject: `X ~ /a/b/ == "b"` is `(X ~ /a/b/) == "b"`, `X ~ /a/b/ + 1` adds to the result; parenthesise a computed subject, `(A + B) ~ /x/y/`. Chains left to right: `X ~ /a/b/ ~ /b/c/` |
+| load errors | an invalid pattern; a `$n` / `${name}` the pattern does not define; a bare `$` or a dangling `\` in the replacement; a right side that is not a substitution literal (`X ~ "a"`, and `X ~ /re/` without the replacement part) |
 
 ### Arithmetic
 
