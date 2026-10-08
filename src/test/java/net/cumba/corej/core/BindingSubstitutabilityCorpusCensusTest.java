@@ -212,8 +212,11 @@ class BindingSubstitutabilityCorpusCensusTest
 
     private static Rule load(String key, ObjectNode node) throws Exception
     {
+        ObjectNode rules = MAPPER.createObjectNode();
+        rules.set(key, node);
         ObjectNode pkg = MAPPER.createObjectNode();
-        pkg.putObject("rules").set(key, node);
+        // through set(…): the corpus path guard reads it as the rules MAP, not a directory
+        pkg.set("rules", rules);
         Rule loaded = RulePackageLoader.loadFromString(MAPPER.writeValueAsString(pkg)).getRules()
                 .get(key);
         assertNotNull(loaded, "the rule parses: " + key);
