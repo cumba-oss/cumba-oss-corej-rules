@@ -77,7 +77,9 @@ binding: `AETERM in ["A", $codes]` is a load error — the `$codes` element woul
 `"$codes"` and never match — so write `$codes` alone as the operand, or spell the values. The one
 place a `$` stands inside a list is a splice of **column names** into
 [`record_count`](../reference/functions.md#record_count)'s `group=` or
-[`is_unique_set`](../reference/functions.md#is_unique_set)'s members.
+[`is_unique_set`](../reference/functions.md#is_unique_set)'s members — and there, as everywhere,
+the expression the binding holds may be written in its place
+(`is_unique_set([USUBJID, natural_key_variables()])`).
 
 
 ## ⛔ Everything else is rejected, loudly

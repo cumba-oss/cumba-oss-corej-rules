@@ -145,7 +145,7 @@ A value the engine supplies directly, without a call — see
 | number | `18`, `-3.5` | |
 | boolean | `true`, `false` | |
 | regex | `/^AE.*$/` | between slashes |
-| list | `["Y", "N"]` | **square** brackets; used with `in` / `not in`. ⛔ A `$` binding is never an element — `AETERM in ["A", $codes]` is a load error (it would read as the text `"$codes"`); write `$codes` alone as the operand. The one exception is a **splice** of column names into [`record_count`](functions.md#record_count)'s `group=` and [`is_unique_set`](functions.md#is_unique_set)'s members |
+| list | `["Y", "N"]` | **square** brackets; used with `in` / `not in`. ⛔ A `$` binding is never an element — `AETERM in ["A", $codes]` is a load error (it would read as the text `"$codes"`); write `$codes` alone as the operand. The one exception is a **splice** of column names into [`record_count`](functions.md#record_count)'s `group=` and [`is_unique_set`](functions.md#is_unique_set)'s members (a `$` holding a dataset-level list of names, or that expression written in place) |
 
 > ⚠ **Single quotes are not string delimiters.** You will see them in `Source` blocks, because
 > that is how the source sheets write SQL-ish prose — but a `Check` expression that uses them is

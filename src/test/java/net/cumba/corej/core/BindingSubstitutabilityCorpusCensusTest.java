@@ -61,11 +61,13 @@ class BindingSubstitutabilityCorpusCensusTest
      * <li><b>C15 — declared exception (Q5):</b> CDISC-AD0002 / AD0085 / AD0086 / AD0199 / AD0590
      * bind {@code cross_dataset_variable_metadata(…)}, a per-variable map that IS the rule's
      * cursor; inline it is refused by {@code rejectInlinePerVariableCalls}. Stays.</li>
-     * <li><b>C4 — leaves with BS2 (splice slots):</b> CDISC-CG0562 ({@code record_count(group=[…,
-     * $TIMING_VARIABLES])}), FDA-SD1117 / PMDA-SD1117 ({@code is_unique_set([…, $natural_key])}),
-     * PMDA-SD1152 ({@code is_unique_set([STUDYID, $define_key_variables])}) — the {@code $} member
-     * splices, its expression written as the member is {@code PARAMETER_TYPE} (G3 arm) or the
-     * {@code record_count} reader's "plain column reference".</li>
+     * <li><b>C4 — LEFT with W1a BS2 (splice slots, ruled Q1 / Q2):</b> CDISC-CG0562 ({@code
+     * record_count(group=[…, $TIMING_VARIABLES])}), FDA-SD1117 / PMDA-SD1117 ({@code
+     * is_unique_set([…, $natural_key])}), PMDA-SD1152 ({@code is_unique_set([STUDYID,
+     * $define_key_variables])}) — until BS2 the {@code $} member spliced while its expression
+     * written as the member was {@code PARAMETER_TYPE} (G3 arm) or the {@code record_count}
+     * reader's "plain column reference"; since BS2 a dataset-level expression of names splices
+     * exactly as the {@code $} member does ({@code GroupSplice.Member}).</li>
      * <li><b>NEW candidate (not in §3), reported by BS0:</b> CDISC-CG0022 — {@code
      * shares_no_elements_with} takes its operand as a {@code $}-reference only ("requires a
      * reference name operand"), so the binding {@code $relrec_links_lnkid} has no native form once
@@ -79,11 +81,7 @@ class BindingSubstitutabilityCorpusCensusTest
             "CDISC-AD0086 | cross_dataset_variable_metadata answers one value per variable and is read only through a binding: that binding is the rule's variable cursor",
             "CDISC-AD0199 | cross_dataset_variable_metadata answers one value per variable and is read only through a binding: that binding is the rule's variable cursor",
             "CDISC-AD0590 | cross_dataset_variable_metadata answers one value per variable and is read only through a binding: that binding is the rule's variable cursor",
-            "CDISC-CG0022 | binding `$relrec_links_lnkid` has no native expression form: Expression construct not supported by the native evaluator: shares_no_elements_with requires a reference name operand",
-            "CDISC-CG0562 | argument 'group' of 'record_count' must be a plain column reference",
-            "FDA-SD1117 | stage A: PARAMETER_TYPE: Check (ERROR): argument 'members' of 'is_unique_set' takes list<column-reference>, not list<string> at element 3",
-            "PMDA-SD1117 | stage A: PARAMETER_TYPE: Check (WARNING): argument 'members' of 'is_unique_set' takes list<column-reference>, not list<string> at element 3",
-            "PMDA-SD1152 | stage A: PARAMETER_TYPE: Check (ERROR): argument 'members' of 'is_unique_set' takes list<column-reference>, not list<string> at element 2"));
+            "CDISC-CG0022 | binding `$relrec_links_lnkid` has no native expression form: Expression construct not supported by the native evaluator: shares_no_elements_with requires a reference name operand"));
 
     @Test
     void everyShippedRuleLoadsAlikeWithItsBindingsInlined() throws Exception
