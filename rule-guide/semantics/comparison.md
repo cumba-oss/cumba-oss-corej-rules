@@ -291,15 +291,23 @@ nothing in the expression says the values are dates:
 date(--DTC) in [date("2020-01-01")]     # matches 2020-01-01T09:15 too — same day, same point
 ```
 
-⛔ **The list has to be written out.** A `date(…)` probe against a **dynamic** set — a `$`-binding,
-a `${*}` wildcard, a grouped result — is still compared as **text**. That is a deliberate limit,
-not an oversight: those sets are resolved per row and a temporal set needs its own per-row path.
-Until that exists, build a date list literally, or ask the question with a comparison.
+**So is a `date(…)` probe against a dynamic set** — a `$`-binding, an inline function call, a
+per-row grouped result: membership follows `==` for every set shape (`D81`, closed 2026-10-08). The
+set is read as a value — once for a dataset-level list, per row for a `group=` result — and every
+member is compared by the hull rule, so a date-only probe matches a datetime member of the same day:
+
+```yaml
+# $ex_dates: distinct(EXSTDTC, domain="EX", group=[USUBJID])
+date(PCRFTDTC) not in $ex_dates     # 2020-01-01 is a member of {2020-01-01T09:15}
+```
+
+`date(X) in $s` answers exactly `date(X) == m1 or date(X) == m2 …` over the members of `$s`; a member
+that is not ISO-shaped is simply not a member. `time(…)` takes the time comparator the same way. Only
+a `${*}` wildcard set stays textual.
 
 ⛔ **And it is `date(…)`/`time(…)` only.** A `date_part(…)` or `time_part(…)` probe is *not* routed
 to its comparison family in a membership — it is still compared as text, even over a written-out
-list. Same limit, same reason, and the same fix if you need it: compare instead of testing
-membership.
+list. If you need it, compare instead of testing membership.
 
 Two consequences to read together:
 

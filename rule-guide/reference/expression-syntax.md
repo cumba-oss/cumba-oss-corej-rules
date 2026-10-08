@@ -384,8 +384,10 @@ VISITNUM in [1, 2, 3]              # NUMERIC membership
 - A **mixed** list literal — a number and a string together — is a **load error**.
 - A **dynamic set** — the thing on the *right* being a `$`-binding, a `${*}` wildcard, an inline
   function call (`X in distinct(VISITNUM, domain=SV, group=[USUBJID])`) or a per-row grouped result — is
-  always **textual** and is not type-checked. Its contents are not statically known, so no
-  classification is possible.
+  **textual** (`==`'s own comparison, member by member) and is not type-checked. Its contents are
+  not statically known, so no classification is possible. A `date(…)` / `time(…)` probe against
+  it is the exception: membership follows `==`, so each member is compared by the date/time hull
+  rule (`date(X) in $s` answers `date(X) == m` for any member `m`); a `${*}` wildcard stays textual.
 - Any **function call on the right** is read on its **value**, exactly as the same call bound to a
   `$`-binding is: `X in upper($names)` answers what `$u: upper($names)` / `X in $u` answers, and so
   does `X in colref(upper($vars))`. A dataset-level list is the set, a per-row list (`split_by`, a
