@@ -413,7 +413,7 @@ Check:
 
 `contains(x, needle)` → **boolean**
 
-True when `needle` occurs anywhere in `x`; `needle` may vary per row. A negated spelling `does_not_contain(x, needle)` exists; prefer `not contains(x, needle)`.
+True when `needle` occurs anywhere in `x`; `needle` may vary per row. A negated spelling `does_not_contain(x, needle)` exists; prefer `not contains(x, needle)`. To ask for any of several substrings, write `contains_any(x, list)`.
 
 | parameter | type | required | description |
 |---|---|---|---|
@@ -425,6 +425,25 @@ True when `needle` occurs anywhere in `x`; `needle` may vary per row. A negated 
 ```yaml
 expression: 'contains(--LAT, ";")'
 ```
+
+### contains_any
+
+`contains_any(x, list)` → **boolean**
+
+True when `x` contains **any** element of `list` as a substring — `contains(x, …)` asked once per element. Negate with `not contains_any(x, list)`.
+
+| parameter | type | required | description |
+|---|---|---|---|
+| `x` | string | yes | The value to read, per row. A list here fails to load (`contains_any` is never a membership test) |
+| `list` | list of strings | yes | The substrings to look for — a list literal (`["ACHE", "PAIN"]`), a `$`-binding holding a list, or a per-row list (`split_by(…)`). A scalar fails to load: write `contains(x, value)` |
+
+**Example**
+
+```yaml
+expression: 'contains_any(upper(TESTRL), $arms)'
+```
+
+**Missing and empty** — As `contains`: a missing `x` or a missing `list` answers **false**; a missing element never matches and does not make the call false; `[]` answers **false**; an element `""` matches every present `x`, a blank `x` included (a blank is a present `""`). A numeric element probes its canonical text (`100.0` probes `"100"`). There is no case folding — write `upper()` on both sides (`contains_any(upper(X), upper($list))`).
 
 ### count
 
