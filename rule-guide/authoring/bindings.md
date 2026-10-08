@@ -78,7 +78,12 @@ binding: `AETERM in ["A", $codes]` is a load error — the `$codes` element woul
 place a `$` stands inside a list is a splice of **column names** into a list of column names: every
 `group=` ([`record_count`](../reference/functions.md#record_count), [`max`](../reference/functions.md#max) /
 `max_date` / `min_date`, [`read_value`](../reference/functions.md#read_value),
-[`distinct`](../reference/functions.md#distinct)),
+[`distinct`](../reference/functions.md#distinct),
+[`is_last_in_group`](../reference/functions.md#is_last_in_group),
+[`has_mixed_emptiness_within_group`](../reference/functions.md#has_mixed_emptiness_within_group) — and its
+`qualifying_any_populated=`), every `keys=` of column names
+([`is_unique_relationship`](../reference/functions.md#is_unique_relationship),
+[`is_inconsistent_across_dataset`](../reference/functions.md#is_inconsistent_across_dataset)),
 [`is_unique_set`](../reference/functions.md#is_unique_set)'s members and
 [`values`](../reference/functions.md#values)' columns — and there, as everywhere,
 the expression the binding holds may be written in its place
@@ -89,7 +94,9 @@ references, `--SEQ` and `DM.USUBJID` included, never mixed with a quoted literal
 **names**, not the cells. It is read exactly where the written list of names is read: as the
 members of `is_unique_set($keys)` / `is_not_unique_set($keys)` (also as a member,
 `is_unique_set([STUDYID, $keys])`), as any `group=$keys` (`record_count`, `max` / `max_date` /
-`min_date`, `read_value`, `distinct`), and as the columns whose per-row values `values($keys)` lists.
+`min_date`, `read_value`, `distinct`, `is_last_in_group`, `has_mixed_emptiness_within_group`), as a
+`keys=$keys` of column names (`is_unique_relationship`, `is_inconsistent_across_dataset`), and as the
+columns whose per-row values `values($keys)` lists.
 Anywhere else — `X in $keys`, a comparison, a function's value argument, another binding,
 `Output_Variables` — it is a load error with the hint *"`$keys` holds column names: use it in a name
 slot (`group=$keys`) or read its values with `values($keys)`; to compare names as text, write a string

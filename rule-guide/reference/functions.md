@@ -1845,8 +1845,8 @@ Check:
 | parameter | type | required | description |
 |---|---|---|---|
 | `name` | column | yes | The column whose emptiness is tallied (`BASETYPE`) |
-| `group` | list of columns | no | Columns whose combined value defines a group; none, or none present, is one whole-table group |
-| `qualifying_any_populated` | list of columns | no | Rows on which none of these columns is populated are out of scope (EC-23); an all-absent list qualifies no row |
+| `group` | list of columns | no | Columns whose combined value defines a group; none, or none present, is one whole-table group. A member may be a `$`-reference to a dataset-level **list of column names**, or the expression such a binding holds, written in place — spliced exactly as [`record_count`](#record_count)'s `group=` splices it (a dataset-level string is one name; a per-row binding or expression is a load error; a bare `group=$names` / `group=<expression>` is the one-member list). |
+| `qualifying_any_populated` | list of columns | no | Rows on which none of these columns is populated are out of scope (EC-23); an all-absent list qualifies no row. A member may be a `$`-reference to a dataset-level **list of column names**, or the expression such a binding holds, written in place — spliced exactly as [`record_count`](#record_count)'s `group=` splices it (a dataset-level string is one name; a per-row binding or expression is a load error; a bare `qualifying_any_populated=$names` / `qualifying_any_populated=<expression>` is the one-member list). |
 | `keep_missings` | boolean | no | Whether a group whose key is missing is kept as its own group (default `true`, the fold) or dropped; requires a non-empty `group` |
 
 Column parameters are **column references** — a quoted name is a string literal and fails to load — and an absent group column is dropped from the key (EC-44). An absent subject column is all-unpopulated, so no group is mixed (EC-45). The group key is compared by identity (`4.9999999999994` and `5.0` are two groups, `-0.0` and `0.0` one). (Until wave 1 of the operation→function programme this was an operation; the spelling is unchanged.)
@@ -1882,7 +1882,7 @@ Check:
 | parameter | type | required | description |
 |---|---|---|---|
 | `ordering` | column | yes | The column that orders the group (`SESEQ`). It orders by its **type**: a numeric column numerically, a character column as **text** — `"10"` < `"9"`, and `"5"` and `"5.0"` (or `"-0.0"` and `"0.0"`) are two values — even when its values look like numbers. A missing value ranks lowest (two missing markers by their value byte), then a blank `""`. The order is total, so the answer never depends on row order. ⚠ `ordering` takes a plain column; a numeric order of a character column (`num(X)`) is not spellable here yet |
-| `group` | list of columns | yes | Columns whose combined value defines a group (`USUBJID`); absent ones are dropped, all absent answers nothing |
+| `group` | list of columns | yes | Columns whose combined value defines a group (`USUBJID`); absent ones are dropped, all absent answers nothing. A member may be a `$`-reference to a dataset-level **list of column names**, or the expression such a binding holds, written in place — spliced exactly as [`record_count`](#record_count)'s `group=` splices it (a dataset-level string is one name; a per-row binding or expression is a load error; a bare `group=$names` / `group=<expression>` is the one-member list). |
 | `keep_missings` | boolean | no | Whether a group whose key is missing is kept as its own group or dropped (default `false`, the drop); requires a non-empty `group` |
 
 It takes **no target**: it reads only `ordering` and `group`. Both are **column references** — `ordering="SESEQ"` is a string literal and fails to load. "Identical" has one meaning, the key identity: a numeric `-0.0` is `0.0`, `4.9999999999994` is not `5.0`, a character `5` is not `5.0` and a character `-0.0` is not `0.0`, and a missing is identical to the same missing. So **every tied row is last**: the copies a one-to-many `Match_Datasets` join makes of one record, a duplicated `SESEQ` in the source, and every row of a group whose ordering values are all missing. (Until wave 1 of the operation→function programme this was an operation whose tied rows all read `false`.)
@@ -2314,7 +2314,7 @@ True on the minority rows of a group that disagrees; blank targets excluded unle
 |---|---|---|---|
 | `name` | any | yes | The column to read |
 | `key` | any | no | The column whose value acts as the key |
-| `keys` | list of columns | no | The values that must all be present |
+| `keys` | list of columns | no | The values that must all be present. A member may be a `$`-reference to a dataset-level **list of column names**, or the expression such a binding holds, written in place — spliced exactly as [`record_count`](#record_count)'s `group=` splices it (a dataset-level string is one name; a per-row binding or expression is a load error; a bare `keys=$names` / `keys=<expression>` is the one-member list). |
 | `include_empty` | boolean | no | Whether a blank key or value takes part |
 | `keep_missings` | boolean | no | Whether a row with a missing key stays in its group |
 
@@ -2345,7 +2345,7 @@ True when `a` and `b` are in a strict one-to-one relationship. A negated spellin
 |---|---|---|---|
 | `name` | any | yes | The column to read |
 | `value` | any | no | The value to compare against |
-| `keys` | list of columns | no | The values that must all be present |
+| `keys` | list of columns | no | The values that must all be present. A member may be a `$`-reference to a dataset-level **list of column names**, or the expression such a binding holds, written in place — spliced exactly as [`record_count`](#record_count)'s `group=` splices it (a dataset-level string is one name; a per-row binding or expression is a load error; a bare `keys=$names` / `keys=<expression>` is the one-member list). |
 
 **Example**
 
