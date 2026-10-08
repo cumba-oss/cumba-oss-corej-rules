@@ -68,11 +68,11 @@ class BindingSubstitutabilityCorpusCensusTest
      * written as the member was {@code PARAMETER_TYPE} (G3 arm) or the {@code record_count}
      * reader's "plain column reference"; since BS2 a dataset-level expression of names splices
      * exactly as the {@code $} member does ({@code GroupSplice.Member}).</li>
-     * <li><b>NEW candidate (not in §3), reported by BS0:</b> CDISC-CG0022 — {@code
-     * shares_no_elements_with} takes its operand as a {@code $}-reference only ("requires a
-     * reference name operand"), so the binding {@code $relrec_links_lnkid} has no native form once
-     * its operands are inlined. A shape refusal of the C1 kind on another reader; its fix is a plan
-     * decision, not taken here.</li>
+     * <li><b>LEFT with W1b SH (coordinator D21), was a BS0 candidate:</b> CDISC-CG0022 — {@code
+     * shares_no_elements_with} took its operand as a {@code $}-reference only ("requires a
+     * reference name operand"), so the binding {@code $relrec_links_lnkid} had no native form once
+     * its operands were inlined; since SH the expression a binding holds is admitted in place, as a
+     * dataset-level value evaluated once, and the row is gone.</li>
      * </ul>
      */
     private static final Set<String> EXPECTED = new TreeSet<>(Set.of(
@@ -80,8 +80,7 @@ class BindingSubstitutabilityCorpusCensusTest
             "CDISC-AD0085 | cross_dataset_variable_metadata answers one value per variable and is read only through a binding: that binding is the rule's variable cursor",
             "CDISC-AD0086 | cross_dataset_variable_metadata answers one value per variable and is read only through a binding: that binding is the rule's variable cursor",
             "CDISC-AD0199 | cross_dataset_variable_metadata answers one value per variable and is read only through a binding: that binding is the rule's variable cursor",
-            "CDISC-AD0590 | cross_dataset_variable_metadata answers one value per variable and is read only through a binding: that binding is the rule's variable cursor",
-            "CDISC-CG0022 | binding `$relrec_links_lnkid` has no native expression form: Expression construct not supported by the native evaluator: shares_no_elements_with requires a reference name operand"));
+            "CDISC-AD0590 | cross_dataset_variable_metadata answers one value per variable and is read only through a binding: that binding is the rule's variable cursor"));
 
     @Test
     void everyShippedRuleLoadsAlikeWithItsBindingsInlined() throws Exception

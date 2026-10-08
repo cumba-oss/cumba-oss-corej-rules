@@ -174,6 +174,33 @@ does not error, and it does not fire.
 
 The same hull rule, on times of day.
 
+### `duration` — the hull rule on durations
+
+`duration(X)` on either side makes the comparison read both operands as ISO-8601 **durations**, and
+the same ∀ rule applies (runbook W1b DO, `PLAN-engine-gap-dur-order`). The exact designators have
+one length each — a week is 7 days, a day 86 400 seconds (a duration carries no calendar, so no
+DST), hours, minutes and seconds exact, a fraction on the lowest component — so every spelling of
+the same length is the same **point**: `PT90M == PT1H30M`, `P1W == P7D`, `P0D == PT0S`, and
+`P2D > PT5H` holds although `"P2D" < "PT5H"` as text. A **month or year** has no one length, so it
+is a **range** — `P1M` is [28 d, 31 d], `P1Y` is [365 d, 366 d] (`P2M` is [56 d, 62 d]) — and the
+comparison quantifies over it:
+
+```
+duration("P1M") <  duration("P32D")   → true    (every candidate is shorter)
+duration("P1M") == duration("P30D")   → false   (P1M is not a point)
+duration("P1M") != duration("P30D")   → false   (the hulls overlap)
+duration("P1M") != duration("P1Y")    → true    (the hulls are disjoint)
+```
+
+A leading `-` negates the whole hull. Junk — `""`, `P`, a date — answers false to all six
+operators (and `!=` fires), exactly as for dates; `is_valid_duration` is the same test as "has a
+hull". The family is selected by the **written marker** only: `--STINT > --ENINT` without it is a
+text comparison, and `relation=` on `has_next_corresponding_record` reads durations only where both
+operands are written `duration(COL)` — the engine never guesses from a cell's content.
+`duration_between(start, end)` is a value of this family (a point for two complete instants, a range
+`lower/upper` where one is partial), and `earliest_possible` / `latest_possible` over a
+`duration(…)` operand are the hull's ends as point durations (`P1M` ⇒ `P28D` / `P31D`).
+
 ### `date_part` and `time_part` compare one part
 
 `date_part(X) == date_part(Y)` compares only the date portion of two ISO values, and

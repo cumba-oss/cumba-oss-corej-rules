@@ -1382,6 +1382,36 @@ expression: 'is_complete_date(AESTDTC) and day(AESTDTC) > 28'
 
 **Missing and empty** — A missing input yields **that missing value**, identity kept (`day(.A)` is `.A`, rulings register `D85c`). `""` carries no date component and yields the plain missing (`MIS`).
 
+### duration_between
+
+`duration_between(start, end)` → **duration**
+
+The duration from one ISO-8601 instant to another — `end − start` — as a value of the
+[`duration`](#duration) family, so it compares under the hull rule from either side:
+`duration(--DUR) != duration_between(--DTC, --ENDTC)` fires only where `--DUR` is *definitely* not
+the difference (SENDIG 3.1.1 §4.4.3: `--DUR` is the difference between `--ENDTC` and `--DTC`). Two
+complete instants give a point, taken at the coarser of their precisions as [`date`](#date)
+compares complete values (`2020-01-01` to `2020-01-03` is `P2D`; `2020-01-01T00:00` to
+`2020-01-02T12:00` is `P1DT12H`; an end before the start is negative, `-P2D`). A **partial** instant
+on either side gives the **range** of durations the two could span — `2020-01` to `2020-02-15` is
+anything from `P14DT1S` to `P45DT23H59M59S` — written `lower/upper`, the family's own carrier
+(not itself a valid ISO duration for `is_valid_duration`).
+
+| parameter | type | required | description |
+|---|---|---|---|
+| `start` | any | yes | The first instant — a column, a `date(…)` conversion or a binding |
+| `end` | any | yes | The second instant, likewise |
+
+**Example**
+
+```yaml
+expression: 'not empty(--DTC) and not empty(--ENDTC) and not empty(--DUR) and duration(--DUR) != duration_between(--DTC, --ENDTC)'
+```
+
+**Missing and empty** — A missing operand yields **that missing value**, identity kept (both missing
+carry their identity; `.A` beside `.B` is `MIS`). `""` or an instant that cannot be placed on the
+calendar yields the plain missing (`MIS`), so `empty(duration_between(…))` is true for it.
+
 ### dy
 
 `dy(name, reference)` → **value**
@@ -1475,6 +1505,13 @@ expression: 'not empty(MHENDTC) and date(latest_possible(MHENDTC)) >= date(earli
 ```
 
 **Missing and empty** — A missing input yields **that missing value**, identity kept (rulings register `D85c`). `""`, and a value that cannot be placed on the calendar, yield the plain missing (`MIS`) — never a sentinel date.
+
+**Over a [`duration`](#duration)** — `earliest_possible(duration(X))` / `latest_possible(duration(X))` answer the
+shortest / longest duration `X` could denote, as point durations: `P1M` bounds as `P28D` and `P31D`,
+`P1Y` as `P365D` and `P366D`, a point (`P1W`) as itself (`P7D`). The written `duration(…)` marker
+is what selects the duration reading — `latest_possible(X)` on the same cell reads a **date**, and no
+duration places on the calendar, so it answers missing. Compare the bound under the marker:
+`duration(latest_possible(duration(--STINT))) > duration(--ENINT)` is the "possibly later" reading.
 
 ⚠ **A bound of a complete value is the value itself**, and two complete values compare as points at the coarser precision — so `date(earliest_possible(A)) < latest_possible(B)` answers exactly `date(A) < date(B)` on complete dates and date-times. A "may" reading of a same-day boundary (an element that ends on the day a date-only visit starts *may* still be in progress) needs its own term; `CDISC-CG0218` spells it as `… < … or (date(earliest_possible(SVSTDTC)) == latest_possible(SE.SEENDTC) and (SVSTDTC !~ /T/ or SE.SEENDTC !~ /T/))` — the same-day equality on the bounds (so a partial value whose first or last possible day is the boundary day counts too), granted only when at least one side carries no time.
 
@@ -1687,7 +1724,7 @@ Check:
   expression: 'date(earliest_possible(--STDTC)) > latest_possible(--ENDTC)'
 ```
 
-**Missing and empty** — As [`earliest_possible`](#earliest_possible): a missing input yields **that missing value**, identity kept (rulings register `D85c`); `""` and an unplaceable value yield the plain missing (`MIS`).
+**Missing and empty** — As [`earliest_possible`](#earliest_possible): a missing input yields **that missing value**, identity kept (rulings register `D85c`); `""` and an unplaceable value yield the plain missing (`MIS`). Over a `duration(…)` operand it is the hull's upper end as a point duration (`P1M` ⇒ `P31D`), see there.
 
 ### month
 
@@ -1776,7 +1813,7 @@ what it is for — `X not in $set`, `X in $set`, `tuple(A, B) not in $pairs`, `c
 
 | parameter | type | required | description |
 |---|---|---|---|
-| `name` | column, a value expression, or a **list of columns** | yes | The positional target. A column (`USUBJID`, `--BLFL`, `upper(ARM)`) collects its distinct **values**; a list (`[VISIT, VISITNUM]`) collects the distinct **row tuples** in that order — see [The target of `distinct`](#the-target-of-distinct-one-column-or-a-list-of-columns). A quoted name is a string literal and fails to load |
+| `name` | column, a value expression, or a **list of columns** | yes | The positional target. A column (`USUBJID`, `--BLFL`, `upper(ARM)`) collects its distinct **values**; a list (`[VISIT, VISITNUM]`) collects the distinct **row tuples** in that order — see [The target of `distinct`](#the-target-of-distinct-one-column-or-a-list-of-columns). A quoted name is a string literal and fails to load. A `$`-binding — bare, or inside a computed target — is one of the rule's own **dataset-level** values, pre-resolved as a `$` inside `filter=` is (`$x: upper("a"); distinct($x)` answers as `distinct(upper("a"))`, runbook W1b DT); a per-row binding there is a load error, and a binding holding a quoted name keeps the literal refusal (the target is not a name slot) |
 | `domain` | dataset reference | no | The dataset to read: `TA` or `"TA"`. Absent ⇒ the dataset under evaluation. With `domain`, **every** column argument names a column of that dataset. A family name reads every member: `domain="SUPPAE"` on a study shipping `SUPPAE1` + `SUPPAE2` (both `RDOMAIN = AE`) reads both, as `LB` reads `LB1` + `LB2`. A `--` in the dataset name is the supplemental family of the dataset under evaluation's **domain**: `domain="SUPP--"` reads `SUPPAE` on `AE`, `SUPPLB` on `LBCH` (every SUPP of the LB family) and `SQAPMH` on `APMH` (the SDTMIG-AP name; `SQAP--` is its synonym) — and `SUPPAE` on a `SUPPAE` primary too — as `Match_Datasets` names do |
 | `filter` | boolean over the target dataset's columns | no | Which rows are read, in parentheses: `filter=(DSDECOD == "DEATH")`, `filter=(DSDECOD in ["TERMINAL SACRIFICE", "INTERIM SACRIFICE"])`, `filter=(RDOMAIN == "AE" and IDVAR == "AESEQ" and QNAM == "AESOSP")`. Only bare columns of the target dataset — a dotted or `--` reference (under `domain`) is a load error. A `$` reference is one of the rule's own bindings, read as **one dataset-level value of the rule's dataset** (never of the target: `filter=(TSVAL in $c)` with `$c: distinct(FLAG)` compares against the evaluated dataset's `FLAG` values) — a per-row binding there is a load error. The retired map spelling `filter=filter(K="v")` fails to load, naming this one |
 | `group` | list of columns | no | Columns whose combined value defines a group — on the target dataset; the list is read per row of the evaluated dataset by the same columns (an absent group column partitions nothing, on both sides). **A column target only**: `group=` beside a list target is a load error (the retired operation ignored it silently). A member may be [qualified](#qualified-group-members) (`DM.RPATHCD`) with `domain`. A member may be a `$`-reference to a dataset-level **list of column names**, or the expression such a binding holds, written in place — spliced exactly as [`record_count`](#record_count)'s `group=` splices it (a dataset-level string is one name; a per-row binding or expression is a load error; a bare `group=$names` / `group=<expression>` is the one-member list); a spliced member is never qualified under `domain`. |
@@ -1952,7 +1989,7 @@ cross-dataset plan `record_count` and `distinct` follow.
 
 | parameter | type | required | description |
 |---|---|---|---|
-| `name` | column of the target dataset, or any value expression over it | yes | The column to aggregate — bare, never quoted (`max("AyIND", …)` fails to load: a quoted name is a string). An expression is allowed: `max(num(ATOXGR), …)` ranks a character grade numerically |
+| `name` | column of the target dataset, or any value expression over it | yes | The column to aggregate — bare, never quoted (`max("AyIND", …)` fails to load: a quoted name is a string). An expression is allowed: `max(num(ATOXGR), …)` ranks a character grade numerically. A dataset-level `$`-binding is admitted as on [`distinct`](#distinct) (runbook W1b DT): pre-resolved against the rule's dataset; a per-row one is a load error; a binding holding a quoted name keeps the literal refusal |
 | `domain` | dataset reference | no | The dataset to read from: `DS` or `"DS"`. Absent ⇒ the dataset under evaluation. With `domain`, **every** column argument names a column of that dataset. A family name reads every member: `domain="SUPPAE"` on a study shipping `SUPPAE1` + `SUPPAE2` (both `RDOMAIN = AE`) reads both, as `LB` reads `LB1` + `LB2`. A `--` in the dataset name is the supplemental family of the dataset under evaluation's **domain**: `domain="SUPP--"` reads `SUPPAE` on `AE`, `SUPPLB` on `LBCH` (every SUPP of the LB family) and `SQAPMH` on `APMH` (the SDTMIG-AP name; `SQAP--` is its synonym) — and `SUPPAE` on a `SUPPAE` primary too — as `Match_Datasets` names do |
 | `filter` | boolean over the target dataset's columns | no | Which rows take part, in parentheses: `filter=(ABLFL == "Y")`. Only bare columns of the target dataset — a dotted or `--` reference (under `domain`) is a load error. A `$` reference is one of the rule's own bindings, read as **one dataset-level value of the rule's dataset** (never of the target: `filter=(TSVAL in $c)` with `$c: distinct(FLAG)` compares against the evaluated dataset's `FLAG` values) — a per-row binding there is a load error. The retired `filter=filter(K="v")` spelling fails to load, naming this one |
 | `group` | list of columns | **yes** | Columns whose combined value defines a group — on the target dataset; the value is read per row of the evaluated dataset by the same columns (an absent group column partitions nothing, on both sides). A member may be [qualified](#qualified-group-members) (`DM.RPATHCD`) with `domain`. A member may be a `$`-reference to a dataset-level **list of column names**, or the expression such a binding holds, written in place — spliced exactly as [`record_count`](#record_count)'s `group=` splices it (a dataset-level string is one name; a per-row binding or expression is a load error; a bare `group=$names` / `group=<expression>` is the one-member list); a spliced member is never qualified under `domain`. |
@@ -2014,7 +2051,7 @@ cannot be positioned yields no value. A registry function since runbook W5; the 
 
 | parameter | type | required | description |
 |---|---|---|---|
-| `name` | column of the target dataset, or any value expression over it | yes | The column to aggregate — bare, never quoted (`max("AyIND", …)` fails to load: a quoted name is a string). An expression is allowed: `max(num(ATOXGR), …)` ranks a character grade numerically |
+| `name` | column of the target dataset, or any value expression over it | yes | The column to aggregate — bare, never quoted (`max("AyIND", …)` fails to load: a quoted name is a string). An expression is allowed: `max(num(ATOXGR), …)` ranks a character grade numerically. A dataset-level `$`-binding is admitted as on [`distinct`](#distinct) (runbook W1b DT): pre-resolved against the rule's dataset; a per-row one is a load error; a binding holding a quoted name keeps the literal refusal |
 | `domain` | dataset reference | no | The dataset to read from: `DS` or `"DS"`. Absent ⇒ the dataset under evaluation. With `domain`, **every** column argument names a column of that dataset. A family name reads every member: `domain="SUPPAE"` on a study shipping `SUPPAE1` + `SUPPAE2` (both `RDOMAIN = AE`) reads both, as `LB` reads `LB1` + `LB2`. A `--` in the dataset name is the supplemental family of the dataset under evaluation's **domain**: `domain="SUPP--"` reads `SUPPAE` on `AE`, `SUPPLB` on `LBCH` (every SUPP of the LB family) and `SQAPMH` on `APMH` (the SDTMIG-AP name; `SQAP--` is its synonym) — and `SUPPAE` on a `SUPPAE` primary too — as `Match_Datasets` names do |
 | `filter` | boolean over the target dataset's columns | no | Which rows take part, in parentheses: `filter=(ABLFL == "Y")`. Only bare columns of the target dataset — a dotted or `--` reference (under `domain`) is a load error. A `$` reference is one of the rule's own bindings, read as **one dataset-level value of the rule's dataset** (never of the target: `filter=(TSVAL in $c)` with `$c: distinct(FLAG)` compares against the evaluated dataset's `FLAG` values) — a per-row binding there is a load error. The retired `filter=filter(K="v")` spelling fails to load, naming this one |
 | `group` | list of columns | **yes** | Columns whose combined value defines a group — on the target dataset; the value is read per row of the evaluated dataset by the same columns (an absent group column partitions nothing, on both sides). A member may be [qualified](#qualified-group-members) (`DM.RPATHCD`) with `domain`. A member may be a `$`-reference to a dataset-level **list of column names**, or the expression such a binding holds, written in place — spliced exactly as [`record_count`](#record_count)'s `group=` splices it (a dataset-level string is one name; a per-row binding or expression is a load error; a bare `group=$names` / `group=<expression>` is the one-member list); a spliced member is never qualified under `domain`. |
@@ -2066,7 +2103,7 @@ keyword spelling.
 
 | parameter | type | required | description |
 |---|---|---|---|
-| `name` | column of the target dataset, or any value expression over it | yes | The column to aggregate — bare, never quoted (`max("AyIND", …)` fails to load: a quoted name is a string). An expression is allowed: `max(num(ATOXGR), …)` ranks a character grade numerically |
+| `name` | column of the target dataset, or any value expression over it | yes | The column to aggregate — bare, never quoted (`max("AyIND", …)` fails to load: a quoted name is a string). An expression is allowed: `max(num(ATOXGR), …)` ranks a character grade numerically. A dataset-level `$`-binding is admitted as on [`distinct`](#distinct) (runbook W1b DT): pre-resolved against the rule's dataset; a per-row one is a load error; a binding holding a quoted name keeps the literal refusal |
 | `domain` | dataset reference | no | The dataset to read from: `DS` or `"DS"`. Absent ⇒ the dataset under evaluation. With `domain`, **every** column argument names a column of that dataset. A family name reads every member: `domain="SUPPAE"` on a study shipping `SUPPAE1` + `SUPPAE2` (both `RDOMAIN = AE`) reads both, as `LB` reads `LB1` + `LB2`. A `--` in the dataset name is the supplemental family of the dataset under evaluation's **domain**: `domain="SUPP--"` reads `SUPPAE` on `AE`, `SUPPLB` on `LBCH` (every SUPP of the LB family) and `SQAPMH` on `APMH` (the SDTMIG-AP name; `SQAP--` is its synonym) — and `SUPPAE` on a `SUPPAE` primary too — as `Match_Datasets` names do |
 | `filter` | boolean over the target dataset's columns | no | Which rows take part, in parentheses: `filter=(ABLFL == "Y")`. Only bare columns of the target dataset — a dotted or `--` reference (under `domain`) is a load error. A `$` reference is one of the rule's own bindings, read as **one dataset-level value of the rule's dataset** (never of the target: `filter=(TSVAL in $c)` with `$c: distinct(FLAG)` compares against the evaluated dataset's `FLAG` values) — a per-row binding there is a load error. The retired `filter=filter(K="v")` spelling fails to load, naming this one |
 | `group` | list of columns | **yes** | Columns whose combined value defines a group — on the target dataset; the value is read per row of the evaluated dataset by the same columns (an absent group column partitions nothing, on both sides). A member may be [qualified](#qualified-group-members) (`DM.RPATHCD`) with `domain`. A member may be a `$`-reference to a dataset-level **list of column names**, or the expression such a binding holds, written in place — spliced exactly as [`record_count`](#record_count)'s `group=` splices it (a dataset-level string is one name; a per-row binding or expression is a load error; a bare `group=$names` / `group=<expression>` is the one-member list); a spliced member is never qualified under `domain`. |
@@ -2230,7 +2267,7 @@ behave as there. Without `group=` it is **one list for the dataset**. Read it wi
 
 | parameter | type | required | description |
 |---|---|---|---|
-| `name` | column, or a value expression | yes | The positional target: the column whose values are listed (`ETCD`, `--SEQ`, `upper(ETCD)`). One column only — `distinct([A, B])` collects row tuples, `sequence` orders one column's values. A quoted name is a string literal and fails to load |
+| `name` | column, or a value expression | yes | The positional target: the column whose values are listed (`ETCD`, `--SEQ`, `upper(ETCD)`). One column only — `distinct([A, B])` collects row tuples, `sequence` orders one column's values. A quoted name is a string literal and fails to load. A dataset-level `$`-binding is admitted as on [`distinct`](#distinct) (runbook W1b DT): pre-resolved; a per-row one is a load error; a binding holding a quoted name keeps the literal refusal |
 | `domain` | dataset reference | no | The dataset to read, as [`distinct`](#distinct)'s: `TA` or `"TA"`; absent ⇒ the dataset under evaluation; with `domain`, every column argument names a column of that dataset |
 | `filter` | boolean over the target dataset's columns | no | Which rows are read, in parentheses — as [`distinct`](#distinct)'s `filter=` |
 | `group` | list of columns | no | Columns whose combined value defines a group, as [`distinct`](#distinct)'s — spliced, [qualified](#qualified-group-members) with `domain`, or **sided** (`[{left: ACTARMCD, right: ARMCD}]`: this row's `ACTARMCD` keys the other table's `ARMCD` groups) |
@@ -2563,12 +2600,12 @@ True when a following record in the group matches under `relation=`; authored un
 
 | parameter | type | required | description |
 |---|---|---|---|
-| `name` | any | yes | The column to read |
-| `value` | any | yes | The value to compare against |
+| `name` | column reference — or `duration(COL)` | yes | The column read on the current record. Written as `duration(COL)` on **both** operands (runbook W1b DO, `PLAN-engine-gap-dur-order` Q3), the cells are compared as [durations](#duration) — under `relation="<="` / `">="` the hull order, under the default the hull equality, so `P1W` corresponds to `P7D`; on one operand only it is a load error. Unmarked, the cells compare as today (text identity, widened by `relation=`'s numeric / date reading), whatever they contain |
+| `value` | column reference — or `duration(COL)` | yes | The column read on the next record, marked exactly as `name` is |
 | `within` | one column reference, or a one-element list | yes | The column that partitions the rows. May be a `$`-reference to a dataset-level string or one-element list of column names, or the expression such a binding holds, written in place — spliced as [`record_count`](#record_count)'s `group=` splices it (a per-row binding or expression is a load error; two or more spliced names make the rule ERROR: the slot takes one column). |
 | `ordering` | one column reference | no | The older spelling of `by=` (accepted until it is refused with the hint *"write by="*) |
 | `by` | one column reference, or a one-element list `[asc(COL)]` / `[COL]` | no | The sort key, ascending — since runbook W1b SK (owner O17) the one sort-key parameter of every function (`by=AESEQ` or `by=[asc(AESEQ)]`); exactly one ascending key here — `desc(…)` or two keys fail to load (*"not supported for …"*). Write `by=` or `ordering=`, not both. May be a `$`-reference to a dataset-level string or one-element list of column names, or the expression such a binding holds, written in place — spliced as [`record_count`](#record_count)'s `group=` splices it (a per-row binding or expression is a load error; two or more spliced names make the rule ERROR: the slot takes one column). |
-| `relation` | string | no | How a record must relate to the next one |
+| `relation` | string | no | How a record must relate to the next one: `"=="` (the default), `"<="` or `">="`, applied **in disjunction with** identity (it only widens what corresponds). Numeric cells compare as numbers, ISO dates under the date hull rule, and — only when both operands are written `duration(COL)` — durations under the duration hull rule |
 | `keep_missings` | boolean | no | Whether a row with a missing key stays in its group |
 
 **Example**
@@ -2595,9 +2632,12 @@ Check:
 True when every element is **strictly** greater than its predecessor (runbook W1b RO,
 `PLAN-engine-gap-row-ordinal` R6, owner 2026-10-07: *"agreed to strict"*). Numerically when
 **every** element is a number (a numeric cell, or text that reads as one: `"9"` before `"10"`),
-else as text; an empty or one-element list is increasing; a **missing element** makes the answer
-`false` — so `is_increasing` does not fire and `not is_increasing` does (the BOOLEAN functions are
-two-valued). Over a per-row list ([`sequence`](#sequence)'s output) and a dataset-level list alike.
+else as text; an empty or one-element list is increasing; a list holding a **missing element**
+answers `true` — vacuously, as the empty list does — so the authored `not is_increasing(…)` gives
+**no finding** on it (the owner ruled a missing element *"answers missing, so no finding"*; the
+BOOLEAN functions are two-valued, and `true` is the answer that fires nothing — coordinator D22,
+runbook W1b P5a; until then it answered `false`). Over a per-row list ([`sequence`](#sequence)'s
+output) and a dataset-level list alike.
 
 | parameter | type | required | description |
 |---|---|---|---|
@@ -2690,11 +2730,18 @@ Check:
 
 True when the two lists have at least one member in common. A negated spelling `shares_no_elements_with($a, $b)` exists; prefer `not shares_elements_with($a, $b)`.
 
+Each operand is a **dataset-level** set: a `$`-binding, or — since runbook W1b SH
+(`PLAN-binding-substitutability`) — the expression such a binding holds, written in place
+(`shares_elements_with(distinct(USUBJID, domain="AE"), keys=[USUBJID])`), evaluated once over the
+rule's dataset exactly as the binding is; a scalar is the one-member set. A **per-row** operand — a
+bare column, `upper(AETERM)`, or a binding holding one — fails the rule's load, bound and inline
+alike (*"cannot read the per-row or per-variable operand"*).
+
 | parameter | type | required | description |
 |---|---|---|---|
-| `name` | any | yes | The column to read |
-| `value` | any | no | The value to compare against |
-| `keys` | list | no | The values that must all be present |
+| `name` | a dataset-level list or value: a `$`-binding, or the expression it holds | yes | The first set |
+| `value` | a dataset-level list or value, likewise | no | The second set — or write `keys=` |
+| `keys` | list | no | The second set as a written list of values |
 
 **Example**
 
@@ -5083,6 +5130,39 @@ expression: 'not empty(DVSTDTC) and date(DVSTDTC) < date(DM.RFICDTC)'
 as a date at any precision — `""`, malformed text — is not an error: every comparison over it
 answers false ([Junk answers false](../semantics/comparison.md#junk-answers-false)), so guard it with
 `is_valid_date(…)` or `not empty(…)` when that is not what you want.
+
+### duration
+
+`duration(x)` → **duration**
+
+The value read as an ISO-8601 **duration** (`P1W`, `PT90M`, `P1Y2M`, `-P1D`), the ISO text itself the
+carrier. Written on either side of a comparison it makes the comparison a **duration comparison**
+— the [hull rule on durations](../semantics/comparison.md#duration--the-hull-rule-on-durations)
+(runbook W1b DO, `PLAN-engine-gap-dur-order`): `PT90M` and `PT1H30M` are the same point, `P2D` is
+longer than `PT5H`, and a **month or year** is a range (`P1M` is any length from 28 to 31 days), so
+`duration(--STINT) > duration(--ENINT)` fires only where the start offset is *definitely* later.
+Without the marker a comparison on duration text is a text comparison (`"PT9H" > "PT10H"` holds) —
+the marker is what selects the family; the engine never decides by the cell's content.
+
+A `duration(…)` operand is also what [`earliest_possible`](#earliest_possible) /
+[`latest_possible`](#latest_possible) read as a duration (the hull's ends as point durations), and
+what [`has_next_corresponding_record`](#has_next_corresponding_record)'s `relation=` compares as a
+duration when written on both operands.
+
+| parameter | type | required | description |
+|---|---|---|---|
+| `x` | any | yes | The ISO-8601 duration — a column, a string literal or a binding |
+
+**Example — a planned interval's start must not denote a later point than its end** (SENDIG 3.1.1)
+
+```yaml
+expression: 'not empty(--STINT) and not empty(--ENINT) and duration(--STINT) > duration(--ENINT)'
+```
+
+**Missing and empty** — A missing input yields **that missing value**. A value that is not a valid
+duration (`is_valid_duration` is the same test: `""`, `P`, malformed text, a date) is not an error:
+every comparison over it answers false, and `!=` fires — exactly as [`date`](#date) treats junk — so
+guard it with `is_valid_duration(…)` or `not empty(…)` when that is not what you want.
 
 ### find_vars
 

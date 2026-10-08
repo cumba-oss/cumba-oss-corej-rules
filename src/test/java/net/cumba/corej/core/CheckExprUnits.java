@@ -112,8 +112,10 @@ public final class CheckExprUnits
      * <ul>
      * <li>{@code date}/{@code date_part}/{@code time_part} — v1 operator families,
      * {@link #UNARY_WRAPPERS};</li>
-     * <li>{@code num}/{@code time} — conversions with no v1 surface, read through tolerantly in
-     * {@code operand()} (name resolves, strictness lost);</li>
+     * <li>{@code num}/{@code time}/{@code duration} — conversions with no v1 surface, read through
+     * tolerantly in {@code operand()} (name resolves, strictness lost); {@code duration} joined the
+     * compiler's roster with runbook W1b DO ({@code PLAN-engine-gap-dur-order}, 2026-10-08),
+     * authored by no shipped rule, so no pinned lint population moves;</li>
      * <li>{@code str} — ⚑ no longer a compiler marker (PLAN-dynamic-column-functions §2.1, owner
      * Q10, 2026-09-30: a registered conversion, {@code str(A) == str(B)} is plain string equality),
      * so it left this set with the compiler's roster. The type-insensitive shape
@@ -123,7 +125,7 @@ public final class CheckExprUnits
      */
     static Set<String> acknowledgedComparisonMarkers()
     {
-        return Set.of("date", "date_part", "time_part", "num", "time");
+        return Set.of("date", "date_part", "time_part", "num", "time", "duration");
     }
 
     /**

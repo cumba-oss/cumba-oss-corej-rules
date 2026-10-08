@@ -155,7 +155,7 @@ A value the engine supplies directly, without a call — see
 
 ## Value types
 
-Six types a **value** can have:
+Seven types a **value** can have:
 
 | type | is |
 |---|---|
@@ -164,14 +164,16 @@ Six types a **value** can have:
 | `boolean` | true / false |
 | `date` | an ISO-8601 calendar value, **partial precision retained** |
 | `time` | a time of day, partial precision retained |
+| `duration` | an ISO-8601 duration read through `duration(…)`, its months and years **ranges** (runbook W1b DO) |
 | `regex` | a pattern — **literal only**: never computed, never stored in a column. Written `/…/`; a computed regex fails the load. The one place a `"…"` string literal is a regex is `record_count`'s `regex=` |
 
 Plus `list<T>` and `set<T>` for the collection-valued positions: a list is ordered and may repeat,
 a set is not and may not.
 
-`date` and `time` are **not** strings. A partial date such as `2019-03` keeps its precision, which
-is why the date predicates can tell a complete value from an incomplete one — something no string
-comparison can do.
+`date`, `time` and `duration` are **not** strings. A partial date such as `2019-03` keeps its
+precision, which is why the date predicates can tell a complete value from an incomplete one —
+something no string comparison can do; and `PT90M` is the same duration as `PT1H30M`, which no
+string comparison can see either.
 
 > ⛔ **A type mismatch is a rule ERROR, not a coercion.** Comparing a character column to a number
 > does not silently parse it. If you mean the numeric reading of text, say so with `num(…)`; if
@@ -228,10 +230,10 @@ so only known-against-known conflicts are reported early; the rest are settled a
 
 ### Conversions and comparison modes
 
-Six call-shaped tokens decide how a value is read or compared, in two groups that behave
+Seven call-shaped tokens decide how a value is read or compared, in two groups that behave
 differently.
 
-**Conversions — `num` · `str` · `date` · `time`.** These are ordinary registered
+**Conversions — `num` · `str` · `date` · `time` · `duration`.** These are ordinary registered
 [functions](#values-and-references) (since 2026-09-30). A conversion is a property of the
 **value**: it means the same thing wherever it is written, and it produces a real converted value.
 
@@ -256,9 +258,13 @@ any `--STRESN`, says nothing and reads as a misunderstanding.
 `num(.A)` is `.A` (rulings register `D85c`), so `abs(num(X))` keeps `X`'s `.A` as well. `""` and
 text that is not a number yield the plain missing (`MIS`).
 
-**`date` and `time` are *interpretive*.** The temporal value's carrier is the ISO string itself,
-so partial precision survives the conversion instead of being flattened into a number. That is
-what lets a partial date stay partial through a comparison.
+**`date`, `time` and `duration` are *interpretive*.** The temporal value's carrier is the ISO
+string itself, so partial precision survives the conversion instead of being flattened into a
+number. That is what lets a partial date stay partial through a comparison — and a month-long
+duration (`P1M`) stay the range of lengths it could denote
+([the hull rule on durations](../semantics/comparison.md#duration--the-hull-rule-on-durations)).
+`duration_between(start, end)` answers a value of the same family, so a comparison on it is a
+duration comparison too.
 
 **Comparison modes — `date_part` · `time_part`.** These are written like calls but are **not
 functions** — neither is in the function registry; the compiler recognises them in comparison
@@ -556,6 +562,7 @@ listed under [Arguments](#arguments). **Every parameter can be given positionall
 | [`date_diff_days(name, reference)`](functions.md#date_diff_days) | value | The days from a reference date to a record's date (no `+1`); a grouped reference is a named `min_date(…)` / `max_date(…)`, an offset is `+ n` |
 | [`date_overlaps(a, b)`](functions.md#date_overlaps) | boolean | True when the two date ranges share at least one possible instant |
 | [`day(x)`](functions.md#day) | value | The day component of an ISO value, or missing |
+| [`duration_between(start, end)`](functions.md#duration_between) | duration | The duration from one ISO instant to another — a point for two complete instants, a range (`lower/upper`) where one is partial |
 | [`dy(name, reference)`](functions.md#dy) | value | The SDTM study day of a record's date relative to a reference date read through the declared join; no day 0 |
 | [`earliest_date(a, b)`](functions.md#earliest_date) | value | The earlier of two dates, with `min_date`'s candidate and determinability rules; a missing or blank argument is skipped |
 | [`earliest_possible(x)`](functions.md#earliest_possible) | value | The earliest instant an incomplete value could denote |
@@ -749,6 +756,7 @@ quantifier over a scalar predicate is that predicate (`any(p(X))` ≡ `p(X)`, `n
 | [`colref(x)`](functions.md#colref) | value | The value of the column *named by* `x` — bare or `DS.X`, typed; a list of names gives a list of values |
 | [`values(columns)`](functions.md#values) | value | The per-row list of the named columns' values, in the written order — `values([X, Y])`; a `$`-binding of names splices as in `group=` |
 | [`date(x)`](functions.md#date) | date | The value as an ISO-8601 date, partial precision kept; makes a comparison temporal |
+| [`duration(x)`](functions.md#duration) | duration | The value as an ISO-8601 duration, months and years as ranges; makes a comparison a duration comparison |
 | [`find_vars(entry)`](functions.md#find_vars) | list | The names of the columns one `Requirements.Variables` entry selects (template, glob, `DS./regex/`, literal) |
 | [`lpad(x, width, fill)`](functions.md#lpad) | text | `x` left-padded to `width`, never truncated |
 | [`num(x)`](functions.md#num) | number | The value as a number |
