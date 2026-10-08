@@ -386,6 +386,14 @@ VISITNUM in [1, 2, 3]              # NUMERIC membership
   function call (`X in distinct(VISITNUM, domain=SV, group=[USUBJID])`) or a per-row grouped result — is
   always **textual** and is not type-checked. Its contents are not statically known, so no
   classification is possible.
+- Any **function call on the right** is read on its **value**, exactly as the same call bound to a
+  `$`-binding is: `X in upper($names)` answers what `$u: upper($names)` / `X in $u` answers, and so
+  does `X in colref(upper($vars))`. A dataset-level list is the set, a per-row list (`split_by`, a
+  `group=` result) is that row's set, a missing row is the empty set.
+- A **list on the left** — a `$`-binding holding a list, `colref($x)` over a list of names, or
+  `lower($s)` / `upper($s)` over one — is decided **row by row**: a row holding a list is a member
+  when **any** of its elements is (`lower($s) in ["b"]` fires on the row whose list holds `b`); a
+  row holding a single value compares as that value.
 
 > **The left operand never chooses the comparison.** `$max_value in [10, 20]` runs **numerically**,
 > because the *list* is all-numeric — a `$`-binding on the left changes nothing. What makes a
