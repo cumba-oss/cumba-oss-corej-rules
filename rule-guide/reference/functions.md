@@ -4704,7 +4704,7 @@ Check:
 
 `define_available()` → **boolean**
 
-True when a Define-XML was **supplied** to the run — the CLI's `-dxp`, the data browser's define, the REST request's `defineXmlFilename` — including one that could not be parsed (that failure is reported on its own, at study level); false otherwise. Authorable, unlike the three machine-emitted gates: its purpose is the presence rule `not define_available()` (study level, scope `ALL`, one finding per run). It needs no define itself, so that rule is never SKIPPED for the absence it reports; the define-reading rules keep SKIPPING without a define, as before.
+True when a Define-XML was **supplied** to the run — the CLI's `-dxp`, the data browser's define, the REST request's `defineXmlFilename` — including one that could not be parsed (that failure is reported on its own: one study-level **ERROR** finding `CUMBA-DEFINE-PARSE` under `STUDY`, beside the report's `Define_Metadata_Basis` line); false otherwise. Authorable, unlike the three machine-emitted gates: its purpose is the presence rule `not define_available()` (study level, scope `ALL`, one finding per run). It needs no define itself, so that rule is never SKIPPED for the absence it reports; the define-reading rules keep SKIPPING without a define, as before.
 
 Takes no arguments.
 
