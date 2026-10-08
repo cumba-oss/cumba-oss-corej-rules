@@ -72,14 +72,26 @@ hold whatever the expression:
 A **list** binding (a list literal, or a list-valued function such as `get_codelist_attributes`) is
 read with `in` / `not in`, `empty(…)` or by a list function such as `minus`; comparing it with `==` / `!=` / `<` … is a
 load error, exactly as comparing a column with an inline list is. A list literal holds plain
-literals of one kind: numbers, or strings, never both, and never a column. Nor does it hold a
+literals of one kind: numbers, or strings, never both. Nor does it hold a
 binding: `AETERM in ["A", $codes]` is a load error — the `$codes` element would be read as the text
 `"$codes"` and never match — so write `$codes` alone as the operand, or spell the values. The one
 place a `$` stands inside a list is a splice of **column names** into
-[`record_count`](../reference/functions.md#record_count)'s `group=` or
-[`is_unique_set`](../reference/functions.md#is_unique_set)'s members — and there, as everywhere,
+[`record_count`](../reference/functions.md#record_count)'s `group=`,
+[`is_unique_set`](../reference/functions.md#is_unique_set)'s members or
+[`values`](../reference/functions.md#values)' columns — and there, as everywhere,
 the expression the binding holds may be written in its place
 (`is_unique_set([USUBJID, natural_key_variables()])`).
+
+A **list of column names** is its own binding form: `$keys: [STUDYID, USUBJID]` — bare column
+references, `--SEQ` and `DM.USUBJID` included, never mixed with a quoted literal — holds the
+**names**, not the cells. It is read exactly where the written list of names is read: as the
+members of `is_unique_set($keys)` / `is_not_unique_set($keys)` (also as a member,
+`is_unique_set([STUDYID, $keys])`), as `record_count(group=$keys)`, and as the columns whose
+per-row values `values($keys)` lists. Anywhere else — `X in $keys`, a comparison, a function's value
+argument, another binding, `Output_Variables` — it is a load error with the hint *"`$keys` holds
+column names: use it in a name slot (`group=$keys`) or read its values with `values($keys)`; to
+compare names as text, write a string list"*. A `group=` that does not splice (`max`, `distinct`,
+`read_value`) refuses it as it refuses a string list of names.
 
 
 ## ⛔ Everything else is rejected, loudly
