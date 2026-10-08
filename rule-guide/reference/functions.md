@@ -2105,10 +2105,10 @@ A count of variables, in one of three forms — give the template **or** the pat
 
 | parameter | type | required | description |
 |---|---|---|---|
-| `name` | string | no | A `--` variable-name template, resolved per dataset of the study |
+| `name` | string | no | A `--` variable-name template, resolved per dataset of the study — any **dataset-level** string: a literal (`"--LNKGRP"`), a `$`-binding holding one, or the expression such a binding would hold, written inline |
 | `name_pattern` | regex | no | A regular expression over the current dataset's column names |
 
-A **registry function** since wave 4b of the operations→functions programme (`PLAN-scalar-metadata-functions`). It is an **aggregate**: one value for the dataset, computed once per rule and dataset and read by every row. Its arguments are read once per call, so each is a **literal** — a column or any other expression there fails to load. The template is a **string** (`"--LNKGRP"`): it names a column of every dataset, not of the current one, so a bare `--LNKGRP` fails to load. An invalid `name_pattern` fails to load (the retired operation counted 0, silently). The study-wide form reads the study inventory; a run whose dataset resolver cannot enumerate the study is a wiring defect and reports a rule **ERROR** (the retired operation counted the current dataset only).
+A **registry function** since wave 4b of the operations→functions programme (`PLAN-scalar-metadata-functions`). It is an **aggregate**: one value for the dataset, computed once per rule and dataset and read by every row. Its arguments are read once per call: the template is any **dataset-level** string — a literal (`"--LNKGRP"`), a `$`-binding or the same expression inline, judged alike — and a per-row value there (a column, `upper(AETERM)`) fails to load as the level finding, the same for both spellings; `name_pattern` is a regex **literal**. The template names a column of every dataset, not of the current one, so a bare `--LNKGRP` is a per-row value and fails to load. An invalid `name_pattern` fails to load (the retired operation counted 0, silently). The study-wide form reads the study inventory; a run whose dataset resolver cannot enumerate the study is a wiring defect and reports a rule **ERROR** (the retired operation counted the current dataset only).
 
 **Example**
 
@@ -2770,9 +2770,9 @@ Its result type follows the key: `"dataset_size"` is a **number**; `"dataset_nam
 
 | parameter | type | required | description |
 |---|---|---|---|
-| `name` | string | yes | The metadata key |
+| `name` | string | yes | The metadata key — any **dataset-level** string: a literal (`"dataset_name"`), a `$`-binding holding one, or the expression such a binding would hold, written inline |
 
-A **registry function** since wave 4b of the operations→functions programme (`PLAN-scalar-metadata-functions`). It is an **aggregate**: one value for the dataset, computed once per rule and dataset and read by every row. Its arguments are read once per call, so each is a **literal** — a column or any other expression there fails to load.
+A **registry function** since wave 4b of the operations→functions programme (`PLAN-scalar-metadata-functions`). It is an **aggregate**: one value for the dataset, computed once per rule and dataset and read by every row. Its argument is read once per call, so it takes any **dataset-level** string — a literal, a `$`-binding or the same expression inline, judged alike — and a per-row value there (a column, `upper(AETERM)`) fails to load as the level finding, the same for both spellings.
 
 **Example**
 
@@ -3107,7 +3107,7 @@ Library variables of the current dataset filtered by metadata, intersected with 
 | parameter | type | required | description |
 |---|---|---|---|
 | `key_name` | string | no | The metadata attribute to filter on — a static string literal naming an attribute the Library publishes for a variable (`role`, `core`, `label`, `simpleDatatype`, …); any other name fails to load, naming the attributes that exist |
-| `key_value` | string | no | The value that attribute must have — a static string literal, compared exactly |
+| `key_value` | string | no | The value that attribute must have — any **dataset-level** string (a literal, a `$`-binding or the same expression inline; a per-row value fails to load), compared exactly |
 
 A **registry function** since wave 4 of the operations→functions programme (`PLAN-list-functions`). It takes **no column target** — the `name` / `names` rows of the retired operation are gone, and `get_dataset_filtered_variables(X)` fails to load. It is an **aggregate**: one list for the dataset, computed once per rule and dataset and read by every row. It needs the CDISC Library: without one the rule is **SKIPPED** (*"Rule skipped — no Library access"*). Both parameters are read once per call, which is why they must be literals (a column bound there would be read at row 0 and silently stand for every row). A `key_name` the dataset's own Library rows do not carry (`core` on a model-only walk, `role` on an ADaM dataset) is legal and logs a WARNING, because servability is a per-dataset fact.
 
@@ -3170,7 +3170,7 @@ Model variables filtered by metadata, **not** intersected with the dataset's col
 | parameter | type | required | description |
 |---|---|---|---|
 | `key_name` | string | no | The metadata attribute to filter on — a static string literal naming an attribute the Library publishes for a variable (`role`, `core`, `label`, `simpleDatatype`, …); any other name fails to load, naming the attributes that exist |
-| `key_value` | string | no | The value that attribute must have — a static string literal, compared exactly |
+| `key_value` | string | no | The value that attribute must have — any **dataset-level** string (a literal, a `$`-binding or the same expression inline; a per-row value fails to load), compared exactly |
 | `model_class` | string | no | The general-observation class whose model table to walk — a static string literal; `Events`, `Interventions`, `Findings`, `Findings About` in any letter case and spacing (`"EVENTS"`, `" Findings About "`), any other spelling fails to load |
 
 A **registry function** since wave 4 of the operations→functions programme (`PLAN-list-functions`). It takes **no column target** — the `name` / `names` rows of the retired operation are gone, and `get_model_filtered_variables(X)` fails to load. It is an **aggregate**: one list for the dataset, computed once per rule and dataset and read by every row. It needs the CDISC Library: without one the rule is **SKIPPED** (*"Rule skipped — no Library access"*). The three parameters are read once per call and must be literals. A `key_name` the walked rows do not carry (`core` on a model walk of a standard SDTM domain) is legal and logs a WARNING — SUPP--/SQ-- datasets and every ADaM dataset publish `core` on this walk.
@@ -4092,7 +4092,7 @@ The terms of the named CT codelists, in the representation `level=` / `returntyp
 
 | parameter | type | required | description |
 |---|---|---|---|
-| `codelists` | list of strings | yes | Which codelists to read, by codelist short name, as a list of string literals — `["DOMAIN"]`, `["ND"]`; several are unioned in order |
+| `codelists` | list of strings | yes | Which codelists to read, by codelist short name — any **dataset-level** list of strings: a list literal of string literals (`["DOMAIN"]`, `["ND"]`), a `$`-binding holding one, or the expression such a binding would hold, written inline (`union(…)`); several are unioned in order |
 | `level` | string | yes | `"term"` reads the terms of each codelist; `"codelist"` reads the codelist's own entry. Any other value fails to load |
 | `returntype` | string | no | Which attribute to return: `"value"` (submission value), `"code"` (NCI concept id, the C-code) or `"pref_term"` (NCI preferred term). Any other value fails to load. Absent: `code` at `level="term"`, `value` at `level="codelist"` |
 
@@ -4150,7 +4150,7 @@ Decode presence against an external dictionary: `true` on a row whose code has *
 |---|---|---|---|
 | `name` | column | yes | The code column (`CMTRT`) |
 | `external_dictionary_type` | string | yes | Which external dictionary to check against — a string literal (`"whodrug"`) |
-| `case_sensitive` | boolean | no | Default `true`; only `case_sensitive=false` folds case. Must be a boolean literal — anything else fails to load |
+| `case_sensitive` | boolean | no | Default `true`; only `false` folds case. Any **dataset-level** boolean — a literal, a `$`-binding or the same expression inline; a per-row value fails to load |
 
 `name` is a **column reference**; a quoted name fails to load, and an absent column answers `false` on every row. The dictionary type must be a static string literal: the function declares the dictionary it needs from it, so a rule whose dictionary is not loaded reports **SKIPPED** — never a finding, never a silent pass — before any row is read, and a run's provider forecast lists the type. Reached without its dictionary the function reports a rule ERROR, never `false`. (Until wave 3 of the operation→function programme this was an operation.)
 
@@ -4247,7 +4247,7 @@ The publication dates of the CT packages the Library publishes for the applicabl
 
 | parameter | type | required | description |
 |---|---|---|---|
-| `ct_package_types` | list of strings | no | The CT package families to consider, as a list of string literals — `["SDTM"]`, `["SDTM", "ADAM"]` (a family maps to its package type by lower-casing and appending `ct`). Omitted: the families of the rule's standard — `sdtmig` ⇒ SDTM CT, `sendig` ⇒ SEND CT, `cdashig` ⇒ CDASH CT, `adamig` ⇒ SDTM + ADaM CT, `usdm` ⇒ DDF + SDTM CT |
+| `ct_package_types` | list of strings | no | The CT package families to consider — any **dataset-level** list of strings: a list literal of string literals (`["SDTM"]`, `["SDTM", "ADAM"]`), a `$`-binding holding one, or the same expression inline (a family maps to its package type by lower-casing and appending `ct`). Omitted: the families of the rule's standard — `sdtmig` ⇒ SDTM CT, `sendig` ⇒ SEND CT, `cdashig` ⇒ CDASH CT, `adamig` ⇒ SDTM + ADaM CT, `usdm` ⇒ DDF + SDTM CT |
 
 A **registry function** since wave 4 of the operations→functions programme (`PLAN-list-functions`). It takes **no column target** — the `name` / `names` rows of the retired operation are gone, and `valid_codelist_dates(X)` fails to load. It is an **aggregate**: one list for the dataset, computed once per rule and dataset and read by every row. It needs the CDISC Library: without one the rule is **SKIPPED** (*"Rule skipped — no Library access"*). The list is read once per call and must be a list literal of string literals — a bare `[SDTM]` names a column and fails to load, naming the quoted spelling.
 
@@ -4285,7 +4285,7 @@ Code validity against an external dictionary: `true` on a row whose value is a m
 | `name` | column | yes | The column holding the value to check |
 | `external_dictionary_type` | string | yes | Which external dictionary to check against — a string literal (`"meddra"`, `"whodrug"`, `"unii"`, `"snomed"`, `"medrt"`, `"loinc"`) |
 | `dictionary_term_type` | string | yes | Which level of the dictionary to check. A static string literal — anything else fails to load |
-| `case_sensitive` | boolean | no | Default `true` (the preferred case); `case_sensitive=false` accepts any case. Must be a boolean literal — anything else fails to load |
+| `case_sensitive` | boolean | no | Default `true` (the preferred case); `false` accepts any case. Any **dataset-level** boolean — a literal, a `$`-binding or the same expression inline; a per-row value fails to load |
 
 `name` is a **column reference**; a quoted name fails to load, and an absent column is a column of blanks (valid on every row). The dictionary type must be a static string literal: the function declares the dictionary it needs from it, so a rule whose dictionary is not loaded reports **SKIPPED** — never a finding, never a silent pass — before any row is read, and a run's provider forecast lists the type. Reached without its dictionary the function reports a rule ERROR, never `false`. (Until wave 3 of the operation→function programme this was an operation.)
 
@@ -4320,7 +4320,7 @@ Code↔decode pairing against an external dictionary: `true` on a row whose code
 | `name` | column | yes | The code column (`TSVALCD`, `--STRESC`) |
 | `external_dictionary_term_variable` | column | yes | The decode / term column to pair with the code (`TSVAL`, `--RESCAT`) |
 | `external_dictionary_type` | string | yes | Which external dictionary to check against — a string literal (`"unii"`, `"snomed"`, `"medrt"`, `"neoplasm"`) |
-| `case_sensitive` | boolean | no | Whether the comparison is case-sensitive; default `true` (compares verbatim). Only `case_sensitive=false` folds case. Must be a boolean literal — anything else fails to load |
+| `case_sensitive` | boolean | no | Whether the comparison is case-sensitive; default `true` (compares verbatim). Only `false` folds case. Any **dataset-level** boolean — a literal, a `$`-binding or the same expression inline; a per-row value fails to load |
 
 Both column parameters are **column references**; a quoted name (`external_dictionary_term_variable="TSVAL"`) is a string literal and fails to load, and a call without the term column fails to load. The dictionary type must be a string literal: the function declares the dictionary it needs from it, so a rule whose dictionary is not loaded reports **SKIPPED** — never a finding, never a silent pass — before any row is read, and a run's provider forecast lists the type. (Until wave 1 of the operation→function programme this was an operation taking `external_dictionary_term_variable="TSVAL"` as a quoted string.)
 
@@ -4358,7 +4358,7 @@ Hierarchy ancestor test against an external dictionary: `true` on a row whose ch
 | `name` | column | yes | The child term column (`--HLT`, `--HLGT`) |
 | `dictionary_parent` | column | yes | The candidate ancestor column (`--SOC`) |
 | `external_dictionary_type` | string | yes | Which external dictionary to check against — a string literal (`"meddra"`) |
-| `case_sensitive` | boolean | no | Whether the comparison is case-sensitive; default `true` (compares verbatim). Only `case_sensitive=false` folds case. Must be a boolean literal — anything else fails to load |
+| `case_sensitive` | boolean | no | Whether the comparison is case-sensitive; default `true` (compares verbatim). Only `false` folds case. Any **dataset-level** boolean — a literal, a `$`-binding or the same expression inline; a per-row value fails to load |
 
 Both column parameters are **column references**: the `--` in `--HLT` / `--SOC` is resolved like any other variable name, and a quoted name (`dictionary_parent="--SOC"`) is a string literal and fails to load. The dictionary type must be a string literal; a rule whose dictionary is not loaded reports **SKIPPED** before any row is read.
 
@@ -4396,7 +4396,7 @@ Term validity against an external dictionary: `true` on a row whose value is a m
 | `name` | column | yes | The column holding the value to check |
 | `external_dictionary_type` | string | yes | Which external dictionary to check against — a string literal (`"meddra"`, `"whodrug"`, `"unii"`, `"snomed"`, `"medrt"`, `"loinc"`) |
 | `dictionary_term_type` | string | yes | Which level of the dictionary to check. A static string literal — anything else fails to load |
-| `case_sensitive` | boolean | no | Default `true` (the preferred case); `case_sensitive=false` accepts any case. Must be a boolean literal — anything else fails to load |
+| `case_sensitive` | boolean | no | Default `true` (the preferred case); `false` accepts any case. Any **dataset-level** boolean — a literal, a `$`-binding or the same expression inline; a per-row value fails to load |
 
 `name` is a **column reference**; a quoted name fails to load, and an absent column is a column of blanks (valid on every row). The dictionary type must be a static string literal: the function declares the dictionary it needs from it, so a rule whose dictionary is not loaded reports **SKIPPED** — never a finding, never a silent pass — before any row is read, and a run's provider forecast lists the type. Reached without its dictionary the function reports a rule ERROR, never `false`. (Until wave 3 of the operation→function programme this was an operation.)
 
