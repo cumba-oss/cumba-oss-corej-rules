@@ -2595,8 +2595,10 @@ dataset). The sixteen predicates that lift are marked **element-wise** in their 
 `is_valid_testcd`. The list of booleans may also be **bound** and quantified later —
 `$ok: is_numeric(values([--ORRES, --STRESC]))` then `all($ok)` — and a quantifier over a scalar
 predicate or a scalar binding is simply that predicate (`any(is_valid_date(X))` is
-`is_valid_date(X)`, `none(…)` its negation). Every other use of such a list is a load error: written
-as a condition on its own (`is_valid_date(values([X, Y]))` — quantify it), compared (`$ok == true`),
+`is_valid_date(X)`, `none(…)` its negation) — and so is a quantifier over a condition written inline,
+as it is over the binding holding it: `any((EPOCH == SE.EPOCH))`, `all(contains(A, "x"))`,
+`none((not empty(A)))` (a comparison or a `not` is parenthesised there). Every other use of such a
+list is a load error: written as a condition on its own (`is_valid_date(values([X, Y]))` — quantify it), compared (`$ok == true`),
 tested with `in`, passed to another function, or reported in `Output_Variables`; and the quantifiers
 take nothing else — `any(values([A, B]))` (cells, not answers) or `any($strings)` fail to load.
 A quantifier inside `joined(…)` stays refused.
@@ -2623,7 +2625,7 @@ false.
 
 | parameter | type | required | description |
 |---|---|---|---|
-| `list` | list of booleans | yes | The answers to fold — `joined(<condition>)`, an element-wise predicate over a list (`is_valid_date(values([X, Y]))`), or a `$`-binding holding one |
+| `list` | list of booleans | yes | The answers to fold — `joined(<condition>)`, an element-wise predicate over a list (`is_valid_date(values([X, Y]))`), or a `$`-binding holding one; a condition written inline (`(A == B)`, `(not empty(A))`, `contains(A, "x")`) is its own one answer |
 
 **Example**
 
@@ -2657,7 +2659,7 @@ B])))`), or every answer in the bound list is true (`$ok: is_numeric(values([A, 
 
 | parameter | type | required | description |
 |---|---|---|---|
-| `list` | list of booleans | yes | The answers to fold — `joined(<condition>)`, an element-wise predicate over a list, or a `$`-binding holding one |
+| `list` | list of booleans | yes | The answers to fold — `joined(<condition>)`, an element-wise predicate over a list, or a `$`-binding holding one; a condition written inline (`(A == B)`, `(not empty(A))`, `contains(A, "x")`) is its own one answer |
 
 **Example**
 
@@ -2682,7 +2684,7 @@ true.
 
 | parameter | type | required | description |
 |---|---|---|---|
-| `list` | list of booleans | yes | The answers to fold — `joined(<condition>)`, an element-wise predicate over a list, or a `$`-binding holding one |
+| `list` | list of booleans | yes | The answers to fold — `joined(<condition>)`, an element-wise predicate over a list, or a `$`-binding holding one; a condition written inline (`(A == B)`, `(not empty(A))`, `contains(A, "x")`) is its own one answer |
 
 **Example** — `CDISC-CG0218`'s `ERROR` level as shipped: the row condition anchors the finding on
 the element that contains the visit start (end-exclusive: the transition instant belongs to the
