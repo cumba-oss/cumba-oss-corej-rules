@@ -37,6 +37,11 @@ an absent or mis-shaped key degrades to empty **silently**
   "hierarchy": {                         // term -> ALL its ancestors (flattened, not just parent)
     "Headaches NEC": ["Headaches", "Nervous system disorders"]
   },
+  "hierarchy_by_level": {                // level -> term -> ancestor level -> ancestor terms (meddra)
+    "PT":   { "Headache":  { "HLT": ["Headaches NEC"], "HLGT": ["Headaches"], "SOC": ["Nervous system disorders"] } },
+    "PTCD": { "10019211":  { "HLTCD": ["10019231"], "HLGTCD": ["10019233"], "SOCCD": ["10029205"] } },
+    "LLT":  { "Cephalgia": { "PT": ["Headache"] } }
+  },
   "pairs": {                             // registry -> code -> decode
     "medrt": { "N0000000160": "Cyclooxygenase Inhibitors" }
   },
@@ -57,12 +62,34 @@ an absent or mis-shaped key degrades to empty **silently**
 | Section      | Key                  | Value                       | Serves |
 |--------------|----------------------|-----------------------------|--------|
 | `levels`     | term **upper-cased** | the term in *preferred case* | `valid_external_dictionary_value`, `valid_external_dictionary_code` |
-| `hierarchy`  | term, verbatim       | list of ancestor terms, verbatim | `valid_external_dictionary_hierarchy` |
+| `hierarchy`  | term, verbatim       | list of ancestor terms, verbatim | `valid_external_dictionary_hierarchy` (legacy arm) |
+| `hierarchy_by_level` | level → term, verbatim | ancestor level → list of ancestor terms, verbatim | `valid_external_dictionary_hierarchy` (level-scoped) |
 | `pairs`      | registry → code, verbatim | decode, verbatim       | `valid_external_dictionary_code_term_pair`, `dictionary_has_decode` |
 | `attributes` | attribute → term, verbatim | value, verbatim        | reached only by the pair/decode fall-through scan |
 
 `levels` keys are upper-cased **at load**; every other section keeps a
-verbatim map *and* a case-folded twin. The registry *name* is a
+verbatim map *and* a case-folded twin (`hierarchy_by_level` builds its twin on
+the first `case_sensitive=false` lookup).
+
+#### `hierarchy` vs `hierarchy_by_level` — the level of the variable read
+
+A MedDRA name can sit at more than one level — a PT name can also be an HLT
+and an LLT name — so the bare-name `hierarchy` map, which files every level
+under one key, can answer with another level's ancestors (a wrong SOC
+passes). `hierarchy_by_level` keys the **primary** path per level: a PT
+(name, and its code under `PTCD`) → its one primary HLT, HLGT and SOC; an LLT
+→ its PT, whose own entry carries the path; an HLT / HLGT → the set of HLGTs
+/ SOCs it reaches on primary rows; codes sit at their own `*CD` levels.
+`valid_external_dictionary_hierarchy` reads it at the levels of **both**
+columns it names, derived from their names at load (`--DECOD` → `PT`,
+`--PTCD` → `PTCD`, `--LLT`, `--HLT`, `--HLGT`, `--SOC` and their `CD` forms);
+`--BODSYS` is deliberately **not** mapped (it may carry a secondary SOC).
+
+⭐ **Legacy arm:** a file **without** `hierarchy_by_level` — every MedDRA file
+installed before this section existed, and the dummy fixture here — answers
+exactly as before through `hierarchy`; so does a call naming a column that
+maps to no level. Re-convert an installed MedDRA distribution to gain the
+level-scoped section (`MedDraConverter` writes both sections). The registry *name* is a
 preference, not a constraint — on a miss both pair operations scan every
 `pairs` registry and every `attributes` map of that dictionary.
 
@@ -79,6 +106,10 @@ Enforced by `DictionaryValidationTest.caseContractViolations`
    backing — and made every real WHODrug distribution uninstallable.
 2. **`hierarchy`** — every key *and every ancestor* must resolve to a
    term in some level, written exactly as some level publishes it.
+   **`hierarchy_by_level`** is held to its **own** levels: a key must be a
+   term of the level it is filed under, an ancestor a term of the level it
+   is filed as, each written as that level publishes it
+   (`HouseFormatValidator.caseContractViolations`).
 3. **`pairs` / `attributes`** — any key or value that *is* a level term
    must be written as some level publishes it. Values that are not terms
    (the NEOPLASM `BENIGN`/`MALIGNANT` classes) are unconstrained.
@@ -113,7 +144,7 @@ Census over `lib/corej-rules/rules/*.json` and
 
 | `type`     | required `levels` keys                                                   | other sections | rules |
 |------------|--------------------------------------------------------------------------|---|-------|
-| `meddra`   | `PT` `PTCD` `LLT` `LLTCD` `HLT` `HLTCD` `HLGT` `HLGTCD` `SOC` `SOCCD` | `hierarchy`, keyed at **HLT + HLGT only**, each carrying its SOC | 51 |
+| `meddra`   | `PT` `PTCD` `LLT` `LLTCD` `HLT` `HLTCD` `HLGT` `HLGTCD` `SOC` `SOCCD` | `hierarchy`, keyed at **HLT + HLGT only**, each carrying its SOC; `hierarchy_by_level` (PT / LLT / HLT / HLGT names and codes → primary path) — written by the converter, not yet required | 51 |
 | `unii`     | `UNII` `SRS`                                                             | `pairs.unii` | 24 |
 | `snomed`   | `SNOMED` `SNOMEDCD`                                                      | `pairs.snomed` | 8 |
 | `medrt`    | `MEDRT` `MEDRTCD`                                                        | `pairs.medrt` | 8 |

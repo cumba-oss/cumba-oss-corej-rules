@@ -4991,12 +4991,14 @@ Hierarchy ancestor test against an external dictionary: `true` on a row whose ch
 
 | parameter | type | required | description |
 |---|---|---|---|
-| `name` | column | yes | The child term column (`--HLT`, `--HLGT`) |
+| `name` | column | yes | The child term column (`--HLT`, `--HLGT`, `--DECOD`, `--LLT`, or a code column) |
 | `dictionary_parent` | column | yes | The candidate ancestor column (`--SOC`) |
 | `external_dictionary_type` | string | yes | Which external dictionary to check against — a string literal (`"meddra"`) |
 | `case_sensitive` | boolean | no | Whether the comparison is case-sensitive; default `true` (compares verbatim). Only `false` folds case. Any **dataset-level** boolean — a literal, a `$`-binding or the same expression inline; a per-row value fails to load |
 
 Both column parameters are **column references**: the `--` in `--HLT` / `--SOC` is resolved like any other variable name, and a quoted name (`dictionary_parent="--SOC"`) is a string literal and fails to load. The dictionary type must be a string literal; a rule whose dictionary is not loaded reports **SKIPPED** before any row is read.
+
+**The level of each column decides the lookup.** A MedDRA name can sit at more than one level (a PT name can also be an HLT or an LLT name), so the dictionary is read at the level of the variable — child **and** parent — derived from the column's name when the rule loads: `--DECOD` is the PT, `--LLT`, `--HLT`, `--HLGT`, `--SOC` their levels, and `--PTCD`, `--LLTCD`, `--HLTCD`, `--HLGTCD`, `--SOCCD` the code levels. The path is the **primary** one: a PT (or its code) lies under its one primary HLT, HLGT and SOC, an LLT under its PT's path, an HLT / HLGT under the SOCs it reaches primarily — so `valid_external_dictionary_hierarchy(--DECOD, --SOC, external_dictionary_type="meddra")` is `false` for a secondary SOC, and an HLT name in `--SOC` is no SOC. `--BODSYS` maps to no level (it may hold a secondary SOC). This needs a MedDRA file carrying the level-scoped section (`hierarchy_by_level`, written by the dictionary converter); a file without it, or a column that maps to no level, answers through the bare-name map — HLT and HLGT names to their primary SOCs — as before.
 
 **Example**
 
