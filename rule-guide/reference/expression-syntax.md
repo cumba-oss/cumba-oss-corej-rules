@@ -418,7 +418,16 @@ upper($required_variables)` — read by `contains_all` / `is_ordered_subset_of` 
 `shares_elements_with`; [`upper`](functions.md#upper) and [`lower`](functions.md#lower) fold a list
 element by element — a `$`-list, a per-row list, and the values of several columns read with
 [`values`](functions.md#values) (`upper(values([X, Y]))`; `upper([X, Y])` with bare names fails to
-load, since `[X, Y]` is a list of column *names*). The sixteen element-wise **predicates**
+load, since `[X, Y]` is a list of column *names*). So do the other scalar value functions
+(runbook W2 E5): `len` / `length`, `trim`, `normalize_space`, `char`, `prefix`, `suffix`,
+`substring`, `lpad`, `str`, `num`, `abs`, `ceil`, `floor`, `round`, `year`, `month`, `day`, `date`,
+`time`, `earliest_possible` and `latest_possible` each answer a list of the same length over a list
+at their first argument (`len(values([X, Y]))`, `trim(split_by(X, ","))`, `date($dates)`), every
+other argument applying unchanged to each element of the row (`substring(values([X, Y]), S, 2)`
+reads the row's `S` for both); a lifted list compared with a single value fails to load (test
+membership with `in`), and a lifted list on the left of `in` asks whether **any** element is a
+member — by the date / time rule for `date(…)` / `time(…)`, numerically for `num(…)` against
+numbers. `count` / `size` stay a list's cardinality. The sixteen element-wise **predicates**
 (`is_valid_date`, `is_numeric`, … — [`functions.md`](functions.md#quantifiers-over-joined-rows)) lift
 the same way and answer a list of booleans for `any` / `all` / `none`:
 `any(is_valid_date(values([--STDTC, --ENDTC])))`. A name **test** folds the name it tests: `ends_with(upper(varname()), "FL")`,

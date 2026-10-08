@@ -689,6 +689,8 @@ expression: 'len(ETCD) > 8'
 
 **Missing and empty** — `len("")` is **0** — an empty string is a present value of length zero. A genuine missing value yields **that missing value**, not 0 — identity kept (`len(.A)` is `.A`, rulings register `D85c`). An absent character column reads as all-`""`, so `len(x) == 0` is true for it.
 
+**List form (element-wise)** — over a list at `x` — the cells of several columns ([`values`](#values): `len(values([X, Y]))`), a per-row list such as `split_by(…)`, or a `$`-list — the function answers **a list of the same length**, each element's length in characters (`unit=` / `encoding=` apply to every element) — a list of numbers, never the list's cardinality, which is [`count`](#count), exactly as the scalar call answers it (runbook W2 E5); a missing element answers as the scalar call answers a missing value, in its position, `[]` gives `[]` and a missing list stays that missing. The list is a per-row membership set on the right of `in`, and on the left of `in` it asks whether **any** element is a member; compared with a single value (`==`, `<`, …) it fails the rule's load. `[X, Y]` with bare names is a list of column *names*: read the values with `values([X, Y])`.
+
 ### lower
 
 `lower(x)` → **value**
@@ -792,6 +794,8 @@ expression: 'upper(normalize_space(var_label("DATA"))) not in library_variable_l
 
 **Missing and empty** — A missing input yields **that missing value**, identity kept (rulings register `D36`). `""` is a present value and yields `""` (it used to yield missing).
 
+**List form (element-wise)** — over a list at `x` — the cells of several columns ([`values`](#values): `normalize_space(values([X, Y]))`), a per-row list such as `split_by(…)`, or a `$`-list — the function answers **a list of the same length**, each element with its whitespace normalised, exactly as the scalar call answers it (runbook W2 E5); a missing element answers as the scalar call answers a missing value, in its position, `[]` gives `[]` and a missing list stays that missing. The list is a per-row membership set on the right of `in`, and on the left of `in` it asks whether **any** element is a member; compared with a single value (`==`, `<`, …) it fails the rule's load. `[X, Y]` with bare names is a list of column *names*: read the values with `values([X, Y])`.
+
 ### prefix
 
 `prefix(x, n)` → **value**
@@ -812,6 +816,8 @@ expression: 'prefix(TSVCDREF, 5) == "CDISC"'
 **Missing and empty** — A missing `x` yields **that missing value**, identity kept (rulings register `D36`); a missing `n` makes the result missing too (the identities of `x` and `n` combine per `D86a`: one distinct identity ⇒ that identity, two ⇒ `MIS`). `""` yields `""`. A value shorter than `n` — or a non-positive or non-integral `n` — returns the value whole.
 
 ⛔ **Type error on a character `n`.** The length operand must be numeric; a character column there raises a rule ERROR. Convert with `num(n)`.
+
+**List form (element-wise)** — over a list at `x` — the cells of several columns ([`values`](#values): `prefix(values([X, Y]), 2)`), a per-row list such as `split_by(…)`, or a `$`-list — the function answers **a list of the same length**, each element's first `n` characters, the row's `n` applied to every element, exactly as the scalar call answers it (runbook W2 E5); a missing element answers as the scalar call answers a missing value, in its position, `[]` gives `[]` and a missing list stays that missing. The list is a per-row membership set on the right of `in`, and on the left of `in` it asks whether **any** element is a member; compared with a single value (`==`, `<`, …) it fails the rule's load. `[X, Y]` with bare names is a list of column *names*: read the values with `values([X, Y])`.
 
 ### prefix_matches
 
@@ -911,6 +917,8 @@ Check:
 ⛔ **Type error on character bounds.** `start` and `length` must be numeric; a character column raises a rule ERROR. Convert with `num(...)`.
 
 
+**List form (element-wise)** — over a list at `x` — the cells of several columns ([`values`](#values): `substring(values([X, Y]), 1, 2)`), a per-row list such as `split_by(…)`, or a `$`-list — the function answers **a list of the same length**, each element's substring, the row's `start` / `length` applied to every element, exactly as the scalar call answers it (runbook W2 E5); a missing element answers as the scalar call answers a missing value, in its position, `[]` gives `[]` and a missing list stays that missing. The list is a per-row membership set on the right of `in`, and on the left of `in` it asks whether **any** element is a member; compared with a single value (`==`, `<`, …) it fails the rule's load. `[X, Y]` with bare names is a list of column *names*: read the values with `values([X, Y])`.
+
 ### suffix
 
 `suffix(x, n)` → **value**
@@ -931,6 +939,8 @@ expression: 'suffix(QNAM, 1) =~ /^[A-Z0-9]$/'
 **Missing and empty** — As [`prefix`](#prefix): a missing `x` or `n` yields that missing value, identity kept (rulings register `D36` / `D86a`); `""` yields `""`; a value shorter than `n` — or a non-positive or non-integral `n` — returns the value whole.
 
 ⛔ **Type error on a character `n`.** The length operand must be numeric; a character column there raises a rule ERROR. Convert with `num(n)`.
+
+**List form (element-wise)** — over a list at `x` — the cells of several columns ([`values`](#values): `suffix(values([X, Y]), 2)`), a per-row list such as `split_by(…)`, or a `$`-list — the function answers **a list of the same length**, each element's last `n` characters, the row's `n` applied to every element, exactly as the scalar call answers it (runbook W2 E5); a missing element answers as the scalar call answers a missing value, in its position, `[]` gives `[]` and a missing list stays that missing. The list is a per-row membership set on the right of `in`, and on the left of `in` it asks whether **any** element is a member; compared with a single value (`==`, `<`, …) it fails the rule's load. `[X, Y]` with bare names is a list of column *names*: read the values with `values([X, Y])`.
 
 ### suffix_matches
 
@@ -980,6 +990,8 @@ expression: 'trim(QVAL) != QVAL'
 ```
 
 **Missing and empty** — A missing input yields **that missing value**, identity kept (rulings register `D36`). `""` yields `""`.
+
+**List form (element-wise)** — over a list at `x` — the cells of several columns ([`values`](#values): `trim(values([X, Y]))`), a per-row list such as `split_by(…)`, or a `$`-list — the function answers **a list of the same length**, each element trimmed, exactly as the scalar call answers it (runbook W2 E5); a missing element answers as the scalar call answers a missing value, in its position, `[]` gives `[]` and a missing list stays that missing. The list is a per-row membership set on the right of `in`, and on the left of `in` it asks whether **any** element is a member; compared with a single value (`==`, `<`, …) it fails the rule's load. `[X, Y]` with bare names is a list of column *names*: read the values with `values([X, Y])`.
 
 ### upper
 
@@ -1083,6 +1095,8 @@ expression: 'abs(num(BASE) - num(AVAL)) > 0.001'
 
 ⛔ **Type error on a character column.** The operand must be numeric; a character column raises a rule ERROR rather than being parsed. Convert it explicitly with `num(x)` if the text is meant as a number.
 
+**List form (element-wise)** — over a list at `x` — the cells of several columns ([`values`](#values): `abs(values([X, Y]))`), a per-row list such as `split_by(…)`, or a `$`-list — the function answers **a list of the same length**, each element's absolute value, exactly as the scalar call answers it (runbook W2 E5); a missing element answers as the scalar call answers a missing value, in its position, `[]` gives `[]` and a missing list stays that missing. The list is a per-row membership set on the right of `in`, and on the left of `in` it asks whether **any** element is a member; compared with a single value (`==`, `<`, …) it fails the rule's load. `[X, Y]` with bare names is a list of column *names*: read the values with `values([X, Y])`.
+
 ### between
 
 `between(x, lo, hi)` → **boolean**
@@ -1123,6 +1137,8 @@ expression: 'ceil(ADY)'
 
 ⛔ **Type error on a character column.** The operand must be numeric; a character column raises a rule ERROR rather than being parsed. Convert it explicitly with `num(x)` if the text is meant as a number.
 
+**List form (element-wise)** — over a list at `x` — the cells of several columns ([`values`](#values): `ceil(values([X, Y]))`), a per-row list such as `split_by(…)`, or a `$`-list — the function answers **a list of the same length**, each element rounded up, exactly as the scalar call answers it (runbook W2 E5); a missing element answers as the scalar call answers a missing value, in its position, `[]` gives `[]` and a missing list stays that missing. The list is a per-row membership set on the right of `in`, and on the left of `in` it asks whether **any** element is a member; compared with a single value (`==`, `<`, …) it fails the rule's load. `[X, Y]` with bare names is a list of column *names*: read the values with `values([X, Y])`.
+
 ### floor
 
 `floor(x)` → **value**
@@ -1142,6 +1158,8 @@ expression: 'floor(ADY)'
 **Missing and empty** — As [`abs`](#abs): a missing input yields **that missing value**, identity kept (rulings register `D85c`); a non-numeric or empty input yields the plain missing (`MIS`).
 
 ⛔ **Type error on a character column.** The operand must be numeric; a character column raises a rule ERROR rather than being parsed. Convert it explicitly with `num(x)` if the text is meant as a number.
+
+**List form (element-wise)** — over a list at `x` — the cells of several columns ([`values`](#values): `floor(values([X, Y]))`), a per-row list such as `split_by(…)`, or a `$`-list — the function answers **a list of the same length**, each element rounded down, exactly as the scalar call answers it (runbook W2 E5); a missing element answers as the scalar call answers a missing value, in its position, `[]` gives `[]` and a missing list stays that missing. The list is a per-row membership set on the right of `in`, and on the left of `in` it asks whether **any** element is a member; compared with a single value (`==`, `<`, …) it fails the rule's load. `[X, Y]` with bare names is a list of column *names*: read the values with `values([X, Y])`.
 
 ### is_integer
 
@@ -1293,6 +1311,8 @@ expression: 'round(AGE) == AGE'
 
 ## Dates and times
 
+**List form (element-wise)** — over a list at `x` — the cells of several columns ([`values`](#values): `round(values([X, Y]))`), a per-row list such as `split_by(…)`, or a `$`-list — the function answers **a list of the same length**, each element rounded, exactly as the scalar call answers it (runbook W2 E5); a missing element answers as the scalar call answers a missing value, in its position, `[]` gives `[]` and a missing list stays that missing. The list is a per-row membership set on the right of `in`, and on the left of `in` it asks whether **any** element is a member; compared with a single value (`==`, `<`, …) it fails the rule's load. `[X, Y]` with bare names is a list of column *names*: read the values with `values([X, Y])`.
+
 ### date_contains
 
 `date_contains(outer, inner)` → **boolean**
@@ -1389,6 +1409,8 @@ expression: 'is_complete_date(AESTDTC) and day(AESTDTC) > 28'
 ```
 
 **Missing and empty** — A missing input yields **that missing value**, identity kept (`day(.A)` is `.A`, rulings register `D85c`). `""` carries no date component and yields the plain missing (`MIS`).
+
+**List form (element-wise)** — over a list at `x` — the cells of several columns ([`values`](#values): `day(values([X, Y]))`), a per-row list such as `split_by(…)`, or a `$`-list — the function answers **a list of the same length**, each element's day, exactly as the scalar call answers it (runbook W2 E5); a missing element answers as the scalar call answers a missing value, in its position, `[]` gives `[]` and a missing list stays that missing. The list is a per-row membership set on the right of `in`, and on the left of `in` it asks whether **any** element is a member; compared with a single value (`==`, `<`, …) it fails the rule's load. `[X, Y]` with bare names is a list of column *names*: read the values with `values([X, Y])`.
 
 ### duration_between
 
@@ -1527,6 +1549,8 @@ duration places on the calendar, so it answers missing. Compare the bound under 
 `duration(latest_possible(duration(--STINT))) > duration(--ENINT)` is the "possibly later" reading.
 
 ⚠ **A bound of a complete value is the value itself**, and two complete values compare as points at the coarser precision — so `date(earliest_possible(A)) < latest_possible(B)` answers exactly `date(A) < date(B)` on complete dates and date-times. A "may" reading of a same-day boundary (an element that ends on the day a date-only visit starts *may* still be in progress) needs its own term; `CDISC-CG0218` spells it as `… < … or (date(earliest_possible(SVSTDTC)) == latest_possible(SE.SEENDTC) and (SVSTDTC !~ /T/ or SE.SEENDTC !~ /T/))` — the same-day equality on the bounds (so a partial value whose first or last possible day is the boundary day counts too), granted only when at least one side carries no time.
+
+**List form (element-wise)** — over a list at `x` — the cells of several columns ([`values`](#values): `earliest_possible(values([X, Y]))`), a per-row list such as `split_by(…)`, or a `$`-list — the function answers **a list of the same length**, each element's earliest possible instant, exactly as the scalar call answers it (runbook W2 E5); a missing element answers as the scalar call answers a missing value, in its position, `[]` gives `[]` and a missing list stays that missing. The list is a per-row membership set on the right of `in`, and on the left of `in` it asks whether **any** element is a member; compared with a single value (`==`, `<`, …) it fails the rule's load. `[X, Y]` with bare names is a list of column *names*: read the values with `values([X, Y])`.
 
 ### interval_uncertainty_precision_mismatch
 
@@ -1739,6 +1763,8 @@ Check:
 
 **Missing and empty** — As [`earliest_possible`](#earliest_possible): a missing input yields **that missing value**, identity kept (rulings register `D85c`); `""` and an unplaceable value yield the plain missing (`MIS`). Over a `duration(…)` operand it is the hull's upper end as a point duration (`P1M` ⇒ `P31D`), see there.
 
+**List form (element-wise)** — over a list at `x` — the cells of several columns ([`values`](#values): `latest_possible(values([X, Y]))`), a per-row list such as `split_by(…)`, or a `$`-list — the function answers **a list of the same length**, each element's latest possible instant, exactly as the scalar call answers it (runbook W2 E5); a missing element answers as the scalar call answers a missing value, in its position, `[]` gives `[]` and a missing list stays that missing. The list is a per-row membership set on the right of `in`, and on the left of `in` it asks whether **any** element is a member; compared with a single value (`==`, `<`, …) it fails the rule's load. `[X, Y]` with bare names is a list of column *names*: read the values with `values([X, Y])`.
+
 ### month
 
 `month(x)` → **value**
@@ -1756,6 +1782,8 @@ expression: 'is_complete_date(AESTDTC) and month(AESTDTC) > 12'
 ```
 
 **Missing and empty** — A missing input yields **that missing value**, identity kept (`month(.A)` is `.A`, rulings register `D85c`). `""` carries no date component and yields the plain missing (`MIS`).
+
+**List form (element-wise)** — over a list at `x` — the cells of several columns ([`values`](#values): `month(values([X, Y]))`), a per-row list such as `split_by(…)`, or a `$`-list — the function answers **a list of the same length**, each element's month, exactly as the scalar call answers it (runbook W2 E5); a missing element answers as the scalar call answers a missing value, in its position, `[]` gives `[]` and a missing list stays that missing. The list is a per-row membership set on the right of `in`, and on the left of `in` it asks whether **any** element is a member; compared with a single value (`==`, `<`, …) it fails the rule's load. `[X, Y]` with bare names is a list of column *names*: read the values with `values([X, Y])`.
 
 ### time_contains
 
@@ -1811,6 +1839,8 @@ expression: 'year(BRTHDTC) < 1900'
 
 
 ## Aggregates over rows and groups
+
+**List form (element-wise)** — over a list at `x` — the cells of several columns ([`values`](#values): `year(values([X, Y]))`), a per-row list such as `split_by(…)`, or a `$`-list — the function answers **a list of the same length**, each element's year, exactly as the scalar call answers it (runbook W2 E5); a missing element answers as the scalar call answers a missing value, in its position, `[]` gives `[]` and a missing list stays that missing. The list is a per-row membership set on the right of `in`, and on the left of `in` it asks whether **any** element is a member; compared with a single value (`==`, `<`, …) it fails the rule's load. `[X, Y]` with bare names is a list of column *names*: read the values with `values([X, Y])`.
 
 ### distinct
 
@@ -5114,6 +5144,8 @@ expression: 'not empty(PARAMCD) and not between(char(PARAMCD), char("A"), char("
 
 **Missing and empty** — A missing input yields **that missing value**, identity kept (`char(.A)` is `.A`, rulings register `D85c`); `""` has no first character to take and yields the plain missing (`MIS`).
 
+**List form (element-wise)** — over a list at `x` — the cells of several columns ([`values`](#values): `char(values([X, Y]))`), a per-row list such as `split_by(…)`, or a `$`-list — the function answers **a list of the same length**, each element's first code point, exactly as the scalar call answers it (runbook W2 E5); a missing element answers as the scalar call answers a missing value, in its position, `[]` gives `[]` and a missing list stays that missing. The list is a per-row membership set on the right of `in`, and on the left of `in` it asks whether **any** element is a member; compared with a single value (`==`, `<`, …) it fails the rule's load. `[X, Y]` with bare names is a list of column *names*: read the values with `values([X, Y])`.
+
 ### colref
 
 `colref(x)` → **value**, or a **list** of values when `x` is a list of names
@@ -5271,6 +5303,8 @@ as a date at any precision — `""`, malformed text — is not an error: every c
 answers false ([Junk answers false](../semantics/comparison.md#junk-answers-false)), so guard it with
 `is_valid_date(…)` or `not empty(…)` when that is not what you want.
 
+**List form (element-wise)** — over a list at `x` — the cells of several columns ([`values`](#values): `date(values([X, Y]))`), a per-row list such as `split_by(…)`, or a `$`-list — the function answers **a list of the same length**, each element read as a date; `date(values([X, Y])) in [date("…")]` compares each element by the date rule, a partial date a range, exactly as `date(X) in […]` does, exactly as the scalar call answers it (runbook W2 E5); a missing element answers as the scalar call answers a missing value, in its position, `[]` gives `[]` and a missing list stays that missing. The list is a per-row membership set on the right of `in`, and on the left of `in` it asks whether **any** element is a member; compared with a single value (`==`, `<`, …) it fails the rule's load. `[X, Y]` with bare names is a list of column *names*: read the values with `values([X, Y])`.
+
 ### duration
 
 `duration(x)` → **duration**
@@ -5368,6 +5402,8 @@ fine, `lpad(X, 3, 10)` is not), fail the rule at load.
 When `width` or `fill` comes from the data, a missing, negative or non-whole `width`, a `width`
 above 32767, or a `fill` that is not exactly one character yields the plain missing (`MIS`).
 
+**List form (element-wise)** — over a list at `x` — the cells of several columns ([`values`](#values): `lpad(values([X, Y]), 3, "0")`), a per-row list such as `split_by(…)`, or a `$`-list — the function answers **a list of the same length**, each element left-padded, the row's `width` / `fill` applied to every element, exactly as the scalar call answers it (runbook W2 E5); a missing element answers as the scalar call answers a missing value, in its position, `[]` gives `[]` and a missing list stays that missing. The list is a per-row membership set on the right of `in`, and on the left of `in` it asks whether **any** element is a member; compared with a single value (`==`, `<`, …) it fails the rule's load. `[X, Y]` with bare names is a list of column *names*: read the values with `values([X, Y])`.
+
 ### num
 
 `num(x)` → **number**
@@ -5387,6 +5423,8 @@ expression: 'num(QVAL) > 8'
 
 **Missing and empty** — A missing input yields **that missing value**; text that is not a number,
 and `""`, yield the plain missing (`MIS`).
+
+**List form (element-wise)** — over a list at `x` — the cells of several columns ([`values`](#values): `num(values([X, Y]))`), a per-row list such as `split_by(…)`, or a `$`-list — the function answers **a list of the same length**, each element read as a number; `num(values([X, Y])) in [1, 2]` compares each element numerically, exactly as the scalar call answers it (runbook W2 E5); a missing element answers as the scalar call answers a missing value, in its position, `[]` gives `[]` and a missing list stays that missing. The list is a per-row membership set on the right of `in`, and on the left of `in` it asks whether **any** element is a member; compared with a single value (`==`, `<`, …) it fails the rule's load. `[X, Y]` with bare names is a list of column *names*: read the values with `values([X, Y])`.
 
 ### printf
 
@@ -5444,6 +5482,8 @@ expression: 'str(IDVARVAL) != str(colref(concat(RDOMAIN, ".", IDVAR)))'
 
 **Missing and empty** — A missing input yields **that missing value**, identity kept.
 
+**List form (element-wise)** — over a list at `x` — the cells of several columns ([`values`](#values): `str(values([X, Y]))`), a per-row list such as `split_by(…)`, or a `$`-list — the function answers **a list of the same length**, each element's text, exactly as the scalar call answers it (runbook W2 E5); a missing element answers as the scalar call answers a missing value, in its position, `[]` gives `[]` and a missing list stays that missing. The list is a per-row membership set on the right of `in`, and on the left of `in` it asks whether **any** element is a member; compared with a single value (`==`, `<`, …) it fails the rule's load. `[X, Y]` with bare names is a list of column *names*: read the values with `values([X, Y])`.
+
 ### time
 
 `time(x)` → **time**
@@ -5464,6 +5504,8 @@ expression: 'not empty(QVAL) and time(QVAL) < time("06:00")'
 
 **Missing and empty** — As for [`date`](#date): a missing input yields **that missing value**; a
 value that cannot be read as a time answers false in every comparison.
+
+**List form (element-wise)** — over a list at `x` — the cells of several columns ([`values`](#values): `time(values([X, Y]))`), a per-row list such as `split_by(…)`, or a `$`-list — the function answers **a list of the same length**, each element read as a time of day; membership compares each element by the time rule, exactly as the scalar call answers it (runbook W2 E5); a missing element answers as the scalar call answers a missing value, in its position, `[]` gives `[]` and a missing list stays that missing. The list is a per-row membership set on the right of `in`, and on the left of `in` it asks whether **any** element is a member; compared with a single value (`==`, `<`, …) it fails the rule's load. `[X, Y]` with bare names is a list of column *names*: read the values with `values([X, Y])`.
 
 ### value
 
