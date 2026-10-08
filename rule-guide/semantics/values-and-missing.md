@@ -171,8 +171,9 @@ date extremes `earliest_date` / `latest_date` follow the **extremes'** candidate
 `min_date` / `max_date` over a group: a missing (or blank) argument is **skipped** and the other
 argument decides alone — `earliest_date(.A, date("2020-01-01"))` is `2020-01-01` — and an identity
 is carried only when **both** are missing (`.A` + `.A` is `.A`; `.A` + `.B` is the plain missing).
-`vlm_value_length` is not yet covered — it answers the plain missing both for a missing target cell and
-for "no value-level match"; the other `vlm_*` value accessors read value-level metadata, not the cell.
+`vlm_value_length` reads the target cell too: a missing target under a matched value-level entry is
+that cell (`.A` stays `.A`), and a record no value-level entry matches is the plain (computed) missing;
+the other `vlm_*` value accessors read value-level metadata, not the cell.
 
 It matches **no** regular expression, including one that matches the empty string. It equals no
 string literal, including `""`, including inside a membership list.

@@ -4685,6 +4685,10 @@ The stored length of the record's value under the matched type
 |---|---|---|---|
 | `name` | any | no | The column to read |
 
+A missing value under a matched value-level entry is handed through with its own missing identity
+(`.A` stays `.A`); a record that no value-level entry matches, or a type whose length is not measured,
+gives the plain missing — so `vlm_value_length(X) > vlm_length(X)` never fires on either.
+
 **Example**
 
 ```yaml
