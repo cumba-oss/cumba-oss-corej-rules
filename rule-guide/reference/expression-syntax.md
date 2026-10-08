@@ -399,8 +399,9 @@ VISITNUM in [1, 2, 3]              # NUMERIC membership
 > because the *list* is all-numeric — a `$`-binding on the left changes nothing. What makes a
 > membership textual is a dynamic set on the **right**.
 
-`upper(X) in [...]` is the case-insensitive surface; it is always string membership, since
-numbers have no case.
+`upper(X) in [...]` — or `upcase(X) in [...]`, its alias — is the case-insensitive surface: the
+probe and the members are both folded; it is always string membership, since numbers have no case.
+`lower(X)` / `lowcase(X)` have no such surface (the folded value against the members as written).
 
 A **column name a rule handles as a value** — `varname()`, the list
 `get_column_order_from_dataset()` returns — is a string and compares exactly like one (owner,

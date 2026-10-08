@@ -695,6 +695,9 @@ expression: 'len(ETCD) > 8'
 
 The value lower-cased. Also spelled `lowcase`.
 
+`lower(X) in [...]` compares the lower-cased value with the members **as written** — only
+[`upper`](#upper) / `upcase` is the case-insensitive membership surface that folds the members too.
+
 | parameter | type | required | description |
 |---|---|---|---|
 | `x` | any | yes | The value to read |
@@ -983,6 +986,11 @@ expression: 'trim(QVAL) != QVAL'
 `upper(x)` → **value**
 
 The value upper-cased. Also spelled `upcase`.
+
+**Case-insensitive membership** — `upper(X) in [...]` is the case-insensitive membership surface:
+the probe **and** the members are folded, so `upper(X) not in ["a"]` fires only on a value that is
+not `a` in any case. `upcase(X) in [...]` is the same surface (and an `upcase("…")` member the same
+member as `upper("…")`). [`lower`](#lower) / `lowcase` have no such surface.
 
 | parameter | type | required | description |
 |---|---|---|---|
