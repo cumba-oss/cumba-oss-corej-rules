@@ -489,9 +489,9 @@ listed under [Arguments](#arguments). **Every parameter can be given positionall
 | [`imatches(x, /re/)`](functions.md#imatches) | boolean | Case-insensitive unanchored regex search |
 | [`is_valid_name(x)`](functions.md#is_valid_name) | boolean | True when `x` is a valid uppercase SAS name of 1–8 characters |
 | [`is_valid_testcd(x)`](functions.md#is_valid_testcd) | boolean | True when `x` is 1–8 characters starting with a letter or underscore |
-| [`len(x)`](functions.md#len) | value | Length of the value in characters; `len("") = 0`. Also spelled `length`. |
+| [`len(x[, unit=, encoding=])`](functions.md#len) | value | Length of the value in characters; `len("") = 0`. Also spelled `length`. `unit="bytes"` counts the value encoded in `encoding=` (default: the table's own `Encoding`; none or `MIXED` ⇒ missing) |
 | [`lower(x)`](functions.md#lower) | value | The value lower-cased. Also spelled `lowcase`. |
-| [`max_value_length([name])`](functions.md#max_value_length) | value | The longest value stored in the column, across all rows |
+| [`max_value_length([name][, unit=, encoding=])`](functions.md#max_value_length) | value | The longest value stored in the column, across all rows — characters, or with `unit="bytes"` bytes once encoded (`encoding=`, default the table's own `Encoding`; none or `MIXED` ⇒ missing) |
 | [`normalize_space(x)`](functions.md#normalize_space) | value | Trims the value and collapses each run of internal whitespace to a single space |
 | [`prefix(x, n)`](functions.md#prefix) | value | The first `n` characters; a shorter value is returned whole |
 | [`prefix_matches(x, /re/[, n])`](functions.md#prefix_matches) | boolean | True when the first `n` characters match the regex, anchored; without `n`, the whole value |
@@ -649,6 +649,7 @@ quantifier over a scalar predicate is that predicate (`any(p(X))` ≡ `p(X)`, `n
 | [`var_has_codelist(x, "DEFINE")`](functions.md#var_has_codelist) | value | Whether the variable binds a codelist at all; `DEFINE` only |
 | [`var_has_comment(x, "DEFINE")`](functions.md#var_has_comment) | value | Whether Define-XML attaches a comment to the variable; `DEFINE` only |
 | [`var_has_method(x, "DEFINE")`](functions.md#var_has_method) | value | Whether Define-XML attaches a derivation method to the variable; `DEFINE` only |
+| [`var_has_value_list(x, "DEFINE")`](functions.md#var_has_value_list) | value | Whether Define-XML documents the variable per value (a `def:ValueListRef`); `DEFINE` only |
 | [`var_label([x,] level)`](functions.md#var_label) | value | The variable's label; available at every level |
 | [`var_length([x,] level)`](functions.md#var_length) | value | The variable's declared length; available at every level |
 | [`var_mandatory(x, "DEFINE")`](functions.md#var_mandatory) | value | Whether Define-XML marks the variable mandatory; `DEFINE` only |
@@ -663,6 +664,8 @@ quantifier over a scalar predicate is that predicate (`any(p(X))` ≡ `p(X)`, `n
 
 | function | returns | what it does |
 |---|---|---|
+| [`codelist_decode([x])`](functions.md#codelist_decode) | value | Per record, the decode the variable's Define-XML codelist gives the record's value; missing when there is none |
+| [`define_available()`](functions.md#define_available) | boolean | True when a Define-XML was supplied to the run (parsed or not); authorable, needs no define — the presence rule's `not define_available()` |
 | [`define_dataset_names()`](functions.md#define_dataset_names) | value | The dataset names the Define-XML declares, upper-cased, as a list; needs the Define-XML |
 | [`define_key_variables()`](functions.md#define_key_variables) | value | The Define-XML key variables of the domain, as a list; SKIPPED when it declares none |
 | [`define_variable_decode_matches([x])`](functions.md#define_variable_decode_matches) | value | Whether the record's code and decode agree at variable level, per the Define-XML |
@@ -673,8 +676,11 @@ quantifier over a scalar predicate is that predicate (`any(p(X))` ≡ `p(X)`, `n
 | [`vlm_data_type(X)`](functions.md#vlm_data_type) | value | The `@DataType` of the Define-XML item matched at value level |
 | [`vlm_decode_matches(X)`](functions.md#vlm_decode_matches) | value | Whether the record's code and decode agree at value level |
 | [`vlm_has_codelist(X)`](functions.md#vlm_has_codelist) | value | Whether the value-level match binds a codelist |
+| [`vlm_has_comment(X)`](functions.md#vlm_has_comment) | value | Whether the value-level match carries a comment (`def:CommentOID`); missing when unmatched |
+| [`vlm_has_method(X)`](functions.md#vlm_has_method) | value | Whether the value-level match carries a derivation method (`MethodOID`); missing when unmatched |
 | [`vlm_length(X)`](functions.md#vlm_length) | value | The `@Length` of the Define-XML item matched at value level |
 | [`vlm_mandatory(X)`](functions.md#vlm_mandatory) | value | Whether the Define-XML item matched at value level is mandatory |
+| [`vlm_origin_type(X)`](functions.md#vlm_origin_type) | value | The origin type of the value-level match (`def:Origin/@Type`, else `@Origin`); `""` when it declares none, missing when unmatched |
 | [`vlm_type_conforms(X)`](functions.md#vlm_type_conforms) | value | Whether the record's value conforms to the matched `@DataType` |
 | [`vlm_value_length(X)`](functions.md#vlm_value_length) | value | The stored length of the record's value under the matched type |
 

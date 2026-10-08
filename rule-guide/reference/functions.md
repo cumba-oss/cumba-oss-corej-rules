@@ -655,19 +655,23 @@ expression: 'not empty(--TESTCD) and not is_valid_testcd(--TESTCD)'
 
 ### len
 
-`len(x)` → **value**
+`len(x[, unit=, encoding=])` → **value**
 
-Length of the value in characters; `len("") = 0`. Also spelled `length`.
+Length of the value in characters; `len("") = 0`. Also spelled `length`. With `unit="bytes"` the number of bytes the value takes when encoded.
 
 | parameter | type | required | description |
 |---|---|---|---|
 | `x` | any | yes | The value to read |
+| `unit` | string | no | `"chars"` (the default) counts characters; `"bytes"` counts the value encoded in `encoding`. A static string literal |
+| `encoding` | string | no | The charset a byte count encodes with (`"UTF-8"`, `"windows-1252"`, …), a static string literal; an unknown name fails the load. Omitted, the table's own `Encoding` (what `extract_metadata("encoding")` reads) — a table declaring none, or `MIXED`, makes the byte count **missing** |
 
 **Example**
 
 ```yaml
 expression: 'len(ETCD) > 8'
 ```
+
+**Bytes** — `len(X, unit="bytes", encoding="UTF-8") > 200` asks per row whether the value would fit a 200-byte XPT column once encoded in UTF-8, whatever the data was read from. `len(X, unit="bytes")` counts in the table's own charset, which for an XPT reproduces the stored byte count; a table without a declared `Encoding` (or with `MIXED`, several charsets in one library) has no single byte count, so the answer is missing and nothing fires — write `encoding=` to count in a charset of your choice. `unit="chars"` keeps counting characters as before.
 
 **Missing and empty** — `len("")` is **0** — an empty string is a present value of length zero. A genuine missing value yields **that missing value**, not 0 — identity kept (`len(.A)` is `.A`, rulings register `D85c`). An absent character column reads as all-`""`, so `len(x) == 0` is true for it.
 
@@ -724,15 +728,17 @@ expression: 'not empty(label_template("LIBRARY")) and not matches_label_template
 
 ### max_value_length
 
-`max_value_length([name])` → **value**
+`max_value_length([name][, unit=, encoding=])` → **value**
 
-The longest value stored in the column, across all rows
+The longest value stored in the column, across all rows — in characters (code points), or with `unit="bytes"` in bytes once encoded.
 
 A qualified name (`max_value_length(DM.ARM)`, or the string form) reads the joined column through its `Match_Datasets` entry over every row of the evaluated dataset, exactly as the operand `DM.ARM` reads it. (Until 2026-10-01 the dotted text was looked up on the primary and the call answered `0`, silently.)
 
 | parameter | type | required | description |
 |---|---|---|---|
 | `name` | any | no | The column to read |
+| `unit` | string | no | `"chars"` (the default) counts characters (code points); `"bytes"` counts each value encoded in `encoding`. A static string literal |
+| `encoding` | string | no | The charset a byte count encodes with, a static string literal; an unknown name fails the load. Omitted, the table's own `Encoding` — a table declaring none, or `MIXED`, makes the answer **missing** |
 
 **Example**
 
@@ -740,6 +746,8 @@ A qualified name (`max_value_length(DM.ARM)`, or the string form) reads the join
 Check:
   expression: 'max_value_length(AETERM) > var_length("DEFINE")'
 ```
+
+**Bytes** — `var_length("DATA") != max_value_length(variable_name, unit="bytes")` compares a variable's declared width with the longest value as stored, in bytes, which is what an XPT width means; with no usable table encoding the byte count is missing and the comparison does not fire.
 
 **Minimal — required parameters only**
 
@@ -3741,6 +3749,23 @@ Whether Define-XML attaches a derivation method to the variable; `DEFINE` only
 expression: 'var_has_method("DEFINE") == false'
 ```
 
+### var_has_value_list
+
+`var_has_value_list(x, "DEFINE")` → **value**
+
+Whether Define-XML documents the variable per value — its `ItemDef` carries a `def:ValueListRef`; `DEFINE` only. Missing for a variable the define does not declare.
+
+| parameter | type | required | description |
+|---|---|---|---|
+| `x` | column | no | The column to read; defaults to the variable being iterated |
+| `level` | level | yes | Which metadata to read — supported here: `DEFINE` |
+
+**Example**
+
+```yaml
+expression: 'var_has_value_list("DEFINE") == true and vlm_has_method(varname()) != true'
+```
+
 ### var_label
 
 `var_label([x,] [level])` → **value**
@@ -3963,6 +3988,24 @@ The example above is the complete call.
 **When there is nothing to answer** — ⚠ **the rule is SKIPPED**, an exception to the totality rule above: a Define-XML that declares no key variables for the domain leaves a uniqueness check with no key to test, so the answer is *Define-XML not available* (*"Rule skipped — Define-XML returned no data for define_key_variables"*) rather than an empty key set that would make `is_unique_set` vacuous.
 
 
+### codelist_decode
+
+`codelist_decode([name])` → **value**
+
+Per record, the decode the Define-XML codelist bound to the variable gives the record's value — the `Decode` of the `CodeListItem` whose `CodedValue` is the value. Needs the Define-XML (the rule is SKIPPED without one).
+
+| parameter | type | required | description |
+|---|---|---|---|
+| `name` | any | no | The column to read — a bare column, a quoted name, `varname()`, or nothing for the variable being iterated. A qualified name (`DM.X`) fails to load: a joined dataset's define metadata is not served |
+
+**Example**
+
+```yaml
+expression: 'not empty(DTYPE) and vlm_has_method(AVAL) != true and empty(codelist_decode(DTYPE))'
+```
+
+**Missing** — the answer is missing when the variable is not in the define, binds no codelist or one without decodes (`EnumeratedItem`s, an `ExternalCodeList`), the value is empty, or the value is not one of the decoded terms. The example is the ADaM reading of "a `DTYPE` value must be documented": by the value-level method of the result variable **or** by a decode of the term in `DTYPE`'s codelist.
+
 ### define_variable_decode_matches
 
 `define_variable_decode_matches([name])` → **value**
@@ -4156,6 +4199,42 @@ Check:
 ```
 
 
+### vlm_has_comment
+
+`vlm_has_comment(X)` → **value**
+
+Whether the value-level `ItemDef` matched for the record carries a `def:CommentOID` — read exactly as `var_has_comment("DEFINE")` reads the variable's. Missing when no value-level entry matches the record.
+
+| parameter | type | required | description |
+|---|---|---|---|
+| `name` | any | no | The column to read |
+
+**Example**
+
+```yaml
+expression: 'vlm_has_comment(variable_name) == false'
+```
+
+**Missing versus false** — `== false` fires only on a **matched** entry without a comment; `!= true` fires also where no entry matches.
+
+### vlm_has_method
+
+`vlm_has_method(X)` → **value**
+
+Whether the value-level `ItemRef` matched for the record carries a `MethodOID` — a derivation method documented for that value, as `var_has_method("DEFINE")` answers it for the whole variable. Missing when no value-level entry matches the record.
+
+| parameter | type | required | description |
+|---|---|---|---|
+| `name` | any | no | The column to read |
+
+**Example**
+
+```yaml
+expression: 'var_has_method("DEFINE") == false and var_has_comment("DEFINE") == false and vlm_has_method(varname()) != true and vlm_has_comment(varname()) != true'
+```
+
+**The composite** — the example is "neither the variable nor the record's value-level entry documents it": a define that documents `AVISIT` per `PARAMCD` only passes it, a define that documents it nowhere fires it. `== false` fires only on a **matched** entry without a method; `!= true` fires also where no entry matches.
+
 ### vlm_length
 
 `vlm_length(X)` → **value**
@@ -4203,6 +4282,24 @@ Check:
   expression: 'not empty(vlm_mandatory())'
 ```
 
+
+### vlm_origin_type
+
+`vlm_origin_type(X)` → **value**
+
+The origin type of the value-level `ItemDef` matched for the record — `def:Origin/@Type`, else the v1.0 `@Origin` attribute, the same rule as `var_origin_type("DEFINE")`; `""` on a matched entry that declares none. Missing when no value-level entry matches the record.
+
+| parameter | type | required | description |
+|---|---|---|---|
+| `name` | any | no | The column to read |
+
+**Example**
+
+```yaml
+expression: 'empty(var_origin_type("DEFINE")) and empty(vlm_origin_type(varname()))'
+```
+
+**Why both levels** — Define-XML 2.1 §5.3.12.3: *"In some cases, def:Origin will be provided only at the Value level"*, and a parent whose every value-level `ItemDef` carries one *should* carry none itself. An origin missing at the variable level is only a finding when the record's value level has none either.
 
 ### vlm_type_conforms
 
@@ -4290,6 +4387,21 @@ Check:
 
 **When there is nothing to answer** — ⚠ **the rule is SKIPPED**, an exception to the totality rule above: when the named codelists resolve no term in the selected representation — a codelist the Library does not hold, or a shape the metadata store cannot serve — the answer is *library not available* (*"Rule skipped — library returned no data for codelist_terms"*), never an empty list a `not in` would fire over.
 
+
+### define_available
+
+`define_available()` → **boolean**
+
+True when a Define-XML was **supplied** to the run — the CLI's `-dxp`, the data browser's define, the REST request's `defineXmlFilename` — including one that could not be parsed (that failure is reported on its own, at study level); false otherwise. Authorable, unlike the three machine-emitted gates: its purpose is the presence rule `not define_available()` (study level, scope `ALL`, one finding per run). It needs no define itself, so that rule is never SKIPPED for the absence it reports; the define-reading rules keep SKIPPING without a define, as before.
+
+Takes no arguments.
+
+**Example**
+
+```yaml
+Check:
+  expression: 'not define_available()'
+```
 
 ### dictionary_available
 
