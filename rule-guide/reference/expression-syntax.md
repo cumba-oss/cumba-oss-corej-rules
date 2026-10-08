@@ -392,7 +392,9 @@ var_name("LIBRARY"))`, and for two lists a sibling binding per side —
 `$dataset_variables_upper: upper($dataset_variables)`, `$required_variables_upper:
 upper($required_variables)` — read by `contains_all` / `is_ordered_subset_of` /
 `shares_elements_with`; [`upper`](functions.md#upper) and [`lower`](functions.md#lower) fold a list
-element by element. A name **test** folds the name it tests: `ends_with(upper(varname()), "FL")`,
+element by element — a `$`-list, a per-row list, and the values of several columns read with
+[`values`](functions.md#values) (`upper(values([X, Y]))`; `upper([X, Y])` with bare names fails to
+load, since `[X, Y]` is a list of column *names*). A name **test** folds the name it tests: `ends_with(upper(varname()), "FL")`,
 `upper(varname()) =~ /^ANL\d\dFL$/`, `prefix(upper(varname()), 2)`, with the literal or pattern
 spelled in upper case. A `QNAM` / `IDVAR` **cell** is a value like any other and is compared
 exactly (`QNAM == "AESOSP"`); `IDVAR not in $rdomain_variables and IDVAR not in

@@ -635,9 +635,12 @@ expression: 'lower(SEX) == "m"'
 **Missing and empty** — A missing input yields **that missing value**, identity kept (`.A` in, `.A` out — rulings register `D36`, owner 2026-09-28 *"D36 stands"*). `""` is a present value and yields `""`.
 
 **List form** — given a list (a `$`-binding such as `get_column_order_from_dataset()` or a
-`distinct(…)` result), returns a **new list** with every element lower-cased, in order; a **missing
+`distinct(…)` result, a per-row list such as `split_by(…)`, or `lower(values([X, Y]))` over several
+columns' values), returns a **new list** with every element lower-cased, in order; a **missing
 element stays missing** — it is carried through unchanged, in its position (missing propagates
-through the string functions, register `D36`), never folded to `""`. Confirmed by the owner 2026-09-28 together
+through the string functions, register `D36`), never folded to `""`. Element-wise as
+[`upper`](#upper) is: `lower([X, Y])` with bare column names fails to load, the values are read with
+`lower(values([X, Y]))`. Confirmed by the owner 2026-09-28 together
 with [`upper`](#upper)'s list form (rulings register `CIT §3`).
 
 ### matches_label_template
@@ -917,9 +920,14 @@ expression: 'not contains(upper(VISIT), upper("UNSCHEDUL"))'
 **Missing and empty** — A missing input yields **that missing value**, identity kept (`.A` in, `.A` out — rulings register `D36`, owner 2026-09-28 *"D36 stands"*). `""` is a present value and yields `""`.
 
 **List form** — given a list (a `$`-binding such as `get_column_order_from_dataset()` or a
-`distinct(…)` result), returns a **new list** with every element upper-cased, in order; a **missing
-element stays missing** — it is carried through unchanged, in its position (missing propagates
-through the string functions, rulings register `D36`), never folded to `""`. This is how a rule compares the dataset's
+`distinct(…)` result, a per-row list such as `split_by(…)`, or the values of several columns read
+with [`values`](#values): `upper(values([X, Y]))`), returns a **new list** with every element
+upper-cased, in order; a **missing element stays missing** — it is carried through unchanged, in its
+position (missing propagates through the string functions, rulings register `D36`), never folded to
+`""`. The function is **element-wise**: it applies to every element of a list at `x` and answers a
+list of the same length, so `"Y" in upper(values([A, B]))` is a per-row membership. ⚠ `upper([X, Y])`
+with bare column names fails to load — `[X, Y]` is a list of column *names* everywhere; to read their
+values write `upper(values([X, Y]))`. This is how a rule compares the dataset's
 column names against the library's names (owner, 2026-09-28: *"upper allows a list of strings as
 parameter and returns a list of these strings converted to upper case"*; rulings register
 `CIT §3`): a column name a rule handles as a value is a string and compares exactly like one, so
