@@ -690,6 +690,7 @@ listed under [Arguments](#arguments). **Every parameter can be given positionall
 |---|---|---|
 | [`char(x)`](functions.md#char) | value | The first character of the value as its numeric code point |
 | [`colref(x)`](functions.md#colref) | value | The value of the column *named by* `x` — bare or `DS.X`, typed; a list of names gives a list of values |
+| [`values(columns)`](functions.md#values) | value | The per-row list of the named columns' values, in the written order — `values([X, Y])`; a `$`-binding of names splices as in `group=` |
 | [`date(x)`](functions.md#date) | date | The value as an ISO-8601 date, partial precision kept; makes a comparison temporal |
 | [`find_vars(entry)`](functions.md#find_vars) | list | The names of the columns one `Requirements.Variables` entry selects (template, glob, `DS./regex/`, literal) |
 | [`lpad(x, width, fill)`](functions.md#lpad) | text | `x` left-padded to `width`, never truncated |

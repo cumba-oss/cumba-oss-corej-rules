@@ -4584,6 +4584,66 @@ as the written name would be (numerically against a number list, as dates agains
 members). An absent member of a list takes the absent default like any `colref` read: `""`,
 unless the name is expected to be a number elsewhere in the rule (then the plain missing).
 
+### values
+
+`values(columns)` → **value (a list)**
+
+The per-row list of the named columns' **values** — `values([X, Y])` answers, on each row, the
+cells of `X` and `Y` in the written order. The argument is a list of column **names**, never
+values: a bare name, a `--` name or a qualified `DS.X`, each read exactly as the same name written
+alone in the expression reads (a bare name the dataset under validation, `DS.X` the merged column
+through the join). The cells keep their columns' types (a numeric column stays a number). `[X, Y]`
+alone keeps its one meaning everywhere — a list of column names, as at `group=` or in
+`is_unique_set` — so reading several columns as values is always spelled `values([X, Y])`.
+
+| parameter | type | required | description |
+|---|---|---|---|
+| `columns` | list of column names | yes | The columns to read, bare — `[X, Y]`, a `$`-binding holding a list of names, or the expression such a binding holds |
+
+**Example**
+
+```yaml
+expression: 'not empty(USUBJID) and "Y" in values([AESER, AESDTH, AESLIFE])'
+```
+
+```yaml
+Bindings:
+  - name: "$flags"
+    expression: 'values([AESER, AESDTH, AESLIFE])'
+Check:
+  expression: 'not empty(USUBJID) and "Y" not in $flags'
+Outcome:
+  Output_Variables: ["USUBJID", "$flags"]
+```
+
+**Missing and empty** — The list always has one member per name: a missing cell stays at its
+position **as that missing value** (the list keeps its length), and a named-but-absent column
+contributes the default the written name would take at the same position — `""` in a character
+position, the plain missing where the rule expects a number (`D34 #3/#4`). An empty list
+`values([])` is a load error.
+
+**Names.** The members are judged at load: a quoted name (`values(["X"])`) is a string literal,
+never a column, and fails to load; a nested list or any other value fails to load naming the
+parameter type. A `$`-binding holding a **dataset-level** list of names — `$keys:
+["STUDYID", "USUBJID"]`, `natural_key_variables()`, `find_vars("…")` — is spliced into the list
+exactly as `record_count`'s `group=` and `is_unique_set`'s members splice it, and so is the
+expression such a binding holds written in place: `values($keys)` reads as `values([$keys])`, and
+`values([STUDYID, $keys])` mixes written and spliced names. A per-row member (`upper(AETERM)`, a
+binding computed per row) cannot be spliced — it fails to load (*"argument 'columns' of 'values'
+cannot splice the per-row member …"*). The spliced names are resolved at evaluation: a binding
+that holds no names there is a rule ERROR. `values(…)` itself is per-row, so it is never a member
+of another splice list (`is_unique_set([USUBJID, values([X])])` fails to load the same way).
+
+**In a membership test.** On the right of `in`, the list is a per-row set: `"Y" in values([A, B])`
+holds where `A` or `B` is `Y` on that row. On the left, `values([A, B]) in ["Y", "N"]` holds when
+**any** member is in the set, as a list-valued accessor does. Compared with `==` against a scalar
+the list is refused at load. `count(values([A, B]))` is the number of names (a missing member
+counts).
+
+**Not `colref`, not `tuple`.** [`colref(x)`](#colref) reads the column whose name a *cell* holds
+(`colref(IDVAR)` — a computed name); `values` reads the columns the rule **names**.
+[`tuple(…)`](#tuple) builds one text key of several columns; `values` keeps the typed cells.
+
 ### date
 
 `date(x)` → **date**
