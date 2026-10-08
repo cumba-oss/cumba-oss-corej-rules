@@ -3164,7 +3164,7 @@ The example above is the complete call.
 
 ### referenced_dataset_variables
 
-`referenced_dataset_variables(name)` → **value (a list)**
+`referenced_dataset_variables(name[, qualifiers=])` → **value (a list)**
 
 The variable names of the dataset **named in a column value**, per row — the list a SUPP-- / CO /
 RELREC record's `RDOMAIN` refers to, so a Check tests the row's `IDVAR` against *its* referenced
@@ -3175,6 +3175,7 @@ which never read its target.
 | parameter | type | required | description |
 |---|---|---|---|
 | `name` | column | yes | The column naming a dataset (`RDOMAIN`) |
+| `qualifiers` | boolean literal | no | `true` adds the `QNAM` values of the dataset's `SUPP--` companion(s) after its columns; default `false` |
 
 `name` is a **column reference** and is required — the former implicit `RDOMAIN` read is spelled
 out. Per row the answer is the column-name list of every dataset member whose domain is the value
@@ -3182,6 +3183,15 @@ out. Per row the answer is the column-name list of every dataset member whose do
 `upper($vars)` folds the list element by element. A missing or blank value, or a value no dataset
 carries, answers the **empty list**. The function reads the study's own datasets, never the CDISC
 Library.
+
+**`qualifiers=true`** (runbook W1b, `PLAN-engine-gap-value-addressed` V3) appends the supplemental
+qualifier names the referenced dataset's `SUPP--` companion(s) deliver — every `QNAM` of
+`SUPP<dataset>` and of the domain-level members of its `SUPP<domain>` family, the same sources the
+merged evaluation table reads — after the columns, in sorted order. It is what ADaM's `SRCVAR` may
+hold when `SRCDOM` names a domain whose source is a supplemental qualifier (ADaMIG 1.1 and later):
+`upper(SRCVAR) not in referenced_dataset_variables(SRCDOM, qualifiers=true)` fires on a `SRCVAR`
+that is neither a column nor a qualifier of `SRCDOM`. A dataset without a `SUPP--` answers its
+columns alone. The flag is a boolean literal, read once per call.
 
 **Example**
 
@@ -3227,6 +3237,95 @@ Check:
 The example above is the complete call.
 
 **When there is nothing to answer** — **`""`** — the closed-world reading: the Library holds no class for that domain. So a `not in` / `!=` against a class literal **fires**.
+
+### referenced_record_count
+
+`referenced_record_count(dataset, value, key_variable=[, keys=])` → **value**
+
+How many records of the dataset **named in a column value** carry this row's pointer value in the
+column `key_variable` names and this row's `keys` — per row. The value-addressed record lookup of
+runbook W1b (`PLAN-engine-gap-value-addressed` V1): a `SUPP--` row's `RDOMAIN` / `IDVAR` /
+`IDVARVAL`, a RELREC link, ADaM's `SRCDOM` / `SRCSEQ` traceability triple. It is a **count, never a
+merge**: a `Child` entry pairs a pointer row with every parent record it addresses (`n:m`), and a
+`1` side refuses a duplicate as a rule ERROR, so "resolves to exactly one record" is observable only
+here.
+
+| parameter | type | required | description |
+|---|---|---|---|
+| `dataset` | value | yes | The dataset name, per row — a column (`RDOMAIN`, `SRCDOM`) or a string naming one dataset |
+| `value` | value | yes | The pointer value, per row (`IDVARVAL`, `SRCSEQ`) |
+| `key_variable` | value or list of strings | yes | The column of the referenced dataset the pointer is looked up in: a per-row name (`IDVAR`), or a list of **candidate templates** resolved against the referenced dataset (`["--SEQ", "ASEQ"]` — a leading `--` is the referenced dataset's domain prefix; the first candidate it carries wins) |
+| `keys` | list of columns | no | The same-named key columns that must agree on both sides (`[USUBJID]`, or `[STUDYID, USUBJID]`); a `$`-binding of names splices as in `group=` |
+
+**What answers what.** A missing or blank `dataset`, `value` or column name answers **missing**; a
+`dataset` value no study dataset carries answers **missing** (an unloaded dataset is
+`CDISC-AD0746`'s finding, not a broken pointer — firing here would double-report); a column the
+referenced dataset lacks answers **`0`** (nothing can match). Otherwise every matching record counts,
+and a split family (`lbch` / `lbhe`) sums its members. The pointer compares as the join token of the
+`SUPP--` / RELREC merges: both sides stripped, and canonicalised when the referenced column is numeric
+(`"01"` and `"1.0"` match a `--SEQ` of `1`); a text column compares the stripped text exactly. The
+keys compare by their text identity; a key column absent on either side is dropped from the key, and
+a blank key component matches nothing. The candidate templates are resolved against the
+**referenced** dataset, never against the dataset in hand (`--SEQ` on an `ADAE` row pointing at `AE`
+is `AESEQ`); writing them bare (`[AESEQ, ASEQ]`) is a load error.
+
+**Example**
+
+```yaml
+# ADaMIG 1.3 §3.3.9: a populated SRCSEQ is the --SEQ (or ASEQ) of a record of the same subject in
+# the dataset SRCDOM names
+Check:
+  expression: 'not empty(SRCSEQ) and referenced_record_count(SRCDOM, SRCSEQ, key_variable=["--SEQ", "ASEQ"], keys=[USUBJID]) == 0'
+```
+
+```yaml
+# SDTMIG 3.3 DV: a SUPPDV record pointing through DVSPID resolves to exactly one DV record
+Scope: {Domains: {Include: [SUPPDV]}}
+Check:
+  expression: 'IDVAR in ["DVREFID", "DVSPID"] and not empty(IDVARVAL) and referenced_record_count(RDOMAIN, IDVARVAL, key_variable=IDVAR, keys=[USUBJID]) != 1'
+```
+
+**Missing and empty** — a missing answer compares as any missing does: `== 0` is silent on it,
+`!= 1` **fires** on it (the register: `X != "Y"` on a missing value fires) — guard with
+`not empty(IDVARVAL)` where the pointer may be blank. The dataset under evaluation is read through
+the run's resolver; the referenced dataset is indexed once per rule and dataset and the index is
+shared across rules.
+
+### referenced_key_is_unique
+
+`referenced_key_is_unique(dataset, key_variable=[, keys=])` → **value (boolean)**
+
+Whether the dataset **named in a column value** has at most one record per (`keys`, the column
+`key_variable` names) — per row. The value-addressed uniqueness verdict of runbook W1b
+(`PLAN-engine-gap-value-addressed` V4): RELREC declares `RELTYPE = "ONE"` for a dataset and a column,
+and the declaration is checked against that dataset.
+
+| parameter | type | required | description |
+|---|---|---|---|
+| `dataset` | value | yes | The dataset name, per row — a column (`RDOMAIN`) or a string naming one dataset |
+| `key_variable` | value or list of strings | yes | The column of the referenced dataset, as for `referenced_record_count` (a per-row name such as `IDVAR`, or candidate templates) |
+| `keys` | list of columns | no | The key columns the tuple starts with (`[USUBJID]`); a `$`-binding of names splices as in `group=` |
+
+The policy is `is_unique_set`'s: `""` and a missing are real, distinct key components; a column the
+referenced dataset lacks is **dropped** from the tuple — a stated answer over the columns it has
+(with none present every record shares the empty key). A split family is judged member by member: a
+duplicate inside any member is `false`. A missing or blank `dataset` or column name, or a dataset no
+study dataset carries, answers **missing**. A boolean value, not a predicate: compare it
+(`== false`).
+
+**Example**
+
+```yaml
+# SDTMIG 3.3 §8.3: a dataset RELREC declares ONE for has at most one record per USUBJID and IDVAR
+Scope: {Domains: {Include: [RELREC]}}
+Check:
+  expression: 'empty(USUBJID) and RELTYPE == "ONE" and referenced_key_is_unique(RDOMAIN, key_variable=IDVAR, keys=[USUBJID]) == false'
+```
+
+The example above is the complete call.
+
+**Missing and empty** — a missing verdict never equals `false`, so the example is silent on an
+unknown dataset or a blank `IDVAR`.
 
 ### split_sibling_length_mismatch
 

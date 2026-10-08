@@ -299,6 +299,11 @@ question, `PLAN-dynamic-column-functions` F3.)
 
 Prefer the word forms; `&&` and `||` are accepted and nothing in the corpus uses them.
 
+The word forms — and the other keywords `in`, `true`, `false` — are read in **any letter case**:
+`X AND Y`, `X Not In [...]`, `TRUE` are the same expression as their lower-case spelling, and the
+engine prints them in lower case. A **column named like a keyword** therefore needs back-quotes
+(`` `IN` == "Y" ``), as every name that would not otherwise lex.
+
 > ⚠ **Keep `&&` apart from an expansion token.** `&A&&B&` and `COL&&&A&` do not lex — *"separate
 > an expansion token from '&' / '&&' by a space"*. Write `&A& && &B&`, or better `&A& and &B&`.
 
@@ -656,8 +661,10 @@ quantifier over a scalar predicate is that predicate (`any(p(X))` ≡ `p(X)`, `n
 | [`ds_name([x,] level)`](functions.md#ds_name) | value | The dataset's name; available at every level |
 | [`ds_structure([x,] level)`](functions.md#ds_structure) | value | The dataset's ADaM data structure; `DEFINE` and `LIBRARY` only |
 | [`extract_metadata(name)`](functions.md#extract_metadata) | value | One dataset-metadata value of the current dataset, by its key |
-| [`referenced_dataset_variables(name)`](functions.md#referenced_dataset_variables) | value (a list) | The variable names of the dataset **named in a column value**, per row (the former `distinct(IDVAR, value_is_reference=true)`) |
+| [`referenced_dataset_variables(name[, qualifiers=])`](functions.md#referenced_dataset_variables) | value (a list) | The variable names of the dataset **named in a column value**, per row (the former `distinct(IDVAR, value_is_reference=true)`); `qualifiers=true` appends its `SUPP--` companions' `QNAM` values |
 | [`referenced_domain_class(name)`](functions.md#referenced_domain_class) | value | The CDISC Library class of the domain **named in a column value**, per row |
+| [`referenced_key_is_unique(dataset, key_variable=[, keys=])`](functions.md#referenced_key_is_unique) | value (boolean) | Whether the dataset **named in a column value** has at most one record per (`keys`, the column `key_variable` names); missing for an unknown dataset |
+| [`referenced_record_count(dataset, value, key_variable=[, keys=])`](functions.md#referenced_record_count) | value | How many records of the dataset **named in a column value** carry the row's pointer value in the column `key_variable` names, with the same-named `keys`; missing for an unknown dataset, `0` for an absent column |
 | [`split_sibling_length_mismatch()`](functions.md#split_sibling_length_mismatch) | value | The variables whose declared length differs across the dataset's split-family members, as a list (library-independent) |
 | [`standard_domains()`](functions.md#standard_domains) | value | The domain codes the standard publishes, as a list; SKIPPED when the Library publishes none |
 | [`study_domains()`](functions.md#study_domains) | value | The distinct `DOMAIN` codes present in the study, as a list (a split domain once; the no-domain datasets contribute `""`) |
@@ -793,6 +800,16 @@ one-argument form a string is the variable's **name** unless it is a level (`"DA
 `var_label("AETERM")`. An attribute with no `DATA` reading must name its level (`var_role()` fails to
 load, naming `var_role("DEFINE")` and `var_role("LIBRARY")`), and a `ds_*` accessor given a dataset
 name needs the level too (`ds_name("DM")` fails to load, naming `ds_name("DM", "DATA")`).
+
+**A computed name reads per row.** Beside a string, a `var_*` accessor's name may be any expression
+— its **value** on each row is the variable's name — and `dataset=` may be one too:
+`var_label(str(SRCVAR), "DATA", dataset=str(SRCDOM))` is the `DATA` label of the variable each
+row's `SRCVAR` names in the dataset its `SRCDOM` names (runbook W1b, `PLAN-engine-gap-value-addressed`
+V2). A missing or blank name or dataset answers missing, as does a variable the dataset does not
+carry; the computed forms are per-row reads (a binding holding one is a row binding), the literal
+forms stay dataset facts. The name is always a string: `var_label(AETERM)` and
+`dataset=RDOMAIN` fail to load — write `var_label("AETERM")` for the column of that name, and
+`var_label(str(AETERM))` / `dataset=str(RDOMAIN)` for the variable or dataset a row's value names.
 
 ## Builtin operands
 

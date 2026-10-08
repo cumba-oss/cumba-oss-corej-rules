@@ -563,6 +563,17 @@ considered.
 > ⚠ One shape no check sees: a read whose *qualifier* is itself substituted (`${X}.COL`) is bound
 > per row and reads the not-supplied default silently when it names no part — do not write it.
 
+> ⭐ **Not every value-addressed read is a merge.** A rule that only has to *count* the records a
+> pointer resolves to, test whether the pointed-at dataset's key is unique, or read a variable's
+> metadata in the dataset a value names, does so without an entry — through
+> [`referenced_record_count`](../reference/functions.md#referenced_record_count),
+> [`referenced_key_is_unique`](../reference/functions.md#referenced_key_is_unique),
+> [`referenced_dataset_variables(…, qualifiers=true)`](../reference/functions.md#referenced_dataset_variables)
+> and a `var_*` accessor with a computed name and `dataset=`
+> (see [the metadata accessors](../reference/expression-syntax.md#the-metadata-accessors-take-a-level)).
+> `Child: true` pairs the rows (`n:m`, a `1` side a rule ERROR on a duplicate); the functions answer
+> the count or the verdict per pointer row, which a merge cannot report.
+
 ## `Supp_Keys` — the key of the SUPP merge
 
 Every rule reads its dataset's supplemental qualifiers as columns ([`Supp_Merge`](requirements.md#supp_merge)),
