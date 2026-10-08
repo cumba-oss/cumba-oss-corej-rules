@@ -84,8 +84,12 @@ place a `$` stands inside a list is a splice of **column names** into a list of 
 `qualifying_any_populated=`), every `keys=` of column names
 ([`is_unique_relationship`](../reference/functions.md#is_unique_relationship),
 [`is_inconsistent_across_dataset`](../reference/functions.md#is_inconsistent_across_dataset)),
-[`is_unique_set`](../reference/functions.md#is_unique_set)'s members and
-[`values`](../reference/functions.md#values)' columns — and there, as everywhere,
+[`is_unique_set`](../reference/functions.md#is_unique_set)'s members,
+[`values`](../reference/functions.md#values)' columns, every `within=` and the single
+`ordering=` / `by=` and `group` slots of the partitioning operators (a string or a one-element
+list there), and the sort keys of [`is_sorted_by`](../reference/functions.md#is_sorted_by) and
+[`sequence`](../reference/functions.md#sequence) (`by=$keys`, each key ascending; `asc($c)`) — and
+there, as everywhere,
 the expression the binding holds may be written in its place
 (`is_unique_set([USUBJID, natural_key_variables()])`).
 
@@ -100,8 +104,8 @@ columns whose per-row values `values($keys)` lists.
 Anywhere else — `X in $keys`, a comparison, a function's value argument, another binding,
 `Output_Variables` — it is a load error with the hint *"`$keys` holds column names: use it in a name
 slot (`group=$keys`) or read its values with `values($keys)`; to compare names as text, write a string
-list"*. `is_sorted_by`'s `by=` takes `asc(X)` / `desc(X)` sort-key descriptors, never a splice: it
-refuses `$keys` as it refuses a string list of names.
+list"*. In a sort-key list (`is_sorted_by`'s and `sequence`'s `by=`) the spliced names are the keys,
+each ascending — the SQL default a bare column means there.
 
 
 ## ⛔ Everything else is rejected, loudly

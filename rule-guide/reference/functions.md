@@ -126,8 +126,22 @@ Bindings:
 `TP` is grouped by its own `RPATHCD` and `RPHASE`. A record of the evaluated dataset (say `BW`,
 which has no `RPATHCD`) reads the group of the `RPATHCD` of **its bound `DM` record** and its own
 `RPHASE`. The qualified name says where the record's value comes from; the **unqualified** name is
-the same variable on the grouped side. There is no sided spelling: `DM.RPATHCD` groups on
-`RPATHCD`.
+the same variable on the grouped side. When the two sides carry **different names** the member
+is written **sided** (runbook W1b RO, `PLAN-engine-gap-row-ordinal` R3):
+
+```yaml
+Bindings:
+- name: "$ta"
+  expression: 'sequence(ETCD, domain="TA", group=[{left: ACTARMCD, right: ARMCD}], by=[asc(TAETORD)])'
+```
+
+`TA` is grouped by its own `ARMCD`; each `DM` record reads the group of its own `ACTARMCD`. A
+sided member `{left: X, right: Y}` is a literal of its own: each side a plain column (no `--`,
+no qualifier, no `$` — a side is never spliced), `domain=` required (without it the two names
+would be columns of one table), the key types checked side against side, an absent left column
+an ERROR (never dropped, as a qualified member), legal **only** as a `group=` member of a
+`domain=` grouped call ([`sequence`](#sequence) included) — as a list element or an operand it
+fails to load. The qualified `DM.RPATHCD` keeps grouping on `RPATHCD`: it has no sided spelling.
 
 - **`domain=` is required.** Without it there is no other side — the evaluated dataset would be
   grouped by a value it does not carry — and the call is a load error. To group the evaluated rows
@@ -1837,15 +1851,16 @@ list would be empty.
 
 ### empty_within_except_last_row
 
-`empty_within_except_last_row(name, group, ordering=, keep_missings=)` → **boolean**
+`empty_within_except_last_row(name, group, by=, keep_missings=)` → **boolean**
 
 True when a row other than the ordered-last one is unpopulated
 
 | parameter | type | required | description |
 |---|---|---|---|
 | `name` | any | yes | The column to read |
-| `group` | any | yes | Columns whose combined value defines a group |
-| `ordering` | any | yes | Sort keys deciding row order inside the group |
+| `group` | one column reference, or a one-element list | yes | The column whose value defines a group. May be a `$`-reference to a dataset-level string or one-element list of column names, or the expression such a binding holds, written in place — spliced as [`record_count`](#record_count)'s `group=` splices it (a per-row binding or expression is a load error; two or more spliced names make the rule ERROR: the slot takes one column). |
+| `ordering` | one column reference | no | The older spelling of `by=` (accepted until it is refused with the hint *"write by="*) |
+| `by` | one column reference, or a one-element list `[asc(COL)]` / `[COL]` | no | The sort key, ascending — since runbook W1b SK (owner O17) the one sort-key parameter of every function (`by=AESEQ` or `by=[asc(AESEQ)]`); exactly one ascending key here — `desc(…)` or two keys fail to load (*"not supported for …"*). Write `by=` or `ordering=`, not both. May be a `$`-reference to a dataset-level string or one-element list of column names, or the expression such a binding holds, written in place — spliced as [`record_count`](#record_count)'s `group=` splices it (a per-row binding or expression is a load error; two or more spliced names make the rule ERROR: the slot takes one column). |
 | `keep_missings` | boolean | no | Whether a row with a missing key stays in its group |
 
 **Example**
@@ -1902,17 +1917,18 @@ Check:
 
 ### is_last_in_group
 
-`is_last_in_group(ordering=, group=, keep_missings=)` → **boolean**
+`is_last_in_group(by=, group=, keep_missings=)` → **boolean**
 
 `true` on every row whose ordering value is identical to its group's maximum — the last record of the group
 
 | parameter | type | required | description |
 |---|---|---|---|
-| `ordering` | column | yes | The column that orders the group (`SESEQ`). It orders by its **type**: a numeric column numerically, a character column as **text** — `"10"` < `"9"`, and `"5"` and `"5.0"` (or `"-0.0"` and `"0.0"`) are two values — even when its values look like numbers. A missing value ranks lowest (two missing markers by their value byte), then a blank `""`. The order is total, so the answer never depends on row order. ⚠ `ordering` takes a plain column; a numeric order of a character column (`num(X)`) is not spellable here yet |
+| `ordering` | column | no | The older spelling of `by=` (accepted until it is refused with the hint *"write by="*). The column that orders the group (`SESEQ`). It orders by its **type**: a numeric column numerically, a character column as **text** — `"10"` < `"9"`, and `"5"` and `"5.0"` (or `"-0.0"` and `"0.0"`) are two values — even when its values look like numbers. A missing value ranks lowest (two missing markers by their value byte), then a blank `""`. The order is total, so the answer never depends on row order. ⚠ `ordering` takes a plain column; a numeric order of a character column (`num(X)`) is not spellable here yet |
+| `by` | one column reference, or a one-element list `[asc(COL)]` / `[COL]` | no | The sort key, ascending — since runbook W1b SK (owner O17) the one sort-key parameter of every function (`by=AESEQ` or `by=[asc(AESEQ)]`); exactly one ascending key here — `desc(…)` or two keys fail to load (*"not supported for …"*). Write `by=` or `ordering=`, not both. May be a `$`-reference to a dataset-level string or one-element list of column names, or the expression such a binding holds, written in place — spliced as [`record_count`](#record_count)'s `group=` splices it (a per-row binding or expression is a load error; two or more spliced names make the rule ERROR: the slot takes one column). |
 | `group` | list of columns | yes | Columns whose combined value defines a group (`USUBJID`); absent ones are dropped, all absent answers nothing. A member may be a `$`-reference to a dataset-level **list of column names**, or the expression such a binding holds, written in place — spliced exactly as [`record_count`](#record_count)'s `group=` splices it (a dataset-level string is one name; a per-row binding or expression is a load error; a bare `group=$names` / `group=<expression>` is the one-member list). |
 | `keep_missings` | boolean | no | Whether a group whose key is missing is kept as its own group or dropped (default `false`, the drop); requires a non-empty `group` |
 
-It takes **no target**: it reads only `ordering` and `group`. Both are **column references** — `ordering="SESEQ"` is a string literal and fails to load. "Identical" has one meaning, the key identity: a numeric `-0.0` is `0.0`, `4.9999999999994` is not `5.0`, a character `5` is not `5.0` and a character `-0.0` is not `0.0`, and a missing is identical to the same missing. So **every tied row is last**: the copies a one-to-many `Match_Datasets` join makes of one record, a duplicated `SESEQ` in the source, and every row of a group whose ordering values are all missing. (Until wave 1 of the operation→function programme this was an operation whose tied rows all read `false`.)
+It takes **no target**: it reads only `by` (`ordering`) and `group`. Both are **column references** — `by="SESEQ"` is a string literal and fails to load. "Identical" has one meaning, the key identity: a numeric `-0.0` is `0.0`, `4.9999999999994` is not `5.0`, a character `5` is not `5.0` and a character `-0.0` is not `0.0`, and a missing is identical to the same missing. So **every tied row is last**: the copies a one-to-many `Match_Datasets` join makes of one record, a duplicated `SESEQ` in the source, and every row of a group whose ordering values are all missing. (Until wave 1 of the operation→function programme this was an operation whose tied rows all read `false`.)
 
 **Example**
 
@@ -2098,7 +2114,7 @@ True for every member of a group that has two or more rows
 | parameter | type | required | description |
 |---|---|---|---|
 | `name` | any | yes | The column to read |
-| `within` | any | yes | Columns that partition the rows |
+| `within` | one column reference, or a one-element list | yes | The column that partitions the rows. May be a `$`-reference to a dataset-level string or one-element list of column names, or the expression such a binding holds, written in place — spliced as [`record_count`](#record_count)'s `group=` splices it (a per-row binding or expression is a load error; two or more spliced names make the rule ERROR: the slot takes one column). |
 | `keep_missings` | boolean | no | Whether a row with a missing key stays in its group |
 
 **Example**
@@ -2200,6 +2216,53 @@ The example above is the complete call.
 
 **When there is nothing to answer** — **missing**: a row whose matched cells are all missing answers their missing value (identity kept when they agree); a row of blanks or an undeterminable date extreme answers the plain missing. A dataset with **no matching column** answers what an absent column would answer at the call's position (owner 2026-10-05, `PLAN-column-typed-function-absent-type` A1): the missing where the call — or the binding it is bound to — is read as a number, `""` everywhere else (the example's `TRTEDT != $trxx_max` is no numeric position, so `""`; until 2026-10-05 the missing everywhere). `empty()` on either is true, so guard with `not empty($x)` as the example does. (Until wave 3 of the operation→function programme this was an operation; it also accepted `name` / `names`, which it never read.)
 
+### sequence
+
+`sequence(name, domain=, filter=, group=, by=[asc(COL), desc(COL)], keep_missings=)` → **value (a list)**
+
+The values of a column **in order** — per row, its group's values in sort-key order, duplicates
+kept, a missing cell at its position (runbook W1b RO, `PLAN-engine-gap-row-ordinal` R1); the
+ordered sibling of [`distinct`](#distinct)`(name, group=)` on the same grouped plan, so `domain=`,
+`filter=`, the splice of `group=`, an absent group column and the no-group row (the empty list)
+behave as there. Without `group=` it is **one list for the dataset**. Read it with
+[`is_prefix_of`](#is_prefix_of), [`is_increasing`](#is_increasing), [`collapse_runs`](#collapse_runs),
+[`count`](#count) and the membership operators.
+
+| parameter | type | required | description |
+|---|---|---|---|
+| `name` | column, or a value expression | yes | The positional target: the column whose values are listed (`ETCD`, `--SEQ`, `upper(ETCD)`). One column only — `distinct([A, B])` collects row tuples, `sequence` orders one column's values. A quoted name is a string literal and fails to load |
+| `domain` | dataset reference | no | The dataset to read, as [`distinct`](#distinct)'s: `TA` or `"TA"`; absent ⇒ the dataset under evaluation; with `domain`, every column argument names a column of that dataset |
+| `filter` | boolean over the target dataset's columns | no | Which rows are read, in parentheses — as [`distinct`](#distinct)'s `filter=` |
+| `group` | list of columns | no | Columns whose combined value defines a group, as [`distinct`](#distinct)'s — spliced, [qualified](#qualified-group-members) with `domain`, or **sided** (`[{left: ACTARMCD, right: ARMCD}]`: this row's `ACTARMCD` keys the other table's `ARMCD` groups) |
+| `by` | list of sort keys: `asc(COL)`, `desc(COL)`, or a bare `COL` (= `asc`) | no | The order inside a group — the SQL default is ascending, so `by=[SESTDTC]` is `by=[asc(SESTDTC)]`; a tie keeps file order; absent ⇒ file order. Cells order **by content**: numbers numerically, ISO dates and datetimes chronologically (a partial before the complete values it contains, a date before its datetimes), other text as text, a blank and a missing last — `desc` reverses it. A key may be a `$`-reference to a dataset-level list of column names (`by=$keys`, each key ascending) or a string naming one column inside a descriptor (`asc($c)`), or the expression such a binding holds, written in place — spliced once per run (a per-row binding or expression is a load error) |
+| `keep_missings` | boolean | no | Whether a row with a missing group key stays in its group (default `true`). Requires `group=` |
+
+**What is a value.** A present cell contributes its **text** (a numeric cell its canonical text,
+as `distinct` lists it); a **missing cell stays at its position** as that missing — the list of a
+group with a missing `SEDY` has a hole, which [`is_increasing`](#is_increasing) answers `false`
+on; a blank `""` is a value. Every cell of the group counts, duplicates included:
+`sequence(EPOCH, group=[ARMCD], by=[asc(TAETORD)])` lists `SCREENING, TREATMENT, TREATMENT, FOLLOW-UP`.
+
+**Example — the subject's elements against its arm's plan** (SDTMIG §5.2, assumption 4c.ii)
+
+```yaml
+Bindings:
+- name: "$se"
+  expression: 'sequence(ETCD, domain="SE", group=[USUBJID], by=[asc(SESTDTC)], filter=(ETCD != "UNPLAN"))'
+- name: "$ta"
+  expression: 'sequence(ETCD, domain="TA", group=[{left: ACTARMCD, right: ARMCD}], by=[asc(TAETORD)])'
+Check:
+  expression: 'not empty(ACTARMCD) and ACTARMCD not in ["SCRNFAIL", "NOTASSGN", "NOTTRT", "UNPLAN"] and not is_prefix_of($se, $ta)'
+```
+
+**Minimal — required parameters only**
+
+```yaml
+Bindings:
+- name: "$etcds"
+  expression: 'sequence(ETCD)'
+```
+
 ### tuple
 
 `tuple(c1, c2, …)` → **value**
@@ -2278,7 +2341,7 @@ True when one `key` maps to more than one `name` — a functional-dependency vio
 |---|---|---|---|
 | `name` | column reference (bare, or a `--`prefix reference) | yes | The column to read — a quoted literal is a load error |
 | `key` | column reference (bare, or a `--`prefix reference) | yes | The column whose value acts as the key — a quoted literal is a load error |
-| `within` | column reference or list of column references (bare, or `--`prefix) | no | Columns that partition the rows, read **by keyword only** — a positional third argument (`has_multiple_values_for(A, B, USUBJID)`) is a load error since runbook W8 (it used to be bound and silently ignored), and so is a quoted literal |
+| `within` | column reference or list of column references (bare, or `--`prefix) | no | A member may be a `$`-reference to a dataset-level list of column names (or a string naming one column), or the expression such a binding holds, written in place — spliced as [`record_count`](#record_count)'s `group=` splices it (a per-row binding or expression is a load error); a nested coalesce component splices inside as at top level. Columns that partition the rows, read **by keyword only** — a positional third argument (`has_multiple_values_for(A, B, USUBJID)`) is a load error since runbook W8 (it used to be bound and silently ignored), and so is a quoted literal |
 | `keep_missings` | boolean | no | Whether a row with a missing key stays in its group |
 | `include_empty` | boolean | no | Whether a blank key or value takes part |
 
@@ -2472,9 +2535,29 @@ Check:
 ```
 
 
+### collapse_runs
+
+`collapse_runs(list)` → **value (a list)**
+
+The list with adjacent duplicates collapsed — `[S, T, T, F, T]` becomes `[S, T, F, T]` (runbook
+W1b RO, `PLAN-engine-gap-row-ordinal` R4). Over a per-row list ([`sequence`](#sequence)'s output)
+and a dataset-level list alike; elements compare as the set operations compare them (text exact,
+a missing by its marker); a missing list is the empty list.
+
+| parameter | type | required | description |
+|---|---|---|---|
+| `list` | list | yes | The list to collapse — a list binding, `sequence(…)`, `distinct(…)`, `values([…])`; a scalar is a rule-definition error |
+
+**Example — an EPOCH must be one contiguous block of its arm's `TAETORD` order**
+
+```yaml
+Check:
+  expression: 'count(collapse_runs(sequence(EPOCH, group=[ARMCD], by=[asc(TAETORD)]))) != count(distinct(EPOCH, group=[ARMCD]))'
+```
+
 ### has_next_corresponding_record
 
-`has_next_corresponding_record(name, value, within=, ordering=, keep_missings=, relation=)` → **boolean**
+`has_next_corresponding_record(name, value, within=, by=, keep_missings=, relation=)` → **boolean**
 
 True when a following record in the group matches under `relation=`; authored under `not`
 
@@ -2482,8 +2565,9 @@ True when a following record in the group matches under `relation=`; authored un
 |---|---|---|---|
 | `name` | any | yes | The column to read |
 | `value` | any | yes | The value to compare against |
-| `within` | any | yes | Columns that partition the rows |
-| `ordering` | any | yes | Sort keys deciding row order inside the group |
+| `within` | one column reference, or a one-element list | yes | The column that partitions the rows. May be a `$`-reference to a dataset-level string or one-element list of column names, or the expression such a binding holds, written in place — spliced as [`record_count`](#record_count)'s `group=` splices it (a per-row binding or expression is a load error; two or more spliced names make the rule ERROR: the slot takes one column). |
+| `ordering` | one column reference | no | The older spelling of `by=` (accepted until it is refused with the hint *"write by="*) |
+| `by` | one column reference, or a one-element list `[asc(COL)]` / `[COL]` | no | The sort key, ascending — since runbook W1b SK (owner O17) the one sort-key parameter of every function (`by=AESEQ` or `by=[asc(AESEQ)]`); exactly one ascending key here — `desc(…)` or two keys fail to load (*"not supported for …"*). Write `by=` or `ordering=`, not both. May be a `$`-reference to a dataset-level string or one-element list of column names, or the expression such a binding holds, written in place — spliced as [`record_count`](#record_count)'s `group=` splices it (a per-row binding or expression is a load error; two or more spliced names make the rule ERROR: the slot takes one column). |
 | `relation` | string | no | How a record must relate to the next one |
 | `keep_missings` | boolean | no | Whether a row with a missing key stays in its group |
 
@@ -2504,6 +2588,33 @@ Check:
 **Missing and empty** — `""` is compared literally, not treated as absent.
 
 
+### is_increasing
+
+`is_increasing(list)` → **boolean**
+
+True when every element is **strictly** greater than its predecessor (runbook W1b RO,
+`PLAN-engine-gap-row-ordinal` R6, owner 2026-10-07: *"agreed to strict"*). Numerically when
+**every** element is a number (a numeric cell, or text that reads as one: `"9"` before `"10"`),
+else as text; an empty or one-element list is increasing; a **missing element** makes the answer
+`false` — so `is_increasing` does not fire and `not is_increasing` does (the BOOLEAN functions are
+two-valued). Over a per-row list ([`sequence`](#sequence)'s output) and a dataset-level list alike.
+
+| parameter | type | required | description |
+|---|---|---|---|
+| `list` | list | yes | The list to judge — a list binding, `sequence(…)`, `values([…])`; a scalar is a rule-definition error |
+
+**Example — the numeric suffix of `MIDS` follows the chronological order** (SDTMIG 3.3 SM)
+
+```yaml
+Bindings:
+- name: "$mids"
+  expression: 'sequence(MIDS, group=[USUBJID, MIDSTYPE], by=[asc(SMSTDTC)], filter=(MIDS =~ /[0-9]$/))'
+- name: "$nums"
+  expression: 'num($mids ~ /^.*?([0-9]+)$/$1/)'
+Check:
+  expression: 'not is_increasing($nums)'
+```
+
 ### is_ordered_subset_of
 
 `is_ordered_subset_of(name, $b)` → **boolean**
@@ -2521,6 +2632,28 @@ True when the column's values appear in `$b` in the same order. A negated spelli
 expression: 'not is_ordered_subset_of($column_order_from_dataset, $model_column_order)'
 ```
 
+### is_prefix_of
+
+`is_prefix_of(a, b)` → **boolean**
+
+True when `a`'s elements equal `b`'s first `|a|` elements — `a` starts `b` (runbook W1b RO,
+`PLAN-engine-gap-row-ordinal` R2). Element identity is the set operations' (text exact, a missing by
+its marker); the empty list is a prefix of every list, a list is its own prefix; a missing list on
+either side answers `false`. Over per-row lists ([`sequence`](#sequence)'s output) and dataset-level
+lists alike. A negated spelling `is_not_prefix_of(a, b)` exists; prefer `not is_prefix_of(a, b)`.
+
+| parameter | type | required | description |
+|---|---|---|---|
+| `a` | list | yes | The candidate prefix |
+| `b` | list | yes | The list it must start |
+
+**Example** — the subject's elements must start the plan of the subject's arm: [`sequence`](#sequence).
+
+```yaml
+Check:
+  expression: 'not is_prefix_of($se, $ta)'
+```
+
 ### is_sorted_by
 
 `is_sorted_by(target, by=[asc(col)[, nulls=]], within=)` → **boolean**
@@ -2530,8 +2663,8 @@ True when the target is sorted by `by=`; authored under `not`, it fires the whol
 | parameter | type | required | description |
 |---|---|---|---|
 | `target` | column reference (bare, or a `--`prefix reference) | yes | The column the function is about — a quoted literal is a load error |
-| `by` | list of `asc(COL)` / `desc(COL)` descriptors | yes | Sort keys — `COL` is bare (or `--`prefix); the quoted `asc("COL")` the engine used to require is a string literal since runbook W8 and fails to load. The `asc`/`desc` direction itself is declarative only — `ExprCompiler.compileTargetIsNotSortedBy` reads only the ordered column names and ignores it, matching the legacy operator A descriptor may carry `nulls=` (`asc(COL, nulls="first")`): no |
-| `within` | one column reference, or a one-element list (bare, or `--`prefix) | no | The column that partitions the rows — a quoted literal is a load error, and so is a list of two or more columns (it used to run ungrouped) |
+| `by` | list of sort keys: `asc(COL)`, `desc(COL)`, or a bare `COL` (= `asc`, the SQL default — runbook W1b SK) | yes | Sort keys — `COL` is bare (or `--`prefix); the quoted `asc("COL")` the engine used to require is a string literal since runbook W8 and fails to load. A key may be a `$`-reference to a dataset-level list of column names (`by=$keys`) or a string naming one column inside a descriptor (`asc($c)`), or the expression such a binding holds, written in place — spliced once per run (a per-row binding or expression is a load error). ⚠ The `asc`/`desc` direction itself is still declarative only — `ExprCompiler.compileTargetIsNotSortedBy` reads only the ordered column names and ignores it, matching the legacy operator (W2 `PLAN-is-sorted-by-direction` honours it); a descriptor may carry `nulls=` (`asc(COL, nulls="first")`): no |
+| `within` | one column reference, or a one-element list (bare, or `--`prefix) | no | The column that partitions the rows — a quoted literal is a load error, and so is a list of two or more columns (it used to run ungrouped). May be a `$`-reference to a dataset-level string or one-element list of column names, or the expression such a binding holds, written in place — spliced as [`record_count`](#record_count)'s `group=` splices it (a per-row binding or expression is a load error; two or more spliced names make the rule ERROR: the slot takes one column). |
 | `keep_missings` | boolean | no | Whether a row with a missing key stays in its group |
 
 **Example**

@@ -146,7 +146,8 @@ A value the engine supplies directly, without a call — see
 | boolean | `true`, `false` | |
 | regex | `/^AE.*$/` | between slashes |
 | substitution | `/^(.*)DTC$/$1/` | a pattern and a replacement, three slashes; only ever the right side of [`~`](#substitution) |
-| list | `["Y", "N"]` | **square** brackets; used with `in` / `not in`. ⛔ A `$` binding is never an element — `AETERM in ["A", $codes]` is a load error (it would read as the text `"$codes"`); write `$codes` alone as the operand. The one exception is a **splice** of column names into [`record_count`](functions.md#record_count)'s `group=`, [`is_unique_set`](functions.md#is_unique_set)'s members and [`values`](functions.md#values)' columns (a `$` holding a dataset-level list of names — a name-list binding `$keys: [STUDYID, USUBJID]` or a string list — or that expression written in place; see [bindings](../authoring/bindings.md)) |
+| sided key | `{left: ACTARMCD, right: ARMCD}` | a `group=` member of a `domain=` grouped call — this row's left column keys the other table's right column ([qualified `group=` members](functions.md#qualified-group-members)); legal nowhere else |
+| list | `["Y", "N"]` | **square** brackets; used with `in` / `not in`. ⛔ A `$` binding is never an element — `AETERM in ["A", $codes]` is a load error (it would read as the text `"$codes"`); write `$codes` alone as the operand. The one exception is a **splice** of column names into [`record_count`](functions.md#record_count)'s `group=`, [`is_unique_set`](functions.md#is_unique_set)'s members, [`values`](functions.md#values)' columns and every `within=` / `by=` slot (a `$` holding a dataset-level list of names — a name-list binding `$keys: [STUDYID, USUBJID]` or a string list — or that expression written in place; see [bindings](../authoring/bindings.md)) |
 
 > ⚠ **Single quotes are not string delimiters.** You will see them in `Source` blocks, because
 > that is how the source sheets write SQL-ish prose — but a `Check` expression that uses them is
@@ -576,14 +577,15 @@ listed under [Arguments](#arguments). **Every parameter can be given positionall
 | function | returns | what it does |
 |---|---|---|
 | [`distinct(name, domain=, filter=, group=, keep_missings=)`](functions.md#distinct) | value (a list) | The distinct values of a column, or the distinct row tuples of a list of columns — one list for the dataset, or each row's group's list with `group=` |
-| [`empty_within_except_last_row(name, group, ordering=, keep_missings=)`](functions.md#empty_within_except_last_row) | boolean | True when a row other than the ordered-last one is unpopulated |
+| [`empty_within_except_last_row(name, group, by=, keep_missings=)`](functions.md#empty_within_except_last_row) | boolean | True when a row other than the ordered-last one is unpopulated |
 | [`has_mixed_emptiness_within_group(name, group=, qualifying_any_populated=, keep_missings=)`](functions.md#has_mixed_emptiness_within_group) | boolean | Per row: the group mixes populated and unpopulated values of the subject column; column references, key identity, KEEP-missing default |
-| [`is_last_in_group(ordering=, group=, keep_missings=)`](functions.md#is_last_in_group) | boolean | Per row: the row's ordering value is identical to its group's maximum (every tied row is last); no target, column references, DROP-missing default |
+| [`is_last_in_group(by=, group=, keep_missings=)`](functions.md#is_last_in_group) | boolean | Per row: the row's ordering value is identical to its group's maximum (every tied row is last); no target, column references, DROP-missing default |
 | [`max(name, …)`](functions.md#max) | value | The largest value of a column, over the dataset or per group |
 | [`max_date(name, …)`](functions.md#max_date) | value | The latest date in a column; a value that cannot be positioned yields no value |
 | [`min_date(name, …)`](functions.md#min_date) | value | The earliest date in a column; a value that cannot be positioned yields no value |
 | [`present_on_multiple_rows_within(name, within=)`](functions.md#present_on_multiple_rows_within) | boolean | True for every member of a group that has two or more rows |
 | [`record_count(…)`](functions.md#record_count) | value | The number of rows; with `group=`, the count for each row's group |
+| [`sequence(name, domain=, filter=, group=, by=[asc(COL), desc(COL)], keep_missings=)`](functions.md#sequence) | value (a list) | The values of a column in sort-key order — one list for the dataset, or each row's group's list; duplicates kept, a missing cell at its position |
 | [`row_max(name_pattern=)`](functions.md#row_max) | value | The largest populated value, per row, among the columns whose names match a regex; values rank by their own type |
 | [`tuple(c1, c2, …)`](functions.md#tuple) | value | Builds a composite key from two to six columns, for whole-tuple membership |
 | [`variable_count(name \| name_pattern=)`](functions.md#variable_count) | value | A count of variables: the current dataset's columns matching `name_pattern=`, or the study's datasets carrying the `"--"` template `name` |
@@ -605,8 +607,11 @@ listed under [Arguments](#arguments). **Every parameter can be given positionall
 | function | returns | what it does |
 |---|---|---|
 | [`contains_all(source, keys=[…])`](functions.md#contains_all) | boolean | True when the source's distinct values include every value in `keys=`. A negated spelling `not_contains_all(source, keys=[…])` exists; prefer `not contains_all(source, keys=[…])`. |
-| [`has_next_corresponding_record(name, value, within=, ordering=, keep_missings=, relation=)`](functions.md#has_next_corresponding_record) | boolean | True when a following record in the group matches under `relation=`; authored under `not` |
+| [`collapse_runs(list)`](functions.md#collapse_runs) | value (a list) | The list with adjacent duplicates collapsed |
+| [`has_next_corresponding_record(name, value, within=, by=, keep_missings=, relation=)`](functions.md#has_next_corresponding_record) | boolean | True when a following record in the group matches under `relation=`; authored under `not` |
+| [`is_increasing(list)`](functions.md#is_increasing) | boolean | True when every element is strictly greater than its predecessor — numerically when every element is a number, else as text; a missing element answers false |
 | [`is_ordered_subset_of(name, $b)`](functions.md#is_ordered_subset_of) | boolean | True when the column's values appear in `$b` in the same order. A negated spelling `is_not_ordered_subset_of(name, $b)` exists; prefer `not is_ordered_subset_of(name, $b)`. |
+| [`is_prefix_of(a, b)`](functions.md#is_prefix_of) | boolean | True when `a`'s elements equal `b`'s first elements. A negated spelling `is_not_prefix_of(a, b)` exists; prefer `not is_prefix_of(a, b)`. |
 | [`is_sorted_by(target, by=[asc(col)[, nulls=]], within=)`](functions.md#is_sorted_by) | boolean | True when the target is sorted by `by=`; authored under `not`, it fires the whole unsorted group |
 | [`shares_elements_with($a, $b)`](functions.md#shares_elements_with) | boolean | True when the two lists have at least one member in common. A negated spelling `shares_no_elements_with($a, $b)` exists; prefer `not shares_elements_with($a, $b)`. |
 
@@ -899,7 +904,11 @@ parameter left unbound, and an argument name the function does not declare.
 > wrote, and under-reports with no signal.
 
 Two tokens look like functions inside an argument but are not: **`asc(…)` and `desc(…)`** inside
-`by=[…]` are sort-key descriptors, read structurally by the function that takes them.
+`by=[…]` are sort-key descriptors, read structurally by the function that takes them. A bare column
+in a sort-key list means `asc` (the SQL default, `by=[USUBJID, desc(SESTDTC)]`); the column may be a
+dataset-level `$` name or name list, spliced once per run (`asc($c)`, `by=$keys`). `by=` is the one
+sort-key parameter: `is_last_in_group`, `has_next_corresponding_record` and
+`empty_within_except_last_row` still accept their older `ordering=` for one ascending key.
 
 **A boolean handed to a function needs its own parentheses** — `filter=(TSPARMCD == "SPECIES")` —
 with one exception: `joined(…)` takes a condition by declaration, so its argument is written bare,

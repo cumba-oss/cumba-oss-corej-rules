@@ -1676,7 +1676,7 @@ abstract class AbstractAdamTemplateTest extends AbstractAdamRuleTest
                         ? String.valueOf((long) d)
                         : String.valueOf(d);
             }
-            case LIST, SUBSTITUTION -> null;
+            case LIST, SUBSTITUTION, SIDED -> null;
             };
         }
 

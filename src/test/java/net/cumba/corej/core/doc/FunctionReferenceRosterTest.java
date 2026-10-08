@@ -64,6 +64,8 @@ class FunctionReferenceRosterTest
             Map.entry("is_not_complete_date_part", "is_complete_date_part"),
             Map.entry("is_not_integer", "is_integer"),
             Map.entry("is_not_ordered_subset_of", "is_ordered_subset_of"),
+            // runbook W1b RO (PLAN-engine-gap-row-ordinal R2): the negated twin of is_prefix_of
+            Map.entry("is_not_prefix_of", "is_prefix_of"),
             Map.entry("is_not_unique_relationship", "is_unique_relationship"),
             Map.entry("is_not_unique_set", "is_unique_set"),
             Map.entry("is_not_unique_value", "is_unique_value"), Map.entry("is_present", "empty"),

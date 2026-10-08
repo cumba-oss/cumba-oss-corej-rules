@@ -75,7 +75,9 @@ Each evaluated row is grouped by the `RPATHCD` of **its own bound `DM` record** 
 
 The same qualified spelling joins a key through an earlier entry in
 [`Match_Datasets`](joins.md#a-qualified-key--joining-through-an-earlier-entry) and keys a grouped
-function's [`group=`](../reference/functions.md#qualified-group-members).
+function's [`group=`](../reference/functions.md#qualified-group-members) — where, when the two sides
+carry different names, the member is written sided, `group=[{left: ACTARMCD, right: ARMCD}]`
+(a `domain=` grouped function only; the rule-level `Grouping` has no other side).
 
 ## `keep_missings` — rows whose key is missing
 
