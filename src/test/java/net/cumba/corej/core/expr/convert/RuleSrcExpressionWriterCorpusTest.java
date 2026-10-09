@@ -128,6 +128,13 @@ class RuleSrcExpressionWriterCorpusTest
      * impossible to repeat. A map-keyed pin over a corpus that can rename or retire its keys is
      * inert-by-default, and nothing in the assertion's own shape says whether it ran.
      * </p>
+     *
+     * <p>
+     * ⚑ Re-expected 2026-10-09 (runbook W3 MA-r2, {@code PLAN-metadata-accessor-default-level} D5):
+     * the corpus no longer writes the default level, so {@code CDISC-CG0332} / {@code CDISC-CG0333}
+     * spell {@code ds_name()} where they spelled {@code ds_name("DATA")} — the same tree after load
+     * ({@code MetadataOperandMapping} fills {@code "DATA"} back in).
+     * </p>
      */
     private static final Map<String, String> CURATED_BY_ID = Map.of("CDISC-CG0280",
             "TSPARMCD == \"RANDQT\" and not empty(TSVAL) "
@@ -139,10 +146,10 @@ class RuleSrcExpressionWriterCorpusTest
             "TSPARMCD == \"RANDQT\" and not empty(TSVAL) "
                     + "and (num(TSVAL) <= 0 or num(TSVAL) > 1 or TSVAL !~ /^[+-]?([0-9]+(\\\\.[0-9]+)?|\\\\.[0-9]+)$/)",
             "CDISC-CG0332",
-            "ds_name(\"DATA\") =~ /(?i)^(?!AP|FA)[A-Z]{2}[A-Z0-9]{1,2}$/ "
-                    + "and upper(prefix(ds_name(\"DATA\"), 2)) not in $study_domains",
-            "CDISC-CG0333", "ds_name(\"DATA\") =~ /(?i)^FA[A-Z]{1,2}$/ "
-                    + "and upper(suffix(ds_name(\"DATA\"), 2)) not in $study_domains");
+            "ds_name() =~ /(?i)^(?!AP|FA)[A-Z]{2}[A-Z0-9]{1,2}$/ "
+                    + "and upper(prefix(ds_name(), 2)) not in $study_domains",
+            "CDISC-CG0333", "ds_name() =~ /(?i)^FA[A-Z]{1,2}$/ "
+                    + "and upper(suffix(ds_name(), 2)) not in $study_domains");
 
     /**
      * The carriers of the retired {@code does_not_equal_string_part} leaf-signature rewrite; their

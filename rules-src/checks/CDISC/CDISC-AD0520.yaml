@@ -13,8 +13,8 @@ Scope:
 Check:
   expression: >-
     ends_with(upper(varname()), "ETMF") and not empty(label_template("LIBRARY", stem="*ETMF")) and
-    (var_label("DATA") !~ / Imput(\\.|ation) Flag$/ or not contains(var_label("DATA"), "End") or not
-    contains(var_label("DATA"), "Time"))
+    (var_label() !~ / Imput(\\.|ation) Flag$/ or not contains(var_label(), "End") or not
+    contains(var_label(), "Time"))
 Outcome:
   Message: "A variable ending in ETMF has a label that does not end with 'Imputation\
     \ Flag' (or 'Imput. Flag') or does not contain 'End' or does not contain 'Time'."

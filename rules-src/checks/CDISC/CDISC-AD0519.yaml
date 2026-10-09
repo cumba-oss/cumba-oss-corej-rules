@@ -13,8 +13,8 @@ Scope:
 Check:
   expression: >-
     ends_with(upper(varname()), "EDTF") and not empty(label_template("LIBRARY", stem="*EDTF")) and
-    (var_label("DATA") !~ / Imput(\\.|ation) Flag$/ or not contains(var_label("DATA"), "End") or not
-    contains(var_label("DATA"), "Date"))
+    (var_label() !~ / Imput(\\.|ation) Flag$/ or not contains(var_label(), "End") or not
+    contains(var_label(), "Date"))
 Outcome:
   Message: "A variable ending in EDTF has a label that does not end with 'Imputation\
     \ Flag' (or 'Imput. Flag') or does not contain 'End' or does not contain 'Date'."

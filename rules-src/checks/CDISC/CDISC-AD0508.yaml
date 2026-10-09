@@ -14,7 +14,7 @@ Scope:
 Check:
   expression: >-
     ends_with(upper(varname()), "TMF") and not empty(label_template("LIBRARY", stem="*TMF")) and
-    (var_label("DATA") !~ / Imput(\\.|ation) Flag$/ or not contains(var_label("DATA"), "Time"))
+    (var_label() !~ / Imput(\\.|ation) Flag$/ or not contains(var_label(), "Time"))
 Outcome:
   Message: "A variable ending in TMF has a label that does not end with 'Imputation\
     \ Flag' (or 'Imput. Flag') or does not contain 'Time'."
