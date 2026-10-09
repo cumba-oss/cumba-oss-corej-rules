@@ -604,7 +604,7 @@ class DefineDatasetChannelTest
 
     /**
      * A minimal {@code Dataset Metadata Check against Define XML} spec: one dataset, one
-     * dataset-level define key, and a Check that fires when {@code define_dataset_class} is
+     * dataset-level define key, and a Check that fires when {@code ds_class("DEFINE")} is
      * non-empty. Written inline rather than as a {@code coreId:} redirect because P1.1 adds no
      * specs — P2 is where a real rule gets one.
      */
@@ -623,7 +623,7 @@ class DefineDatasetChannelTest
                     Domains:
                       Include: ["%1$s"]
                   Check:
-                    expression: 'not empty(define_dataset_class)'
+                    expression: 'not empty(ds_class("DEFINE"))'
                   Outcome:
                     Message: "define class present"
                     Output_Variables: [define_dataset_class]

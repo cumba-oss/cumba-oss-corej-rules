@@ -845,51 +845,54 @@ A builtin operand is a bare name you use where a value is expected, with **no ca
 arguments**:
 
 ```yaml
-expression: 'variable_label != library_variable_label'
+expression: 'variable_value_length > define_vlm_length'
 ```
 
-**42 of the 64 are a [metadata accessor](#the-metadata-accessors-take-a-level) with the level
+**44 of the 65 are a [metadata accessor](#the-metadata-accessors-take-a-level) with the level
 baked into the name** — `<level-prefix><scope>_<attribute>`, with no prefix for `DATA`, `define_`
-for Define-XML and `library_` for the CDISC Library. Their rows below name the equivalent call
-rather than repeating its description.
+for Define-XML and `library_` for the CDISC Library — and `library_variable_label_template` is
+`label_template("LIBRARY")` the same way. **These 45 are retired in expressions** (runbook W4 MA6):
+written in a Check, a binding or a `Match_Datasets` Filter, one fails the rule's load naming the
+accessor to write — *"retired operand 'dataset_name': the metadata aliases were retired in
+expressions — write ds_name() (same value); 'dataset_name' stays valid as an Output_Variables report
+column"*. Write the accessor call: `ds_name()`, `var_label()`, `var_codelist_coded_codes("DEFINE")`.
+They stay valid **`Output_Variables`** report columns, which is what their rows below are for.
 
-> **Prefer the accessor call when the level is the point.** `var_label("DEFINE")` says which level
-> it reads and changes by editing one argument; `define_variable_label` bakes the answer into the
-> identifier. The bare form reads better when the level never varies.
-
-The other 22 are their own things: the `define_vlm_*` family (value-level metadata, a scope of its
-own), the per-row value accessors, two list variants, the `*_decode_matches` /
-`*_code_pair_matches` pair — which are also callable — plus `dataset_metadata` and `record_count`.
+The other 20 are their own things: the `define_vlm_*` family (value-level metadata, a scope of its
+own), the per-row value accessors, the declared and stored lengths (`variable_size`,
+`variable_max_size`), two list variants, the `*_decode_matches` / `*_code_pair_matches` pair —
+which are also callable — plus `dataset_metadata` and `record_count`. They stay legal in
+expressions.
 
 | operand | type | what it is |
 |---|---|---|
-| `dataset_class` | string | The `ds_class` accessor at the `DATA` level — `ds_class("DATA")` |
-| `dataset_domain` | string | The `ds_domain` accessor at the `DATA` level — `ds_domain("DATA")` |
-| `dataset_label` | string | The `ds_label` accessor at the `DATA` level — `ds_label("DATA")` |
+| `dataset_class` | string | Retired in expressions — write `ds_class()`; an `Output_Variables` report column |
+| `dataset_domain` | string | Retired in expressions — write `ds_domain()`; an `Output_Variables` report column |
+| `dataset_label` | string | Retired in expressions — write `ds_label()`; an `Output_Variables` report column |
 | `dataset_metadata` | value | The current dataset's metadata record |
-| `dataset_name` | string | The `ds_name` accessor at the `DATA` level — `ds_name("DATA")` |
-| `define_dataset_class` | string | The `ds_class` accessor at the `DEFINE` level — `ds_class("DEFINE")` |
-| `define_dataset_label` | string | The `ds_label` accessor at the `DEFINE` level — `ds_label("DEFINE")` |
-| `define_dataset_name` | string | The `ds_name` accessor at the `DEFINE` level — `ds_name("DEFINE")` |
-| `define_variable_ccode` | string | The `var_ccode` accessor at the `DEFINE` level — `var_ccode("DEFINE")` |
-| `define_variable_codelist` | string | The `var_codelist` accessor at the `DEFINE` level — `var_codelist("DEFINE")` |
-| `define_variable_codelist_coded_codes` | string | The `var_codelist_coded_codes` accessor at the `DEFINE` level — `var_codelist_coded_codes("DEFINE")` |
-| `define_variable_codelist_coded_values` | string | The `var_codelist_coded_values` accessor at the `DEFINE` level — `var_codelist_coded_values("DEFINE")` |
-| `define_variable_codelist_extended_values` | string | The `var_codelist_extended_values` accessor at the `DEFINE` level — `var_codelist_extended_values("DEFINE")` |
-| `define_variable_core` | string | The `var_core` accessor at the `DEFINE` level — `var_core("DEFINE")` |
-| `define_variable_data_type` | value | The `var_type` accessor at the `DEFINE` level — `var_type("DEFINE")` |
+| `dataset_name` | string | Retired in expressions — write `ds_name()`; an `Output_Variables` report column |
+| `define_dataset_class` | string | Retired in expressions — write `ds_class("DEFINE")`; an `Output_Variables` report column |
+| `define_dataset_label` | string | Retired in expressions — write `ds_label("DEFINE")`; an `Output_Variables` report column |
+| `define_dataset_name` | string | Retired in expressions — write `ds_name("DEFINE")`; an `Output_Variables` report column |
+| `define_variable_ccode` | string | Retired in expressions — write `var_ccode("DEFINE")`; an `Output_Variables` report column |
+| `define_variable_codelist` | string | Retired in expressions — write `var_codelist("DEFINE")`; an `Output_Variables` report column |
+| `define_variable_codelist_coded_codes` | string | Retired in expressions — write `var_codelist_coded_codes("DEFINE")`; an `Output_Variables` report column |
+| `define_variable_codelist_coded_values` | string | Retired in expressions — write `var_codelist_coded_values("DEFINE")`; an `Output_Variables` report column |
+| `define_variable_codelist_extended_values` | string | Retired in expressions — write `var_codelist_extended_values("DEFINE")`; an `Output_Variables` report column |
+| `define_variable_core` | string | Retired in expressions — write `var_core("DEFINE")`; an `Output_Variables` report column |
+| `define_variable_data_type` | value | Retired in expressions — write `var_type("DEFINE")`; an `Output_Variables` report column |
 | `define_variable_decode_matches` | value | Operand form of the §5 decode matcher |
-| `define_variable_external_dictionary` | string | The `var_external_dictionary` accessor at the `DEFINE` level — `var_external_dictionary("DEFINE")` |
-| `define_variable_external_dictionary_version` | string | The `var_external_dictionary_version` accessor at the `DEFINE` level — `var_external_dictionary_version("DEFINE")` |
-| `define_variable_has_codelist` | boolean | The `var_has_codelist` accessor at the `DEFINE` level — `var_has_codelist("DEFINE")` |
-| `define_variable_has_comment` | boolean | The `var_has_comment` accessor at the `DEFINE` level — `var_has_comment("DEFINE")` |
-| `define_variable_has_method` | boolean | The `var_has_method` accessor at the `DEFINE` level — `var_has_method("DEFINE")` |
-| `define_variable_label` | string | The `var_label` accessor at the `DEFINE` level — `var_label("DEFINE")` |
-| `define_variable_length` | number | The `var_length` accessor at the `DEFINE` level — `var_length("DEFINE")` |
-| `define_variable_name` | string | The `var_name` accessor at the `DEFINE` level — `var_name("DEFINE")` |
-| `define_variable_ordinal` | number | The `var_ordinal` accessor at the `DEFINE` level — `var_ordinal("DEFINE")` |
-| `define_variable_origin_type` | string | The `var_origin_type` accessor at the `DEFINE` level — `var_origin_type("DEFINE")` |
-| `define_variable_role` | string | The `var_role` accessor at the `DEFINE` level — `var_role("DEFINE")` |
+| `define_variable_external_dictionary` | string | Retired in expressions — write `var_external_dictionary("DEFINE")`; an `Output_Variables` report column |
+| `define_variable_external_dictionary_version` | string | Retired in expressions — write `var_external_dictionary_version("DEFINE")`; an `Output_Variables` report column |
+| `define_variable_has_codelist` | boolean | Retired in expressions — write `var_has_codelist("DEFINE")`; an `Output_Variables` report column |
+| `define_variable_has_comment` | boolean | Retired in expressions — write `var_has_comment("DEFINE")`; an `Output_Variables` report column |
+| `define_variable_has_method` | boolean | Retired in expressions — write `var_has_method("DEFINE")`; an `Output_Variables` report column |
+| `define_variable_label` | string | Retired in expressions — write `var_label("DEFINE")`; an `Output_Variables` report column |
+| `define_variable_length` | number | Retired in expressions — write `var_length("DEFINE")`; an `Output_Variables` report column |
+| `define_variable_name` | string | Retired in expressions — write `var_name("DEFINE")`; an `Output_Variables` report column |
+| `define_variable_ordinal` | number | Retired in expressions — write `var_ordinal("DEFINE")`; an `Output_Variables` report column |
+| `define_variable_origin_type` | string | Retired in expressions — write `var_origin_type("DEFINE")`; an `Output_Variables` report column |
+| `define_variable_role` | string | Retired in expressions — write `var_role("DEFINE")`; an `Output_Variables` report column |
 | `define_vlm_codelist_coded_codes` | value | The `vlm_codelist_coded_codes` value-level match, without a call |
 | `define_vlm_codelist_coded_values` | value | The `vlm_codelist_coded_values` value-level match, without a call |
 | `define_vlm_codelist_extensible` | value | The `vlm_codelist_extensible` value-level match, without a call |
@@ -899,29 +902,30 @@ own), the per-row value accessors, two list variants, the `*_decode_matches` /
 | `define_vlm_length` | value | The `vlm_length` value-level match, without a call |
 | `define_vlm_mandatory` | value | The `vlm_mandatory` value-level match, without a call |
 | `define_vlm_type_conforms` | value | The `vlm_type_conforms` value-level match, without a call |
-| `library_dataset_class` | string | The `ds_class` accessor at the `LIBRARY` level — `ds_class("LIBRARY")` |
-| `library_dataset_label` | string | The `ds_label` accessor at the `LIBRARY` level — `ds_label("LIBRARY")` |
-| `library_dataset_name` | string | The `ds_name` accessor at the `LIBRARY` level — `ds_name("LIBRARY")` |
-| `library_variable_ccode` | string | The `var_ccode` accessor at the `LIBRARY` level — `var_ccode("LIBRARY")` |
+| `library_dataset_class` | string | Retired in expressions — write `ds_class("LIBRARY")`; an `Output_Variables` report column |
+| `library_dataset_label` | string | Retired in expressions — write `ds_label("LIBRARY")`; an `Output_Variables` report column |
+| `library_dataset_name` | string | Retired in expressions — write `ds_name("LIBRARY")`; an `Output_Variables` report column |
+| `library_variable_ccode` | string | Retired in expressions — write `var_ccode("LIBRARY")`; an `Output_Variables` report column |
 | `library_variable_code_pair_matches` | value | Operand form of the §7 CT pair predicate |
-| `library_variable_codelist` | string | The `var_codelist` accessor at the `LIBRARY` level — `var_codelist("LIBRARY")` |
-| `library_variable_codelist_coded_codes` | string | The `var_codelist_coded_codes` accessor at the `LIBRARY` level — `var_codelist_coded_codes("LIBRARY")` |
-| `library_variable_codelist_coded_values` | string | The `var_codelist_coded_values` accessor at the `LIBRARY` level — `var_codelist_coded_values("LIBRARY")` |
-| `library_variable_codelist_extensible` | boolean | The `var_codelist_extensible` accessor at the `LIBRARY` level — `var_codelist_extensible("LIBRARY")` |
-| `library_variable_core` | string | The `var_core` accessor at the `LIBRARY` level — `var_core("LIBRARY")` |
-| `library_variable_data_type` | value | The `var_type` accessor at the `LIBRARY` level — `var_type("LIBRARY")` |
+| `library_variable_codelist` | string | Retired in expressions — write `var_codelist("LIBRARY")`; an `Output_Variables` report column |
+| `library_variable_codelist_coded_codes` | string | Retired in expressions — write `var_codelist_coded_codes("LIBRARY")`; an `Output_Variables` report column |
+| `library_variable_codelist_coded_values` | string | Retired in expressions — write `var_codelist_coded_values("LIBRARY")`; an `Output_Variables` report column |
+| `library_variable_codelist_extensible` | boolean | Retired in expressions — write `var_codelist_extensible("LIBRARY")`; an `Output_Variables` report column |
+| `library_variable_core` | string | Retired in expressions — write `var_core("LIBRARY")`; an `Output_Variables` report column |
+| `library_variable_data_type` | value | Retired in expressions — write `var_type("LIBRARY")`; an `Output_Variables` report column |
 | `library_variable_data_type_values` | value | The data types the CDISC Library allows for the variable, as a list |
-| `library_variable_label` | string | The `var_label` accessor at the `LIBRARY` level — `var_label("LIBRARY")` |
+| `library_variable_label` | string | Retired in expressions — write `var_label("LIBRARY")`; an `Output_Variables` report column |
+| `library_variable_label_template` | string | Retired in expressions — write `label_template("LIBRARY")`; an `Output_Variables` report column (the expected form a label finding reports) |
 | `library_variable_label_values` | value | The labels the CDISC Library allows for the variable, as a list |
-| `library_variable_length` | number | The `var_length` accessor at the `LIBRARY` level — `var_length("LIBRARY")` |
-| `library_variable_name` | string | The `var_name` accessor at the `LIBRARY` level — `var_name("LIBRARY")` |
-| `library_variable_ordinal` | number | The `var_ordinal` accessor at the `LIBRARY` level — `var_ordinal("LIBRARY")` |
-| `library_variable_role` | string | The `var_role` accessor at the `LIBRARY` level — `var_role("LIBRARY")` |
+| `library_variable_length` | number | Retired in expressions — write `var_length("LIBRARY")`; an `Output_Variables` report column |
+| `library_variable_name` | string | Retired in expressions — write `var_name("LIBRARY")`; an `Output_Variables` report column |
+| `library_variable_ordinal` | number | Retired in expressions — write `var_ordinal("LIBRARY")`; an `Output_Variables` report column |
+| `library_variable_role` | string | Retired in expressions — write `var_role("LIBRARY")`; an `Output_Variables` report column |
 | `record_count` | number | The number of rows in the dataset, with no call |
-| `variable_data_type` | value | The `var_type` accessor at the `DATA` level — `var_type("DATA")` |
-| `variable_format` | string | The `var_format` accessor at the `DATA` level — `var_format("DATA")` |
-| `variable_label` | string | The `var_label` accessor at the `DATA` level — `var_label("DATA")` |
-| `variable_length` | number | The `var_length` accessor at the `DATA` level — `var_length("DATA")` |
+| `variable_data_type` | value | Retired in expressions — write `var_type()`; an `Output_Variables` report column |
+| `variable_format` | string | Retired in expressions — write `var_format()`; an `Output_Variables` report column |
+| `variable_label` | string | Retired in expressions — write `var_label()`; an `Output_Variables` report column |
+| `variable_length` | number | Retired in expressions — write `var_length()`; an `Output_Variables` report column |
 | `variable_max_size` | value | The longest value stored in the current variable |
 | `variable_name` | string | The current variable's name — the operand form of `varname()` |
 | `variable_size` | value | The declared length of the current variable |
