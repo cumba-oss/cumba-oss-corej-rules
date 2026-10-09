@@ -92,7 +92,7 @@ columns it names, derived from their names at load (`--DECOD` → `PT`,
 `--PTCD` → `PTCD`, `--LLT`, `--HLT`, `--HLGT`, `--SOC` and their `CD` forms);
 `--BODSYS` is deliberately **not** mapped (it may carry a secondary SOC).
 
-⭐ **No legacy arm** (runbook W4 DI2): the hierarchy is read from
+⭐ **No legacy arm for MedDRA** (runbook W4 DI2): the MedDRA hierarchy is read from
 `hierarchy_by_level` only. A MedDRA file **without** it — every file
 converted before this section existed — stays loaded (its membership and pair
 rules answer), is reported once at load (WARNING) and in the run's
@@ -102,10 +102,14 @@ the reason; so does a rule whose child level the section does not carry
 (`--LLT` / `--LLTCD`). A call naming a column that maps to no level
 (`--BODSYS`, a `$`-binding, a computed operand) fails to load. **Re-install
 (re-convert) an installed MedDRA distribution** after this release — the
-installer refuses a meddra file without the six levels PT, PTCD, HLT, HLTCD,
-HLGT, HLGTCD in `hierarchy_by_level` (`MedDraConverter` writes both
-sections; the bare-name `hierarchy` stays for older engine releases sharing
-the directory). The dummy fixture here carries the section (runbook W3 FX).
+installer WARNS about a meddra file without one of the six levels PT, PTCD,
+HLT, HLTCD, HLGT, HLGTCD in `hierarchy_by_level` and installs it anyway
+(W4 fold: its membership and pair rules answer, its hierarchy rules SKIP;
+`MedDraConverter` writes both sections; the bare-name `hierarchy` stays for
+older engine releases sharing the directory). ⚠ The level-scoped read, the
+load error and the SKIP are **MedDRA-only**: every other type (`whodrug`, …)
+answers `valid_external_dictionary_hierarchy` from its bare-name
+`hierarchy` map at any column, exactly as before W4 (W4 fold). The dummy fixture here carries the section (runbook W3 FX).
 The registry *name* is a
 preference, not a constraint — on a miss both pair operations scan every
 `pairs` registry and every `attributes` map of that dictionary.
@@ -161,7 +165,7 @@ Census over `lib/corej-rules/rules/*.json` and
 
 | `type`     | required `levels` keys                                                   | other sections | rules |
 |------------|--------------------------------------------------------------------------|---|-------|
-| `meddra`   | `PT` `PTCD` `LLT` `LLTCD` `HLT` `HLTCD` `HLGT` `HLGTCD` `SOC` `SOCCD` | `hierarchy`, keyed at **HLT + HLGT only**, each carrying its SOC; `hierarchy_by_level` (PT / HLT / HLGT names and codes → primary path) — required since runbook W4 DI2 (`PT` `PTCD` `HLT` `HLTCD` `HLGT` `HLGTCD`) | 51 |
+| `meddra`   | `PT` `PTCD` `LLT` `LLTCD` `HLT` `HLTCD` `HLGT` `HLGTCD` `SOC` `SOCCD` | `hierarchy`, keyed at **HLT + HLGT only**, each carrying its SOC; `hierarchy_by_level` (PT / HLT / HLGT names and codes → primary path) — expected since runbook W4 DI2 (`PT` `PTCD` `HLT` `HLTCD` `HLGT` `HLGTCD`; a missing level is an install warning) | 51 |
 | `unii`     | `UNII` `SRS`                                                             | `pairs.unii` | 24 |
 | `snomed`   | `SNOMED` `SNOMEDCD`                                                      | `pairs.snomed` | 8 |
 | `medrt`    | `MEDRT` `MEDRTCD`                                                        | `pairs.medrt` | 8 |

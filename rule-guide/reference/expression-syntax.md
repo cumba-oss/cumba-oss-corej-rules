@@ -427,7 +427,8 @@ other argument applying unchanged to each element of the row (`substring(values(
 reads the row's `S` for both — a list at any of those other arguments fails to load, or ERRORs the
 rule when only the run knows it is a list: a list is lifted at the first argument only, never
 zipped; and a list whose elements are themselves lists, such as `distinct([A, B])`'s row tuples, is
-not lifted — one level only: it fails to load, or ERRORs the rule at run time); a lifted list
+not lifted — one level only: it fails to load where its type is known, otherwise it ERRORs the rule at
+run time — `upper(distinct([A, B]))` loads and ERRORs when it runs); a lifted list
 compared with a single value fails to load when the
 list is known statically — over an unknown-typed `$` value it is the rule's run-time ERROR (test
 membership with `in`) — and a lifted list on the left of `in` asks whether **any** element is a
