@@ -23,6 +23,12 @@ passed to a function yields a missing result rather than a default, an error or 
 check built from ordinary functions ignores rows with missing data by construction. Where that is
 not what you want, test for it with `empty(x)` explicitly.
 
+**A list form (element-wise) lifts over its first argument only, and one level deep.** Every other
+argument of such a function takes one value per row: a list there (`substring(X, $starts)`) fails to
+load, or — when only the run knows it is a list — ERRORs the rule, never a zip or a guess (runbook W4
+E6). A list whose elements are themselves lists (`distinct([A, B])`'s row tuples) is not lifted: it
+fails to load, or ERRORs the rule at run time (one level only, runbook W4 E7a).
+
 **Functions that reach outside the row have one more failure mode**, and it is not an error.
 `record_count(domain="DS")`, `distinct(X, domain="TA")`, `read_value(…, domain=TS)`, the library and Define-XML lookups — each names something that
 may not be there: an absent dataset, a filter no row satisfies, a group no row falls in, a name
@@ -432,7 +438,7 @@ True when `needle` occurs anywhere in `x`; `needle` may vary per row. A negated 
 | parameter | type | required | description |
 |---|---|---|---|
 | `x` | any | yes | The value to read |
-| `value` | any | yes | The value to compare against |
+| `value` | any | yes | The value to compare against — **one** value per row. A list here fails to load with the hint *"use contains_any(x, list)"* (for `does_not_contain`: *"use not contains_any(x, list)"*), and when only the run knows the value is a list (an unknown-typed `$`), the rule ERRORs with the same sentence (runbook W4 E6b — before, the list's rendering `"[a, b]"` was probed as text and never matched) |
 
 **Example**
 
@@ -504,7 +510,7 @@ True when `x` ends with `needle`; `needle` may vary per row
 | parameter | type | required | description |
 |---|---|---|---|
 | `x` | any | yes | The value to read |
-| `value` | any | yes | The value to compare against |
+| `value` | any | yes | The value to compare against — **one** value per row. A list here fails to load (*"ends_with has no list form"*), or ERRORs the rule when only the run knows it is a list (runbook W4 E6b) |
 
 **Example**
 
@@ -878,7 +884,7 @@ True when `x` begins with `needle`
 | parameter | type | required | description |
 |---|---|---|---|
 | `x` | any | yes | The value to read |
-| `value` | any | yes | The value to compare against |
+| `value` | any | yes | The value to compare against — **one** value per row. A list here fails to load (*"starts_with has no list form"*), or ERRORs the rule when only the run knows it is a list (runbook W4 E6b) |
 
 **Example**
 

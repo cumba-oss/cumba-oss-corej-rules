@@ -112,6 +112,16 @@ slot (`group=$keys`) or read its values with `values($keys)`; to compare names a
 list"*. In a sort-key list (`is_sorted_by`'s and `sequence`'s `by=`) the spliced names are the keys,
 each ascending — the SQL default a bare column means there.
 
+A list of **strings** is values, never names. `$keys: ["STUDYID", "USUBJID"]` read where names are
+spliced — `group=$keys`, `is_unique_set([AETERM, $keys])`, `values($keys)`, `within=$keys`,
+`by=[asc($keys)]`, also through a binding of the binding — fails to load with the hint *"write the
+columns as names: [STUDYID, USUBJID]"*: write the bare names, `$keys: [STUDYID, USUBJID]` (runbook W4
+E3 — before, the strings were turned into names when the rule was bound, while the same strings
+written in place, `group=["STUDYID"]`, were already refused). As values the string list stays what it
+is (`AETERM in $keys`, `minus($keys, subtract=[…])`); a computed list of names
+(`get_dataset_variables()`, `minus([…], subtract=[…])`) still splices; and a single string binding
+(`$k: "--SEQ"`) still names its one column.
+
 
 ## ⛔ Everything else is rejected, loudly
 

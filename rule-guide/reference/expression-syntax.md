@@ -147,7 +147,7 @@ A value the engine supplies directly, without a call — see
 | regex | `/^AE.*$/` | between slashes |
 | substitution | `/^(.*)DTC$/$1/` | a pattern and a replacement, three slashes; only ever the right side of [`~`](#substitution) |
 | sided key | `{left: ACTARMCD, right: ARMCD}` | a `group=` member of a `domain=` grouped call — this row's left column keys the other table's right column ([qualified `group=` members](functions.md#qualified-group-members)); legal nowhere else |
-| list | `["Y", "N"]` | **square** brackets; used with `in` / `not in`. ⛔ A `$` binding is never an element — `AETERM in ["A", $codes]` is a load error (it would read as the text `"$codes"`); write `$codes` alone as the operand. The one exception is a **splice** of column names into [`record_count`](functions.md#record_count)'s `group=`, [`is_unique_set`](functions.md#is_unique_set)'s members, [`values`](functions.md#values)' columns and every `within=` / `by=` slot (a `$` holding a dataset-level list of names — a name-list binding `$keys: [STUDYID, USUBJID]` or a string list — or that expression written in place; see [bindings](../authoring/bindings.md)) |
+| list | `["Y", "N"]` | **square** brackets; used with `in` / `not in`. ⛔ A `$` binding is never an element — `AETERM in ["A", $codes]` is a load error (it would read as the text `"$codes"`); write `$codes` alone as the operand. The one exception is a **splice** of column names into [`record_count`](functions.md#record_count)'s `group=`, [`is_unique_set`](functions.md#is_unique_set)'s members, [`values`](functions.md#values)' columns and every `within=` / `by=` slot (a `$` holding a dataset-level list of names — a name-list binding `$keys: [STUDYID, USUBJID]` or a computed list of names such as `get_dataset_variables()` — or that expression written in place; see [bindings](../authoring/bindings.md)). A binding of a written **string** list (`$keys: ["STUDYID", "USUBJID"]`) is values, not names: at a splice slot it fails to load with the hint *"write the columns as names: [STUDYID, USUBJID]"* (runbook W4 E3), as the same strings written in place do |
 
 > ⚠ **Single quotes are not string delimiters.** You will see them in `Source` blocks, because
 > that is how the source sheets write SQL-ish prose — but a `Check` expression that uses them is
@@ -424,7 +424,11 @@ load, since `[X, Y]` is a list of column *names*). So do the other scalar value 
 `time`, `earliest_possible` and `latest_possible` each answer a list of the same length over a list
 at their first argument (`len(values([X, Y]))`, `trim(split_by(X, ","))`, `date($dates)`), every
 other argument applying unchanged to each element of the row (`substring(values([X, Y]), S, 2)`
-reads the row's `S` for both); a lifted list compared with a single value fails to load when the
+reads the row's `S` for both — a list at any of those other arguments fails to load, or ERRORs the
+rule when only the run knows it is a list: a list is lifted at the first argument only, never
+zipped; and a list whose elements are themselves lists, such as `distinct([A, B])`'s row tuples, is
+not lifted — one level only: it fails to load, or ERRORs the rule at run time); a lifted list
+compared with a single value fails to load when the
 list is known statically — over an unknown-typed `$` value it is the rule's run-time ERROR (test
 membership with `in`) — and a lifted list on the left of `in` asks whether **any** element is a
 member — by the date / time rule for `date(…)` / `time(…)`, numerically against numbers for
@@ -544,7 +548,7 @@ listed under [Arguments](#arguments). **Every parameter can be given positionall
 | function | returns | what it does |
 |---|---|---|
 | [`concat(a, b[, c])`](functions.md#concat) | value | Joins two or three values into one string; a missing operand makes the result that missing (`D36`) |
-| [`contains(x, needle)`](functions.md#contains) | boolean | True when `needle` occurs anywhere in `x`; `needle` may vary per row. A negated spelling `does_not_contain(x, needle)` exists; prefer `not contains(x, needle)`. |
+| [`contains(x, needle)`](functions.md#contains) | boolean | True when `needle` occurs anywhere in `x`; `needle` may vary per row. A negated spelling `does_not_contain(x, needle)` exists; prefer `not contains(x, needle)`. `needle` is one value: a list there fails to load — write `contains_any(x, list)` (`starts_with` / `ends_with` have no list form). |
 | [`count(x)`](functions.md#count) | value | Number of elements in a list-valued operand — 1 for a present scalar, 0 for missing or `""`. Also spelled `size`. |
 | [`does_not_equal_string_part(name, value, regex=)`](functions.md#does_not_equal_string_part) | boolean | True when `value` differs from capture-group 1 of `regex=` applied to `name` |
 | [`ends_with(x, needle)`](functions.md#ends_with) | boolean | True when `x` ends with `needle`; `needle` may vary per row |
