@@ -88,7 +88,7 @@ place a `$` stands inside a list is a splice of **column names** into a list of 
 is a value key component instead, bound or inline alike),
 [`is_not_unique_member_set`](../reference/functions.md#is_not_unique_member_set)'s `members=` and `group=`,
 [`values`](../reference/functions.md#values)' columns, every `within=` and the single
-`by=` (older `ordering=`) and `group` slots of the partitioning operators (a string or a one-element
+`by=` and `group` slots of the partitioning operators (a string or a one-element
 list there), and the sort keys of [`is_sorted_by`](../reference/functions.md#is_sorted_by) and
 [`sequence`](../reference/functions.md#sequence) (`by=$keys`, each key ascending; `asc($c)`) — and
 there, as everywhere,
@@ -102,7 +102,10 @@ members of `is_unique_set($keys)` / `is_not_unique_set($keys)` (also as a member
 `is_unique_set([STUDYID, $keys])`), as any `group=$keys` (`record_count`, `max` / `max_date` /
 `min_date`, `read_value`, `distinct`, `is_last_in_group`, `has_mixed_emptiness_within_group`), as a
 `keys=$keys` of column names (`is_unique_relationship`, `is_inconsistent_across_dataset`), and as the
-columns whose per-row values `values($keys)` lists.
+columns whose per-row values `values($keys)` lists. Their **positional** key is a column, never a
+binding: `is_unique_relationship(A, $keys)` (any `$` there) fails to load with the hint *"a binding
+of column names is spliced through keys=[$keys]"* (runbook W4 KP — before, the binding's name was
+read as a column and the key silently dropped).
 Anywhere else — `X in $keys`, a comparison, a function's value argument, another binding,
 `Output_Variables` — it is a load error with the hint *"`$keys` holds column names: use it in a name
 slot (`group=$keys`) or read its values with `values($keys)`; to compare names as text, write a string

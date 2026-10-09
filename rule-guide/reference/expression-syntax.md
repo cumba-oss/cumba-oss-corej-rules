@@ -958,8 +958,10 @@ Two tokens look like functions inside an argument but are not: **`asc(…)` and 
 in a sort-key list means `asc` (the SQL default, `by=[USUBJID, desc(SESTDTC)]`); the column may be a
 dataset-level `$` name or name list, spliced once per run (`asc($c)`, `by=$keys`). `by=` is the one
 sort-key parameter: `is_last_in_group`, `has_next_corresponding_record` and
-`empty_within_except_last_row` still accept their older `ordering=` for one ascending key (the
-corpus spells `by=` since runbook W3).
+`empty_within_except_last_row` take one ascending key there; their older `ordering=` is retired —
+write `by=` (`ordering=` fails to load with the hint *"write by="*, runbook W4 OR2; the corpus
+spells `by=` since runbook W3). A descriptor's `nulls=` takes `"first"` or `"last"` only, and no
+other descriptor keyword exists (runbook W4 SB3).
 
 **A boolean handed to a function needs its own parentheses** — `filter=(TSPARMCD == "SPECIES")` —
 with one exception: `joined(…)` takes a condition by declaration, so its argument is written bare,
