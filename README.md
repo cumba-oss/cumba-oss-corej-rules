@@ -126,8 +126,9 @@ mvn -B clean install -Drevision=<version> \
     -Dpmd.failOnViolation=true -Dspotbugs.failOnError=true
 ```
 
-Requires **`cumba-oss-corej` 0.3.0** and its upstreams on Central; the engine version is
-pinned by `dependency.cumba-oss-corej.version` in the root pom.
+Requires the **`cumba-oss-corej`** version pinned by `dependency.cumba-oss-corej.version` in the
+root pom, and its upstreams: on `main` a `-SNAPSHOT` from the Central snapshot repository (see
+"Building `main`"), on a release tag the released version on Central.
 
 ### ⛔⛔ Five of this repo's gates CANNOT FAIL — they are structurally inert
 
