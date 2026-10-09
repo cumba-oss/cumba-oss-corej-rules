@@ -19,9 +19,10 @@
 #   3. NO MAVEN MIRROR. Everything resolves from Maven Central. Verified by a
 #      cold build with an empty local repo and no settings.xml: 1030
 #      artifacts, all from `central`.
-#   4. NO SONAR, NO DEPLOY, NO RELEASE. Those target internal hosts. Releases
-#      and Maven Central publishing are deliberately out of scope here and
-#      are being added in later steps.
+#   4. NO SONAR, NO NEXUS DEPLOY. Those target internal hosts. Nothing goes to
+#      Maven Central; a tag cuts the GitHub Release with the corpus archives.
+#      Non-tag runs resolve sibling snapshots from Central's snapshot
+#      repository (settings step).
 #
 # Nothing in the pom is CI-specific: `mvn install` with no -P builds the whole
 # reactor, so the commands below match what a developer runs locally.
@@ -139,6 +140,53 @@ jobs:
         with:
           distribution: temurin
           java-version: '25'
+
+      # ⭐ Sibling -SNAPSHOT artifacts (net.cumba:cumba-oss-*) resolve from the
+      # Central Portal snapshot repository. The poms deliberately name NO
+      # snapshot repository (each forge supplies its own), so this step writes a
+      # settings file and hands it to every later Maven call through MAVEN_ARGS,
+      # which Maven reads from 3.9 on. `-gs` (global settings) MERGES with the
+      # user ~/.m2/settings.xml that setup-java writes for the Central
+      # credentials; nothing is overwritten. It must run before the first `mvn`.
+      # ⚠ An older Maven IGNORES MAVEN_ARGS without a word and resolves no
+      # sibling snapshot, so the step refuses a Maven below 3.9, loudly.
+      # ⚠ Tag runs get neither the file nor the variable: a release resolves
+      # released artifacts only (requireReleaseDeps guards that as well).
+      # This step is byte-identical in every cumba-oss repo; copy it unchanged.
+      - name: Configure Central snapshot repository
+        if: ${{ !startsWith(github.ref, 'refs/tags/') }}
+        run: |
+          # Unanchored: a colour code may precede "Apache Maven" on the line.
+          mvn_version="$(mvn -B -v 2>/dev/null | sed -n 's/.*Apache Maven \([0-9][0-9.]*\).*/\1/p' | head -1)" || mvn_version=""
+          IFS=. read -r mvn_major mvn_minor _ <<< "${mvn_version:-0.0}"
+          if (( mvn_major < 3 || (mvn_major == 3 && mvn_minor < 9) )); then
+            echo "::error::Maven '${mvn_version:-?}' (from mvn -v): MAVEN_ARGS needs Maven >= 3.9 (an older one ignores it silently, and no sibling snapshot resolves)." >&2
+            exit 1
+          fi
+          cat > "$RUNNER_TEMP/central-snapshots.xml" <<'EOF'
+          <settings xmlns="http://maven.apache.org/SETTINGS/1.2.0"
+                    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                    xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.2.0 https://maven.apache.org/xsd/settings-1.2.0.xsd">
+            <profiles>
+              <profile>
+                <id>central-portal-snapshots</id>
+                <repositories>
+                  <repository>
+                    <id>central-portal-snapshots</id>
+                    <url>https://central.sonatype.com/repository/maven-snapshots/</url>
+                    <releases><enabled>false</enabled></releases>
+                    <snapshots><enabled>true</enabled></snapshots>
+                  </repository>
+                </repositories>
+              </profile>
+            </profiles>
+            <activeProfiles>
+              <activeProfile>central-portal-snapshots</activeProfile>
+            </activeProfiles>
+          </settings>
+          EOF
+          # Append, never replace: keep any MAVEN_ARGS set before this step.
+          echo "MAVEN_ARGS=${MAVEN_ARGS:+$MAVEN_ARGS }-gs $RUNNER_TEMP/central-snapshots.xml" >> "$GITHUB_ENV"
 
       # Restore at the top; save in a matching step at the end (not
       # setup-java's built-in cache) so a run that downloads new dependencies

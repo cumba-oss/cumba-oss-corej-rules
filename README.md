@@ -190,6 +190,47 @@ curl -fsSL "https://github.com/cdisc-org/cdisc-rules-engine/archive/v0.16.0.tar.
 ~82 MB on the wire, ~450 MB extracted. The locator refuses a path that is set but is not
 a directory — a wrong path and no path look identical in a test log otherwise.
 
+## Building `main`
+
+On `main` the version is a `-SNAPSHOT`, and so is every sibling `cumba-oss-*`
+artifact it depends on. Each sibling publishes its snapshot to the Central
+Portal snapshot repository on every push to its `main`. The poms deliberately
+name no snapshot repository, so a clone that has not built the siblings itself
+needs a settings file that adds it (the same one CI writes):
+
+```xml
+<settings xmlns="http://maven.apache.org/SETTINGS/1.2.0"
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.2.0 https://maven.apache.org/xsd/settings-1.2.0.xsd">
+  <profiles>
+    <profile>
+      <id>central-portal-snapshots</id>
+      <repositories>
+        <repository>
+          <id>central-portal-snapshots</id>
+          <url>https://central.sonatype.com/repository/maven-snapshots/</url>
+          <releases><enabled>false</enabled></releases>
+          <snapshots><enabled>true</enabled></snapshots>
+        </repository>
+      </repositories>
+    </profile>
+  </profiles>
+  <activeProfiles>
+    <activeProfile>central-portal-snapshots</activeProfile>
+  </activeProfiles>
+</settings>
+```
+
+```bash
+mvn -gs central-snapshots.xml clean install
+```
+
+`-gs` replaces only the Maven installation's global settings; your
+`~/.m2/settings.xml` still applies. Alternatively install the siblings locally,
+in order: commons → formats → datatable → swingx-msp → corej. A release build
+(a tag) never needs this: it depends on released versions from Maven Central
+only. Central deletes snapshots after 90 days.
+
 ## The Cumba OSS repositories
 
 ```
