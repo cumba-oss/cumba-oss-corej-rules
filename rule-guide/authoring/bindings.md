@@ -88,7 +88,7 @@ place a `$` stands inside a list is a splice of **column names** into a list of 
 is a value key component instead, bound or inline alike),
 [`is_not_unique_member_set`](../reference/functions.md#is_not_unique_member_set)'s `members=` and `group=`,
 [`values`](../reference/functions.md#values)' columns, every `within=` and the single
-`ordering=` / `by=` and `group` slots of the partitioning operators (a string or a one-element
+`by=` (older `ordering=`) and `group` slots of the partitioning operators (a string or a one-element
 list there), and the sort keys of [`is_sorted_by`](../reference/functions.md#is_sorted_by) and
 [`sequence`](../reference/functions.md#sequence) (`by=$keys`, each key ascending; `asc($c)`) — and
 there, as everywhere,

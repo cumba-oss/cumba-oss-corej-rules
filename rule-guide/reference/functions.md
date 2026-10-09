@@ -1947,14 +1947,14 @@ True when a row other than the ordered-last one is unpopulated
 
 ```yaml
 Check:
-  expression: 'empty_within_except_last_row(AEENDTC, group=[USUBJID], ordering=AESEQ, keep_missings=false)'
+  expression: 'empty_within_except_last_row(AEENDTC, group=[USUBJID], by=AESEQ, keep_missings=false)'
 ```
 
 **Minimal — required parameters only**
 
 ```yaml
 Check:
-  expression: 'empty_within_except_last_row(AEENDTC, group=[USUBJID], ordering=AESEQ)'
+  expression: 'empty_within_except_last_row(AEENDTC, group=[USUBJID], by=AESEQ)'
 ```
 
 
@@ -2015,7 +2015,7 @@ It takes **no target**: it reads only `by` (`ordering`) and `group`. Both are **
 ```yaml
 Bindings:
 - name: "$is_last_se"
-  expression: 'is_last_in_group(ordering=SESEQ, group=[USUBJID], keep_missings=false)'
+  expression: 'is_last_in_group(by=SESEQ, group=[USUBJID], keep_missings=false)'
 Check:
   expression: '$is_last_se == true and date(SEENDTC) != date(DS.DSSTDTC)'
 ```
@@ -2677,14 +2677,14 @@ True when a following record in the group matches under `relation=`; authored un
 
 ```yaml
 Check:
-  expression: 'not has_next_corresponding_record(--ENDTC, --STDTC, within=[USUBJID], ordering=--SEQ, relation="<=", keep_missings=false)'
+  expression: 'not has_next_corresponding_record(--ENDTC, --STDTC, within=[USUBJID], by=--SEQ, relation="<=", keep_missings=false)'
 ```
 
 **Minimal — required parameters only**
 
 ```yaml
 Check:
-  expression: 'not has_next_corresponding_record(--ENDTC, --STDTC, within=[USUBJID], ordering=--SEQ)'
+  expression: 'not has_next_corresponding_record(--ENDTC, --STDTC, within=[USUBJID], by=--SEQ)'
 ```
 
 **Missing and empty** — `""` is compared literally, not treated as absent.
