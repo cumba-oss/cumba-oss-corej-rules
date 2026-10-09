@@ -40,7 +40,7 @@ an absent or mis-shaped key degrades to empty **silently**
   "hierarchy_by_level": {                // level -> term -> ancestor level -> ancestor terms (meddra)
     "PT":   { "Headache":  { "HLT": ["Headaches NEC"], "HLGT": ["Headaches"], "SOC": ["Nervous system disorders"] } },
     "PTCD": { "10019211":  { "HLTCD": ["10019231"], "HLGTCD": ["10019233"], "SOCCD": ["10029205"] } },
-    "LLT":  { "Cephalgia": { "PT": ["Headache"] } }
+    "HLT":  { "Headaches NEC": { "HLGT": ["Headaches"], "SOC": ["Nervous system disorders"] } }
   },
   "pairs": {                             // registry -> code -> decode
     "medrt": { "N0000000160": "Cyclooxygenase Inhibitors" }
@@ -68,8 +68,10 @@ an absent or mis-shaped key degrades to empty **silently**
 | `attributes` | attribute → term, verbatim | value, verbatim        | reached only by the pair/decode fall-through scan |
 
 `levels` keys are upper-cased **at load**; every other section keeps a
-verbatim map *and* a case-folded twin (`hierarchy_by_level` builds its twin on
-the first `case_sensitive=false` lookup).
+verbatim map *and* a case-folded twin (`hierarchy_by_level` builds its twin
+once, on the first `case_sensitive=false` lookup). The terms of `levels` and
+`hierarchy_by_level` are interned through one map at load, so a name that
+recurs (a SOC on every PT row) is held once.
 
 #### `hierarchy` vs `hierarchy_by_level` — the level of the variable read
 
@@ -77,9 +79,14 @@ A MedDRA name can sit at more than one level — a PT name can also be an HLT
 and an LLT name — so the bare-name `hierarchy` map, which files every level
 under one key, can answer with another level's ancestors (a wrong SOC
 passes). `hierarchy_by_level` keys the **primary** path per level: a PT
-(name, and its code under `PTCD`) → its one primary HLT, HLGT and SOC; an LLT
-→ its PT, whose own entry carries the path; an HLT / HLGT → the set of HLGTs
-/ SOCs it reaches on primary rows; codes sit at their own `*CD` levels.
+(name, and its code under `PTCD`) → its one primary HLT, HLGT and SOC; an HLT /
+HLGT → the set of HLGTs / SOCs it reaches on primary rows; codes sit at their
+own `*CD` levels. **No LLT level is written** (runbook W2 fold, R5 PB-M1): it
+was about three quarters of the section and no shipped rule reads `--LLT` — a
+`--LLT` read takes the bare-name map, as before the section existed. ⚠ When a
+rule comes to read `--LLT`, the converter must add the level back (an LLT name
+and code → its PT, `llt.asc` field 2): a PT name can also be an LLT name, which
+the bare-name map cannot tell apart.
 `valid_external_dictionary_hierarchy` reads it at the levels of **both**
 columns it names, derived from their names at load (`--DECOD` → `PT`,
 `--PTCD` → `PTCD`, `--LLT`, `--HLT`, `--HLGT`, `--SOC` and their `CD` forms);
@@ -88,7 +95,8 @@ columns it names, derived from their names at load (`--DECOD` → `PT`,
 ⭐ **Legacy arm:** a file **without** `hierarchy_by_level` — every MedDRA file
 installed before this section existed, and the dummy fixture here — answers
 exactly as before through `hierarchy`; so does a call naming a column that
-maps to no level. Re-convert an installed MedDRA distribution to gain the
+maps to no level, and one whose child level the section does not carry (R5
+PB-L1 — today the LLT levels). Re-convert an installed MedDRA distribution to gain the
 level-scoped section (`MedDraConverter` writes both sections). The registry *name* is a
 preference, not a constraint — on a miss both pair operations scan every
 `pairs` registry and every `attributes` map of that dictionary.
