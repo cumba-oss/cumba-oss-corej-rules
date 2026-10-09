@@ -1,0 +1,16 @@
+#!RuleTest
+#test CDISC-CG0209 expect=noViolation domain=SE
+# Rule:Description: Raise an error when SEENDTC is not populated for an element that is not the subject's last element.
+#note "Ordered by SESTDTC with the UTC offset applied first: element 2 starts 2014-01-02T10:00+02:00 (08:00 UTC), element 3 at 2014-01-02T09:00Z (09:00 UTC), so element 3 is the last and its empty SEENDTC is allowed. Ordered by the key's text, T09:00Z sorts before T10:00+02:00, element 2 becomes the last and element 3's empty SEENDTC fires; PLAN-by-key-numeric-order (CellOrder by= key, O24)."
+dataset SE label="Subject Elements"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col SESEQ type=Num label="Sequence Number"
+col SESTDTC type=Char label="Start Date/Time of Element"
+col SEENDTC type=Char label="End Date/Time of Element"
+---
+CDISCPILOT01 | SE | 01-701-1015 | 1 | 2013-12-26 | 2014-01-02T10:00+02:00
+CDISCPILOT01 | SE | 01-701-1015 | 2 | 2014-01-02T10:00+02:00 | 2014-01-02T09:00Z
+CDISCPILOT01 | SE | 01-701-1015 | 3 | 2014-01-02T09:00Z |
+---

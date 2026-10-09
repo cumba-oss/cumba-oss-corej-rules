@@ -212,7 +212,13 @@ class ScenarioFixtureCoverageRatchetTest
     // whose distinct() read had no scenario at all gained their first .cdt suites (76 files) —
     // seventeen CG rules and thirteen SEND rules. Measured by setting the ratchet to 0 and reading
     // 463 back; it equals the arithmetic, which is not why it was written.
-    private static final int MAX_UNCOVERED = 463;
+    // ⭐ 463 -> 403 on 2026-10-09 (PLAN-by-key-numeric-order phase 1a): CDISC-SEND-0126 and
+    // CDISC-SEND-0353.1 gained their first .cdt suites (a valid >= 11-element chain and an
+    // invalid gap each). Measured by setting the ratchet to 0 and reading the count back: 405
+    // without the two suites, 403 with them — NOT the 461 the plan's arithmetic predicted: 463
+    // was already carrying 58 rows of slack from earlier corpus movements (not decomposed here),
+    // which would have licensed 58 new uncovered rules.
+    private static final int MAX_UNCOVERED = 403;
 
     /**
      * Floor on the corpus, so a run that loaded nothing cannot report perfect coverage. The corpus

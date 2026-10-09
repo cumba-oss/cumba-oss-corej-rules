@@ -1,0 +1,17 @@
+#!RuleTest
+#test CDISC-SEND-0126 expect=violation domain=SE
+#library standard=sendig version=3-0
+#note "ordered by SESEQ, record 1's SEENDTC does not equal record 2's SESTDTC (a gap) - one finding, on the current row; the last record never fires"
+#expectViolationCount 1
+#expectViolationAt row=1 SESEQ=1 USUBJID=01-701-1015
+dataset SE label="Subject Elements"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col SESEQ   type=Num  label="Sequence Number"
+col SESTDTC type=Char label="Start Date/Time of Element"
+col SEENDTC type=Char label="End Date/Time of Element"
+---
+STUDY01 | SE | 01-701-1015 | 1 | 2013-12-26 | 2014-01-02
+STUDY01 | SE | 01-701-1015 | 2 | 2014-01-05 | 2014-07-02
+---

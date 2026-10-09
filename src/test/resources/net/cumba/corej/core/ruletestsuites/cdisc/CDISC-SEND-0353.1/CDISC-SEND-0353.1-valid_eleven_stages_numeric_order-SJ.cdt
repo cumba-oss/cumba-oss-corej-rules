@@ -1,0 +1,24 @@
+#!RuleTest
+#test CDISC-SEND-0353.1 expect=noViolation domain=SJ
+#library standard=sendig-dart version=1-1
+#note "Eleven stages in file order 1, 10, 11, 2, 3, 4, 5, 6, 7, 8, 9: each SJENDTC equals the next stage's SJSTDTC, a clean chain only in NUMERIC SJSEQ order. Ordered by the key's text (1, 10, 11, 2, ...) the chain breaks at 1->10 and 11->2; PLAN-by-key-numeric-order (CellOrder by= key)."
+dataset SJ label="Subject Stages"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col SJSEQ   type=Num  label="Sequence Number"
+col SJSTDTC type=Char label="Start Date/Time of Repro Stage"
+col SJENDTC type=Char label="End Date/Time of Repro Stage"
+---
+STUDY01 | SJ | R-001 | 1 | 2014-01-01 | 2014-01-02
+STUDY01 | SJ | R-001 | 10 | 2014-01-10 | 2014-01-11
+STUDY01 | SJ | R-001 | 11 | 2014-01-11 | 2014-01-12
+STUDY01 | SJ | R-001 | 2 | 2014-01-02 | 2014-01-03
+STUDY01 | SJ | R-001 | 3 | 2014-01-03 | 2014-01-04
+STUDY01 | SJ | R-001 | 4 | 2014-01-04 | 2014-01-05
+STUDY01 | SJ | R-001 | 5 | 2014-01-05 | 2014-01-06
+STUDY01 | SJ | R-001 | 6 | 2014-01-06 | 2014-01-07
+STUDY01 | SJ | R-001 | 7 | 2014-01-07 | 2014-01-08
+STUDY01 | SJ | R-001 | 8 | 2014-01-08 | 2014-01-09
+STUDY01 | SJ | R-001 | 9 | 2014-01-09 | 2014-01-10
+---

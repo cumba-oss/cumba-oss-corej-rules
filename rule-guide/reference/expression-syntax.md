@@ -989,12 +989,12 @@ sort-key parameter: `is_last_in_group`, `has_next_corresponding_record` and
 fails to load with the hint *"ordering= is retired — write by=…"*); `is_sorted_by`,
 `empty_within_except_last_row` and `has_next_corresponding_record` take it by keyword only. A
 descriptor's `nulls=` takes the literal `"first"` or `"last"` only (lower case), and no other
-descriptor keyword exists. ⚠ The functions order differently: `sequence` and `is_sorted_by`
-classify each key over its cells — numeric when every present cell is a number, so a character
-column of numeric-looking text sorts numerically, else ISO date part by part, then text;
-`is_last_in_group` orders by the column's type (a character column as text); and
-`empty_within_except_last_row` / `has_next_corresponding_record` order by the cells' text whatever
-the column's type. Each [function's section](functions.md#sequence) gives the detail.
+descriptor keyword exists. ⚠ One function orders differently: `sequence`, `is_sorted_by`,
+`empty_within_except_last_row` and `has_next_corresponding_record` classify each key over its cells
+— numeric when every present cell is a number, so a character column of numeric-looking text sorts
+numerically, else ISO date part by part (a UTC offset applied first), then text — while
+`is_last_in_group` orders by the column's type (a character column as text). Each
+[function's section](functions.md#sequence) gives the detail.
 
 **A boolean handed to a function needs its own parentheses** — `filter=(TSPARMCD == "SPECIES")` —
 with one exception: `joined(…)` takes a condition by declaration, so its argument is written bare,
