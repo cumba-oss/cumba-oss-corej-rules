@@ -25,10 +25,9 @@ not what you want, test for it with `empty(x)` explicitly.
 
 **A list form (element-wise) lifts over its first argument only, and one level deep.** Every other
 argument of such a function takes one value per row: a list there (`substring(X, $starts)`) fails to
-load, or — when only the run knows it is a list — ERRORs the rule, never a zip or a guess (runbook W4
-E6). A list whose elements are themselves lists (`distinct([A, B])`'s row tuples) is not lifted: it
+load, or — when only the run knows it is a list — ERRORs the rule, never a zip or a guess. A list whose elements are themselves lists (`distinct([A, B])`'s row tuples) is not lifted: it
 fails to load where its type is known, and otherwise ERRORs the rule at run time — `upper(distinct([A, B]))`
-loads (only the run knows its elements are lists) and ERRORs when it runs (one level only, runbook W4 E7a).
+loads (only the run knows its elements are lists) and ERRORs when it runs (one level only).
 
 **Functions that reach outside the row have one more failure mode**, and it is not an error.
 `record_count(domain="DS")`, `distinct(X, domain="TA")`, `read_value(…, domain=TS)`, the library and Define-XML lookups — each names something that
@@ -49,7 +48,7 @@ library lookups are exceptions and SKIP the rule instead; their section says so.
 ## The target of `distinct`: one column, or a list of columns
 
 `distinct` is the one function whose single positional argument decides the **shape** of its
-answer (runbook W7, `PLAN-distinct-function`; like every function that reads another dataset it
+answer (like every function that reads another dataset it
 takes that target as its only positional argument — see below). What that argument *is* decides what the function collects:
 
 | you write | collects | meaning |
@@ -134,7 +133,7 @@ Bindings:
 which has no `RPATHCD`) reads the group of the `RPATHCD` of **its bound `DM` record** and its own
 `RPHASE`. The qualified name says where the record's value comes from; the **unqualified** name is
 the same variable on the grouped side. When the two sides carry **different names** the member
-is written **sided** (runbook W1b RO, `PLAN-engine-gap-row-ordinal` R3):
+is written **sided**:
 
 ```yaml
 Bindings:
@@ -237,7 +236,7 @@ Check:
   expression: 'empty(coalesce(AEDECOD, AETERM))'
 ```
 
-**Missing and empty** — `""` counts as **not present** and is skipped, exactly like a genuine missing: `coalesce("", "a")` returns `"a"`, and an absent column is skipped as well. For **numbers only a missing value is skipped** — `0` and `0.0` are real values and are returned. When every operand is missing or `""`, the result is missing — and it is the missing the operands carry (rulings register `D85c` / `D86a`): one distinct identity among the genuinely missing operands gives that missing (`coalesce(.A, "")` is `.A`), two or more give the plain `MIS` (`coalesce(.A, .B)`), and none — every operand `""` — gives the plain `MIS`. A plain missing, and an absent numeric column, count as the identity `.`: `coalesce(.A, «missing» .)` is `MIS`; an absent character column reads `""` and contributes no identity. The call's **position passes through to its operands**: in `coalesce(A, B) > 3` an absent `A` takes the default `A > 3` would give it — missing — rule-wide, exactly as `A` read in place; `coalesce`'s own answer is unchanged by it (owner 2026-10-05, `PLAN-column-typed-function-absent-type`).
+**Missing and empty** — `""` counts as **not present** and is skipped, exactly like a genuine missing: `coalesce("", "a")` returns `"a"`, and an absent column is skipped as well. For **numbers only a missing value is skipped** — `0` and `0.0` are real values and are returned. When every operand is missing or `""`, the result is missing — and it is the missing the operands carry (rulings register `D85c` / `D86a`): one distinct identity among the genuinely missing operands gives that missing (`coalesce(.A, "")` is `.A`), two or more give the plain `MIS` (`coalesce(.A, .B)`), and none — every operand `""` — gives the plain `MIS`. A plain missing, and an absent numeric column, count as the identity `.`: `coalesce(.A, «missing» .)` is `MIS`; an absent character column reads `""` and contributes no identity. The call's **position passes through to its operands**: in `coalesce(A, B) > 3` an absent `A` takes the default `A > 3` would give it — missing — rule-wide, exactly as `A` read in place; `coalesce`'s own answer is unchanged by it.
 
 
 ### ds_exists
@@ -267,7 +266,7 @@ expression: 'ds_exists("SJ")'
 
 `empty(x)` → **boolean**
 
-True when the value is missing or `""`. The positive spellings `non_empty` / `present` / `is_present` exist; prefer `not empty(x)`. `is_missing(x)` is **not** a spelling of it: it is true only for a genuine missing (rulings register `D50`, owner 2026-10-05: *"is_missing() is for misisng and empty() is for missing or \"\""*) — `is_missing("")` is false. Until 2026-10-05 `is_missing` was an alias of `empty`.
+True when the value is missing or `""`. The positive spellings `non_empty` / `present` / `is_present` exist; prefer `not empty(x)`. `is_missing(x)` is **not** a spelling of it: it is true only for a genuine missing (rulings register `D50`) — `is_missing("")` is false. Until 2026-10-05 `is_missing` was an alias of `empty`.
 
 | parameter | type | required | description |
 |---|---|---|---|
@@ -285,7 +284,7 @@ expression: 'empty(AGE)'
 
 `is_missing(x)` → **boolean**
 
-True only when the value is a genuine missing — `.` or any special missing (`.A`–`.Z`, `._`) — and never for `""`, which is a present value (rulings register `D50`, owner 2026-10-05: *"is_missing() is for misisng and empty() is for missing or \"\""*). To ask "missing or `""`" write [`empty(x)`](#empty). Until 2026-10-05 `is_missing` was an alias of `empty`; no shipped rule calls it.
+True only when the value is a genuine missing — `.` or any special missing (`.A`–`.Z`, `._`) — and never for `""`, which is a present value (rulings register `D50`). To ask "missing or `""`" write [`empty(x)`](#empty). Until 2026-10-05 `is_missing` was an alias of `empty`; no shipped rule calls it.
 
 | parameter | type | required | description |
 |---|---|---|---|
@@ -343,7 +342,7 @@ column guards the name: `not empty($n) and not var_exists($n)`. A guard on the d
 
 True when the column is absent, or present and blank — `""` or missing — on every record (the column's content status is `EMPTY` or `MISSING`)
 
-**Renamed from `var_is_null`** (2026-10-06, owner D10): the old name contradicted the never-null doctrine (nothing is ever null — a cell is a value or a missing value). Same semantics; `var_is_null(…)` is now a **load error** with the hint *"var_is_null was renamed to var_is_empty"*, never an alias.
+**Renamed from `var_is_null`** (2026-10-06): the old name contradicted the never-null doctrine (nothing is ever null — a cell is a value or a missing value). Same semantics; `var_is_null(…)` is now a **load error** with the hint *"var_is_null was renamed to var_is_empty"*, never an alias.
 
 A qualified name (`var_is_empty(DM.DTHDTC)`, or the string `"DM.DTHDTC"`) reads the joined column through its `Match_Datasets` entry over every row of the evaluated dataset, exactly as the operand `DM.DTHDTC` reads it — an unmatched row reads the column's type default, and an absent column or an undeclared join the absent default. (Until 2026-10-01 the dotted text was looked up on the primary and the call answered `true`, silently.)
 
@@ -439,7 +438,7 @@ True when `needle` occurs anywhere in `x`; `needle` may vary per row. A negated 
 | parameter | type | required | description |
 |---|---|---|---|
 | `x` | any | yes | The value to read |
-| `value` | any | yes | The value to compare against — **one** value per row. A list here fails to load with the hint *"use contains_any(x, list)"* (for `does_not_contain`: *"use not contains_any(x, list)"*), and when only the run knows the value is a list (an unknown-typed `$`), the rule ERRORs with the same sentence (runbook W4 E6b — before, the list's rendering `"[a, b]"` was probed as text and never matched) |
+| `value` | any | yes | The value to compare against — **one** value per row. A list here fails to load with the hint *"use contains_any(x, list)"* (for `does_not_contain`: *"use not contains_any(x, list)"*), and when only the run knows the value is a list (an unknown-typed `$`), the rule ERRORs with the same sentence |
 
 **Example**
 
@@ -511,7 +510,7 @@ True when `x` ends with `needle`; `needle` may vary per row
 | parameter | type | required | description |
 |---|---|---|---|
 | `x` | any | yes | The value to read |
-| `value` | any | yes | The value to compare against — **one** value per row. A list here fails to load (*"ends_with has no list form"*), or ERRORs the rule when only the run knows it is a list (runbook W4 E6b) |
+| `value` | any | yes | The value to compare against — **one** value per row. A list here fails to load (*"ends_with has no list form"*), or ERRORs the rule when only the run knows it is a list |
 
 **Example**
 
@@ -696,7 +695,7 @@ expression: 'len(ETCD) > 8'
 
 **Missing and empty** — `len("")` is **0** — an empty string is a present value of length zero. A genuine missing value yields **that missing value**, not 0 — identity kept (`len(.A)` is `.A`, rulings register `D85c`). An absent character column reads as all-`""`, so `len(x) == 0` is true for it.
 
-**List form (element-wise)** — over a list at `x` — the cells of several columns ([`values`](#values): `len(values([X, Y]))`), a per-row list such as `split_by(…)`, or a `$`-list — the function answers **a list of the same length**, each element's length in characters (`unit=` / `encoding=` apply to every element) — a list of numbers, never the list's cardinality, which is [`count`](#count), exactly as the scalar call answers it (runbook W2 E5); a missing element answers as the scalar call answers a missing value, in its position, `[]` gives `[]` and a missing list stays that missing. The list is a per-row membership set on the right of `in`, and on the left of `in` it asks whether **any** element is a member; compared with a single value (`==`, `<`, …) it fails the rule's load when the list is known statically — over an unknown-typed `$` value it is the rule's run-time ERROR. `[X, Y]` with bare names is a list of column *names*: read the values with `values([X, Y])`.
+**List form (element-wise)** — over a list at `x` — the cells of several columns ([`values`](#values): `len(values([X, Y]))`), a per-row list such as `split_by(…)`, or a `$`-list — the function answers **a list of the same length**, each element's length in characters (`unit=` / `encoding=` apply to every element) — a list of numbers, never the list's cardinality, which is [`count`](#count), exactly as the scalar call answers it; a missing element answers as the scalar call answers a missing value, in its position, `[]` gives `[]` and a missing list stays that missing. The list is a per-row membership set on the right of `in`, and on the left of `in` it asks whether **any** element is a member; compared with a single value (`==`, `<`, …) it fails the rule's load when the list is known statically — over an unknown-typed `$` value it is the rule's run-time ERROR. `[X, Y]` with bare names is a list of column *names*: read the values with `values([X, Y])`.
 
 ### lower
 
@@ -717,7 +716,7 @@ The value lower-cased. Also spelled `lowcase`.
 expression: 'lower(SEX) == "m"'
 ```
 
-**Missing and empty** — A missing input yields **that missing value**, identity kept (`.A` in, `.A` out — rulings register `D36`, owner 2026-09-28 *"D36 stands"*). `""` is a present value and yields `""`.
+**Missing and empty** — A missing input yields **that missing value**, identity kept (`.A` in, `.A` out — rulings register `D36`). `""` is a present value and yields `""`.
 
 **List form** — given a list (a `$`-binding such as `get_column_order_from_dataset()` or a
 `distinct(…)` result, a per-row list such as `split_by(…)`, or `lower(values([X, Y]))` over several
@@ -725,8 +724,7 @@ columns' values), returns a **new list** with every element lower-cased, in orde
 element stays missing** — it is carried through unchanged, in its position (missing propagates
 through the string functions, register `D36`), never folded to `""`. Element-wise as
 [`upper`](#upper) is: `lower([X, Y])` with bare column names fails to load, the values are read with
-`lower(values([X, Y]))`. Confirmed by the owner 2026-09-28 together
-with [`upper`](#upper)'s list form (rulings register `CIT §3`).
+`lower(values([X, Y]))`.
 
 ### matches_label_template
 
@@ -741,13 +739,13 @@ True when `label` conforms to `template`, a library label read as a template ([`
 
 | parameter | type | required | description |
 |---|---|---|---|
-| `label` | string | yes | The label to judge, usually `var_label("DATA")` |
+| `label` | string | yes | The label to judge, usually `var_label()` |
 | `template` | string | yes | The template, usually `label_template("LIBRARY")` |
 
 **Example**
 
 ```yaml
-expression: 'not empty(label_template("LIBRARY")) and not matches_label_template(var_label("DATA"), label_template("LIBRARY"))'
+expression: 'not empty(label_template("LIBRARY")) and not matches_label_template(var_label(), label_template("LIBRARY"))'
 ```
 
 **Missing** — A missing `label` or `template` answers **false**, as `contains` does, so the `not empty(label_template("LIBRARY"))` guard is what keeps a column without a template out of the rule; without it, `not matches_label_template(…)` fires on every such column. Both parameters are strings: a number in either position fails to load.
@@ -773,7 +771,7 @@ Check:
   expression: 'max_value_length(AETERM) > var_length("DEFINE")'
 ```
 
-**Bytes** — `var_length("DATA") != max_value_length(variable_name, unit="bytes")` compares a variable's declared width with the longest value as stored, in bytes, which is what an XPT width means; with no usable table encoding the byte count is missing and the comparison does not fire.
+**Bytes** — `var_length() != max_value_length(variable_name, unit="bytes")` compares a variable's declared width with the longest value as stored, in bytes, which is what an XPT width means; with no usable table encoding the byte count is missing and the comparison does not fire.
 
 **Minimal — required parameters only**
 
@@ -796,12 +794,12 @@ Trims the value and collapses each run of internal whitespace to a single space
 **Example**
 
 ```yaml
-expression: 'upper(normalize_space(var_label("DATA"))) not in library_variable_label_values'
+expression: 'upper(normalize_space(var_label())) not in library_variable_label_values'
 ```
 
 **Missing and empty** — A missing input yields **that missing value**, identity kept (rulings register `D36`). `""` is a present value and yields `""` (it used to yield missing).
 
-**List form (element-wise)** — over a list at `x` — the cells of several columns ([`values`](#values): `normalize_space(values([X, Y]))`), a per-row list such as `split_by(…)`, or a `$`-list — the function answers **a list of the same length**, each element with its whitespace normalised, exactly as the scalar call answers it (runbook W2 E5); a missing element answers as the scalar call answers a missing value, in its position, `[]` gives `[]` and a missing list stays that missing. The list is a per-row membership set on the right of `in`, and on the left of `in` it asks whether **any** element is a member; compared with a single value (`==`, `<`, …) it fails the rule's load when the list is known statically — over an unknown-typed `$` value it is the rule's run-time ERROR. `[X, Y]` with bare names is a list of column *names*: read the values with `values([X, Y])`.
+**List form (element-wise)** — over a list at `x` — the cells of several columns ([`values`](#values): `normalize_space(values([X, Y]))`), a per-row list such as `split_by(…)`, or a `$`-list — the function answers **a list of the same length**, each element with its whitespace normalised, exactly as the scalar call answers it; a missing element answers as the scalar call answers a missing value, in its position, `[]` gives `[]` and a missing list stays that missing. The list is a per-row membership set on the right of `in`, and on the left of `in` it asks whether **any** element is a member; compared with a single value (`==`, `<`, …) it fails the rule's load when the list is known statically — over an unknown-typed `$` value it is the rule's run-time ERROR. `[X, Y]` with bare names is a list of column *names*: read the values with `values([X, Y])`.
 
 ### prefix
 
@@ -824,7 +822,7 @@ expression: 'prefix(TSVCDREF, 5) == "CDISC"'
 
 ⛔ **Type error on a character `n`.** The length operand must be numeric; a character column there raises a rule ERROR. Convert with `num(n)`.
 
-**List form (element-wise)** — over a list at `x` — the cells of several columns ([`values`](#values): `prefix(values([X, Y]), 2)`), a per-row list such as `split_by(…)`, or a `$`-list — the function answers **a list of the same length**, each element's first `n` characters, the row's `n` applied to every element, exactly as the scalar call answers it (runbook W2 E5); a missing element answers as the scalar call answers a missing value, in its position, `[]` gives `[]` and a missing list stays that missing. The list is a per-row membership set on the right of `in`, and on the left of `in` it asks whether **any** element is a member; compared with a single value (`==`, `<`, …) it fails the rule's load when the list is known statically — over an unknown-typed `$` value it is the rule's run-time ERROR. `[X, Y]` with bare names is a list of column *names*: read the values with `values([X, Y])`.
+**List form (element-wise)** — over a list at `x` — the cells of several columns ([`values`](#values): `prefix(values([X, Y]), 2)`), a per-row list such as `split_by(…)`, or a `$`-list — the function answers **a list of the same length**, each element's first `n` characters, the row's `n` applied to every element, exactly as the scalar call answers it; a missing element answers as the scalar call answers a missing value, in its position, `[]` gives `[]` and a missing list stays that missing. The list is a per-row membership set on the right of `in`, and on the left of `in` it asks whether **any** element is a member; compared with a single value (`==`, `<`, …) it fails the rule's load when the list is known statically — over an unknown-typed `$` value it is the rule's run-time ERROR. `[X, Y]` with bare names is a list of column *names*: read the values with `values([X, Y])`.
 
 ### prefix_matches
 
@@ -885,7 +883,7 @@ True when `x` begins with `needle`
 | parameter | type | required | description |
 |---|---|---|---|
 | `x` | any | yes | The value to read |
-| `value` | any | yes | The value to compare against — **one** value per row. A list here fails to load (*"starts_with has no list form"*), or ERRORs the rule when only the run knows it is a list (runbook W4 E6b) |
+| `value` | any | yes | The value to compare against — **one** value per row. A list here fails to load (*"starts_with has no list form"*), or ERRORs the rule when only the run knows it is a list |
 
 **Example**
 
@@ -924,7 +922,7 @@ Check:
 ⛔ **Type error on character bounds.** `start` and `length` must be numeric; a character column raises a rule ERROR. Convert with `num(...)`.
 
 
-**List form (element-wise)** — over a list at `x` — the cells of several columns ([`values`](#values): `substring(values([X, Y]), 1, 2)`), a per-row list such as `split_by(…)`, or a `$`-list — the function answers **a list of the same length**, each element's substring, the row's `start` / `length` applied to every element, exactly as the scalar call answers it (runbook W2 E5); a missing element answers as the scalar call answers a missing value, in its position, `[]` gives `[]` and a missing list stays that missing. The list is a per-row membership set on the right of `in`, and on the left of `in` it asks whether **any** element is a member; compared with a single value (`==`, `<`, …) it fails the rule's load when the list is known statically — over an unknown-typed `$` value it is the rule's run-time ERROR. `[X, Y]` with bare names is a list of column *names*: read the values with `values([X, Y])`.
+**List form (element-wise)** — over a list at `x` — the cells of several columns ([`values`](#values): `substring(values([X, Y]), 1, 2)`), a per-row list such as `split_by(…)`, or a `$`-list — the function answers **a list of the same length**, each element's substring, the row's `start` / `length` applied to every element, exactly as the scalar call answers it; a missing element answers as the scalar call answers a missing value, in its position, `[]` gives `[]` and a missing list stays that missing. The list is a per-row membership set on the right of `in`, and on the left of `in` it asks whether **any** element is a member; compared with a single value (`==`, `<`, …) it fails the rule's load when the list is known statically — over an unknown-typed `$` value it is the rule's run-time ERROR. `[X, Y]` with bare names is a list of column *names*: read the values with `values([X, Y])`.
 
 ### suffix
 
@@ -947,7 +945,7 @@ expression: 'suffix(QNAM, 1) =~ /^[A-Z0-9]$/'
 
 ⛔ **Type error on a character `n`.** The length operand must be numeric; a character column there raises a rule ERROR. Convert with `num(n)`.
 
-**List form (element-wise)** — over a list at `x` — the cells of several columns ([`values`](#values): `suffix(values([X, Y]), 2)`), a per-row list such as `split_by(…)`, or a `$`-list — the function answers **a list of the same length**, each element's last `n` characters, the row's `n` applied to every element, exactly as the scalar call answers it (runbook W2 E5); a missing element answers as the scalar call answers a missing value, in its position, `[]` gives `[]` and a missing list stays that missing. The list is a per-row membership set on the right of `in`, and on the left of `in` it asks whether **any** element is a member; compared with a single value (`==`, `<`, …) it fails the rule's load when the list is known statically — over an unknown-typed `$` value it is the rule's run-time ERROR. `[X, Y]` with bare names is a list of column *names*: read the values with `values([X, Y])`.
+**List form (element-wise)** — over a list at `x` — the cells of several columns ([`values`](#values): `suffix(values([X, Y]), 2)`), a per-row list such as `split_by(…)`, or a `$`-list — the function answers **a list of the same length**, each element's last `n` characters, the row's `n` applied to every element, exactly as the scalar call answers it; a missing element answers as the scalar call answers a missing value, in its position, `[]` gives `[]` and a missing list stays that missing. The list is a per-row membership set on the right of `in`, and on the left of `in` it asks whether **any** element is a member; compared with a single value (`==`, `<`, …) it fails the rule's load when the list is known statically — over an unknown-typed `$` value it is the rule's run-time ERROR. `[X, Y]` with bare names is a list of column *names*: read the values with `values([X, Y])`.
 
 ### suffix_matches
 
@@ -998,7 +996,7 @@ expression: 'trim(QVAL) != QVAL'
 
 **Missing and empty** — A missing input yields **that missing value**, identity kept (rulings register `D36`). `""` yields `""`.
 
-**List form (element-wise)** — over a list at `x` — the cells of several columns ([`values`](#values): `trim(values([X, Y]))`), a per-row list such as `split_by(…)`, or a `$`-list — the function answers **a list of the same length**, each element trimmed, exactly as the scalar call answers it (runbook W2 E5); a missing element answers as the scalar call answers a missing value, in its position, `[]` gives `[]` and a missing list stays that missing. The list is a per-row membership set on the right of `in`, and on the left of `in` it asks whether **any** element is a member; compared with a single value (`==`, `<`, …) it fails the rule's load when the list is known statically — over an unknown-typed `$` value it is the rule's run-time ERROR. `[X, Y]` with bare names is a list of column *names*: read the values with `values([X, Y])`.
+**List form (element-wise)** — over a list at `x` — the cells of several columns ([`values`](#values): `trim(values([X, Y]))`), a per-row list such as `split_by(…)`, or a `$`-list — the function answers **a list of the same length**, each element trimmed, exactly as the scalar call answers it; a missing element answers as the scalar call answers a missing value, in its position, `[]` gives `[]` and a missing list stays that missing. The list is a per-row membership set on the right of `in`, and on the left of `in` it asks whether **any** element is a member; compared with a single value (`==`, `<`, …) it fails the rule's load when the list is known statically — over an unknown-typed `$` value it is the rule's run-time ERROR. `[X, Y]` with bare names is a list of column *names*: read the values with `values([X, Y])`.
 
 ### upper
 
@@ -1021,7 +1019,7 @@ member as `upper("…")`). [`lower`](#lower) / `lowcase` have no such surface.
 expression: 'not contains(upper(VISIT), upper("UNSCHEDUL"))'
 ```
 
-**Missing and empty** — A missing input yields **that missing value**, identity kept (`.A` in, `.A` out — rulings register `D36`, owner 2026-09-28 *"D36 stands"*). `""` is a present value and yields `""`.
+**Missing and empty** — A missing input yields **that missing value**, identity kept (`.A` in, `.A` out — rulings register `D36`). `""` is a present value and yields `""`.
 
 **List form** — given a list (a `$`-binding such as `get_column_order_from_dataset()` or a
 `distinct(…)` result, a per-row list such as `split_by(…)`, or the values of several columns read
@@ -1032,12 +1030,10 @@ position (missing propagates through the string functions, rulings register `D36
 list of the same length, so `"Y" in upper(values([A, B]))` is a per-row membership. ⚠ `upper([X, Y])`
 with bare column names fails to load — `[X, Y]` is a list of column *names* everywhere; to read their
 values write `upper(values([X, Y]))`. This is how a rule compares the dataset's
-column names against the library's names (owner, 2026-09-28: *"upper allows a list of strings as
-parameter and returns a list of these strings converted to upper case"*; rulings register
-`CIT §3`): a column name a rule handles as a value is a string and compares exactly like one, so
-the rule folds **both sides** — the owner's *"compare the upper case version of a name against the
-upper case version of a list of strings"*; folding a library list is a no-op under the owner's
-assumption that library names are upper case, and it spares the rule from deciding which side is
+column names against the library's names: a column name a rule handles as a value is a string and
+compares exactly like one, so the rule folds **both sides** — the upper-case version of a name
+against the upper-case version of a list of strings; folding a library list is a no-op when the
+library names are upper case, and it spares the rule from deciding which side is
 the library —
 
 ```yaml
@@ -1102,7 +1098,7 @@ expression: 'abs(num(BASE) - num(AVAL)) > 0.001'
 
 ⛔ **Type error on a character column.** The operand must be numeric; a character column raises a rule ERROR rather than being parsed. Convert it explicitly with `num(x)` if the text is meant as a number.
 
-**List form (element-wise)** — over a list at `x` — the cells of several columns ([`values`](#values): `abs(values([X, Y]))`), a per-row list such as `split_by(…)`, or a `$`-list — the function answers **a list of the same length**, each element's absolute value, exactly as the scalar call answers it (runbook W2 E5); a missing element answers as the scalar call answers a missing value, in its position, `[]` gives `[]` and a missing list stays that missing. The list is a per-row membership set on the right of `in`, and on the left of `in` it asks whether **any** element is a member; compared with a single value (`==`, `<`, …) it fails the rule's load when the list is known statically — over an unknown-typed `$` value it is the rule's run-time ERROR. `[X, Y]` with bare names is a list of column *names*: read the values with `values([X, Y])`.
+**List form (element-wise)** — over a list at `x` — the cells of several columns ([`values`](#values): `abs(values([X, Y]))`), a per-row list such as `split_by(…)`, or a `$`-list — the function answers **a list of the same length**, each element's absolute value, exactly as the scalar call answers it; a missing element answers as the scalar call answers a missing value, in its position, `[]` gives `[]` and a missing list stays that missing. The list is a per-row membership set on the right of `in`, and on the left of `in` it asks whether **any** element is a member; compared with a single value (`==`, `<`, …) it fails the rule's load when the list is known statically — over an unknown-typed `$` value it is the rule's run-time ERROR. `[X, Y]` with bare names is a list of column *names*: read the values with `values([X, Y])`.
 
 ### between
 
@@ -1144,7 +1140,7 @@ expression: 'ceil(ADY)'
 
 ⛔ **Type error on a character column.** The operand must be numeric; a character column raises a rule ERROR rather than being parsed. Convert it explicitly with `num(x)` if the text is meant as a number.
 
-**List form (element-wise)** — over a list at `x` — the cells of several columns ([`values`](#values): `ceil(values([X, Y]))`), a per-row list such as `split_by(…)`, or a `$`-list — the function answers **a list of the same length**, each element rounded up, exactly as the scalar call answers it (runbook W2 E5); a missing element answers as the scalar call answers a missing value, in its position, `[]` gives `[]` and a missing list stays that missing. The list is a per-row membership set on the right of `in`, and on the left of `in` it asks whether **any** element is a member; compared with a single value (`==`, `<`, …) it fails the rule's load when the list is known statically — over an unknown-typed `$` value it is the rule's run-time ERROR. `[X, Y]` with bare names is a list of column *names*: read the values with `values([X, Y])`.
+**List form (element-wise)** — over a list at `x` — the cells of several columns ([`values`](#values): `ceil(values([X, Y]))`), a per-row list such as `split_by(…)`, or a `$`-list — the function answers **a list of the same length**, each element rounded up, exactly as the scalar call answers it; a missing element answers as the scalar call answers a missing value, in its position, `[]` gives `[]` and a missing list stays that missing. The list is a per-row membership set on the right of `in`, and on the left of `in` it asks whether **any** element is a member; compared with a single value (`==`, `<`, …) it fails the rule's load when the list is known statically — over an unknown-typed `$` value it is the rule's run-time ERROR. `[X, Y]` with bare names is a list of column *names*: read the values with `values([X, Y])`.
 
 ### floor
 
@@ -1166,7 +1162,7 @@ expression: 'floor(ADY)'
 
 ⛔ **Type error on a character column.** The operand must be numeric; a character column raises a rule ERROR rather than being parsed. Convert it explicitly with `num(x)` if the text is meant as a number.
 
-**List form (element-wise)** — over a list at `x` — the cells of several columns ([`values`](#values): `floor(values([X, Y]))`), a per-row list such as `split_by(…)`, or a `$`-list — the function answers **a list of the same length**, each element rounded down, exactly as the scalar call answers it (runbook W2 E5); a missing element answers as the scalar call answers a missing value, in its position, `[]` gives `[]` and a missing list stays that missing. The list is a per-row membership set on the right of `in`, and on the left of `in` it asks whether **any** element is a member; compared with a single value (`==`, `<`, …) it fails the rule's load when the list is known statically — over an unknown-typed `$` value it is the rule's run-time ERROR. `[X, Y]` with bare names is a list of column *names*: read the values with `values([X, Y])`.
+**List form (element-wise)** — over a list at `x` — the cells of several columns ([`values`](#values): `floor(values([X, Y]))`), a per-row list such as `split_by(…)`, or a `$`-list — the function answers **a list of the same length**, each element rounded down, exactly as the scalar call answers it; a missing element answers as the scalar call answers a missing value, in its position, `[]` gives `[]` and a missing list stays that missing. The list is a per-row membership set on the right of `in`, and on the left of `in` it asks whether **any** element is a member; compared with a single value (`==`, `<`, …) it fails the rule's load when the list is known statically — over an unknown-typed `$` value it is the rule's run-time ERROR. `[X, Y]` with bare names is a list of column *names*: read the values with `values([X, Y])`.
 
 ### is_integer
 
@@ -1233,7 +1229,7 @@ The set difference of two lists — the members of `value` that are not in `subt
 | `value` | list | yes | The minuend — any dataset-level list: a `$`-binding holding one, a list literal of string literals (`["AGEU", "SDESIGN"]`), or the expression such a binding would hold, written inline (`distinct(X)`, `union(…)`) |
 | `subtract` | list | yes | The subtrahend — the same spellings |
 
-A **registry function** since wave 4 of the operations→functions programme (`PLAN-list-functions`). Both operands are **dataset-level** lists, and an operand is judged by its **level**, never by its spelling: a `$`-binding holding a dataset-level list, a list literal, or the expression such a binding would hold written inline — `distinct(X)`, another `minus(…)` / `union(…)`, `upper($names)` over a dataset-level `$names` — are all operands (`PLAN-union-function` §3.3, ruled by D3 / D16: where `$x` is accepted, the expression `$x` holds is accepted too). An operand whose value varies **per row or per variable** — a column `X`, `split_by(X, ",")`, `distinct(…, group=[…])`, a per-variable value — has no row to pick the value at and is a load error, **the same finding whether bound or inline** (*"the list function minus(…) … cannot read the per-row or per-variable operand `…` — a set difference reads only dataset-level lists"*). A list literal must hold string literals — a bare `[AGEU]` names a column and fails to load. Operands are **lists only** (runbook W4, `PLAN-minus-lists-only`; `union`'s contract): a **scalar**-typed operand (`upper(X)`, `extract_metadata(…)`) fails to load (*"argument 'value' of 'minus' takes list<unknown>, not string"*), and an operand that is a single value at evaluation is a rule ERROR (*"minus(…) operand `value` is not a list (X): a set difference reads lists only — a single value is written as its singleton list literal ["X"]"*) — before, a scalar was its own singleton. It is an **aggregate**: one list for the dataset. Members compare as set elements: a text against a text, a missing value by its identity, and a row tuple (from `distinct([A, B], …)`) **structurally**, component by component — never by its printed form.
+A **registry function**. Both operands are **dataset-level** lists, and an operand is judged by its **level**, never by its spelling: a `$`-binding holding a dataset-level list, a list literal, or the expression such a binding would hold written inline — `distinct(X)`, another `minus(…)` / `union(…)`, `upper($names)` over a dataset-level `$names` — are all operands (where `$x` is accepted, the expression `$x` holds is accepted too). An operand whose value varies **per row or per variable** — a column `X`, `split_by(X, ",")`, `distinct(…, group=[…])`, a per-variable value — has no row to pick the value at and is a load error, **the same finding whether bound or inline** (*"the list function minus(…) … cannot read the per-row or per-variable operand `…` — a set difference reads only dataset-level lists"*). A list literal must hold string literals — a bare `[AGEU]` names a column and fails to load. Operands are **lists only** (as for `union`): a **scalar**-typed operand (`upper(X)`, `extract_metadata(…)`) fails to load (*"argument 'value' of 'minus' takes list<unknown>, not string"*), and an operand that is a single value at evaluation is a rule ERROR (*"minus(…) operand `value` is not a list (X): a set difference reads lists only — a single value is written as its singleton list literal ["X"]"*). It is an **aggregate**: one list for the dataset. Members compare as set elements: a text against a text, a missing value by its identity, and a row tuple (from `distinct([A, B], …)`) **structurally**, component by component — never by its printed form.
 
 **Example**
 
@@ -1270,7 +1266,7 @@ The set union of two or more lists — every member of `first` in its order, the
 | `second` | list | yes | The second operand — the same spellings |
 | `more` | list of lists (absorbs the remaining arguments) | no | Any further operands, the same spellings |
 
-A **registry function** (`PLAN-union-function`), the set partner of [`minus`](#minus). Every operand is a **dataset-level** list, judged by its **level**, never by its spelling: a `$`-binding holding one (typically the answer of another list function), a list literal of string literals, or the expression such a binding would hold written inline (`union(distinct(X), $b)`, `union(minus(…), $b)` — `PLAN-union-function` §3.3, D3 / D16). An operand computed **per row or per variable** (`X`, `split_by(X, ",")`, `distinct(…, group=[…])`, a per-variable value) is refused at load, the same finding bound or inline (*"the list function union(…) … cannot read the per-row or per-variable operand `…` — a set union reads only dataset-level lists"*); a **scalar**-typed operand (`upper(X)`, `extract_metadata(…)`) is additionally a type finding (*"takes list<unknown>, not string"*). A list literal must hold string literals — a bare `[AGEU]` names a column and fails to load, at every operand position. Operands are **lists only**: a single value is written as its singleton literal `["X"]`; a scalar operand is a rule ERROR at evaluation (as for `minus`). It is an **aggregate**: one list for the dataset. Members compare as set elements, exactly as in `minus`: a text against a text, a missing value by its identity, a row tuple **structurally** — and one union holds one element shape (texts, or tuples of one arity; a mixed union is a rule ERROR). Positional arguments only: the third operand on is collected by `more`, and a named argument (`first=`, `more=`, …) fails to load (*"'union' takes positional arguments only — a named argument (first=) cannot address a collector's elements …"*; runbook W4 U2 — before, one naming a leading operand was silently dropped).
+A **registry function**, the set partner of [`minus`](#minus). Every operand is a **dataset-level** list, judged by its **level**, never by its spelling: a `$`-binding holding one (typically the answer of another list function), a list literal of string literals, or the expression such a binding would hold written inline (`union(distinct(X), $b)`, `union(minus(…), $b)`). An operand computed **per row or per variable** (`X`, `split_by(X, ",")`, `distinct(…, group=[…])`, a per-variable value) is refused at load, the same finding bound or inline (*"the list function union(…) … cannot read the per-row or per-variable operand `…` — a set union reads only dataset-level lists"*); a **scalar**-typed operand (`upper(X)`, `extract_metadata(…)`) is additionally a type finding (*"takes list<unknown>, not string"*). A list literal must hold string literals — a bare `[AGEU]` names a column and fails to load, at every operand position. Operands are **lists only**: a single value is written as its singleton literal `["X"]`; a scalar operand is a rule ERROR at evaluation (as for `minus`). It is an **aggregate**: one list for the dataset. Members compare as set elements, exactly as in `minus`: a text against a text, a missing value by its identity, a row tuple **structurally** — and one union holds one element shape (texts, or tuples of one arity; a mixed union is a rule ERROR). Positional arguments only: the third operand on is collected by `more`, and a named argument (`first=`, `more=`, …) fails to load (*"'union' takes positional arguments only — a named argument (first=) cannot address a collector's elements …"*).
 
 **Example**
 
@@ -1318,7 +1314,7 @@ expression: 'round(AGE) == AGE'
 
 ## Dates and times
 
-**List form (element-wise)** — over a list at `x` — the cells of several columns ([`values`](#values): `round(values([X, Y]))`), a per-row list such as `split_by(…)`, or a `$`-list — the function answers **a list of the same length**, each element rounded, exactly as the scalar call answers it (runbook W2 E5); a missing element answers as the scalar call answers a missing value, in its position, `[]` gives `[]` and a missing list stays that missing. The list is a per-row membership set on the right of `in`, and on the left of `in` it asks whether **any** element is a member; compared with a single value (`==`, `<`, …) it fails the rule's load when the list is known statically — over an unknown-typed `$` value it is the rule's run-time ERROR. `[X, Y]` with bare names is a list of column *names*: read the values with `values([X, Y])`.
+**List form (element-wise)** — over a list at `x` — the cells of several columns ([`values`](#values): `round(values([X, Y]))`), a per-row list such as `split_by(…)`, or a `$`-list — the function answers **a list of the same length**, each element rounded, exactly as the scalar call answers it; a missing element answers as the scalar call answers a missing value, in its position, `[]` gives `[]` and a missing list stays that missing. The list is a per-row membership set on the right of `in`, and on the left of `in` it asks whether **any** element is a member; compared with a single value (`==`, `<`, …) it fails the rule's load when the list is known statically — over an unknown-typed `$` value it is the rule's run-time ERROR. `[X, Y]` with bare names is a list of column *names*: read the values with `values([X, Y])`.
 
 ### date_contains
 
@@ -1348,7 +1344,7 @@ The calendar days from a reference date to a record's date — `date − referen
 | `name` | column | yes | The record's date column (`--DTC`, `--STDTC`, `--ENDTC`), or a column read through a declared join (`PM.PMDTC`) |
 | `reference` | value | yes | The date to measure from: a column of the record, a column read through the rule's declared join, or a **named aggregation** — `min_date(…)` / `max_date(…)` over another dataset |
 
-Both arguments are read **per record**. A reference that is the earliest (or latest) date of a group in another dataset is written as that aggregation, `min_date(SJSTDTC, domain="SJ", group=[USUBJID, RPHASE])` — its `domain=`, `group=`, `filter=`, `keep_missings=` and `missing_values=` belong to [`min_date`](#min_date) / [`max_date`](#max_date), never to `date_diff_days`. An offset is plain arithmetic — a constant (`date_diff_days(…) + 1`) or a value read from another dataset (`+ $rprfdy`). A date read from a *matched record of another dataset* is a declared join and a dotted `name` (`Match_Datasets` on the matching keys, then `PM.PMDTC`). A quoted name (`"--DTC"`) is a string literal, never a column, and fails to load. (Until runbook W2b this was an operation with `domain=`, `group=`, `reference="…"`, `offset=`, `reference_extreme=`, `missing_values=`, `minuend_domain=` and `minuend_match=` keywords; each is now spelled as above, and each is a load error on `date_diff_days`.)
+Both arguments are read **per record**. A reference that is the earliest (or latest) date of a group in another dataset is written as that aggregation, `min_date(SJSTDTC, domain="SJ", group=[USUBJID, RPHASE])` — its `domain=`, `group=`, `filter=`, `keep_missings=` and `missing_values=` belong to [`min_date`](#min_date) / [`max_date`](#max_date), never to `date_diff_days`. An offset is plain arithmetic — a constant (`date_diff_days(…) + 1`) or a value read from another dataset (`+ $rprfdy`). A date read from a *matched record of another dataset* is a declared join and a dotted `name` (`Match_Datasets` on the matching keys, then `PM.PMDTC`). A quoted name (`"--DTC"`) is a string literal, never a column, and fails to load. The keywords `domain=`, `group=`, `reference="…"`, `offset=`, `reference_extreme=`, `missing_values=`, `minuend_domain=` and `minuend_match=` are each a load error on `date_diff_days`; write what they meant as above.
 
 **Example**
 
@@ -1417,7 +1413,7 @@ expression: 'is_complete_date(AESTDTC) and day(AESTDTC) > 28'
 
 **Missing and empty** — A missing input yields **that missing value**, identity kept (`day(.A)` is `.A`, rulings register `D85c`). `""` carries no date component and yields the plain missing (`MIS`).
 
-**List form (element-wise)** — over a list at `x` — the cells of several columns ([`values`](#values): `day(values([X, Y]))`), a per-row list such as `split_by(…)`, or a `$`-list — the function answers **a list of the same length**, each element's day, exactly as the scalar call answers it (runbook W2 E5); a missing element answers as the scalar call answers a missing value, in its position, `[]` gives `[]` and a missing list stays that missing. The list is a per-row membership set on the right of `in`, and on the left of `in` it asks whether **any** element is a member; compared with a single value (`==`, `<`, …) it fails the rule's load when the list is known statically — over an unknown-typed `$` value it is the rule's run-time ERROR. `[X, Y]` with bare names is a list of column *names*: read the values with `values([X, Y])`.
+**List form (element-wise)** — over a list at `x` — the cells of several columns ([`values`](#values): `day(values([X, Y]))`), a per-row list such as `split_by(…)`, or a `$`-list — the function answers **a list of the same length**, each element's day, exactly as the scalar call answers it; a missing element answers as the scalar call answers a missing value, in its position, `[]` gives `[]` and a missing list stays that missing. The list is a per-row membership set on the right of `in`, and on the left of `in` it asks whether **any** element is a member; compared with a single value (`==`, `<`, …) it fails the rule's load when the list is known statically — over an unknown-typed `$` value it is the rule's run-time ERROR. `[X, Y]` with bare names is a list of column *names*: read the values with `values([X, Y])`.
 
 ### duration_between
 
@@ -1465,7 +1461,7 @@ The SDTM study day of a record's date relative to a reference date; there is no 
 | `name` | column | yes | The record's date column (`--DTC`, `--STDTC`, `--ENDTC`) |
 | `reference` | column | yes | The reference date, read through the rule's declared join: `DM.RFSTDTC`, `DM.RFXSTDTC` or `DM.RFCSTDTC` |
 
-Both arguments are **column references**. The reference is read per row through the `Match_Datasets` join the rule declares (`DM` on `USUBJID`), so on a subject that `DM` carries twice every row copy the join makes reads its own `DM` record — the same one the Check reads through `DM.RFSTDTC`. A quoted name (`reference="RFXSTDTC"`) is a string literal, never a column, and fails to load; so does a call with one argument. (Until wave 1 of the operation→function programme `dy(--DTC)` was an operation that read `DM` itself and defaulted its reference to `RFSTDTC`.)
+Both arguments are **column references**. The reference is read per row through the `Match_Datasets` join the rule declares (`DM` on `USUBJID`), so on a subject that `DM` carries twice every row copy the join makes reads its own `DM` record — the same one the Check reads through `DM.RFSTDTC`. A quoted name (`reference="RFXSTDTC"`) is a string literal, never a column, and fails to load; so does a call with one argument.
 
 **Example**
 
@@ -1557,7 +1553,7 @@ duration places on the calendar, so it answers missing. Compare the bound under 
 
 ⚠ **A bound of a complete value is the value itself**, and two complete values compare as points at the coarser precision — so `date(earliest_possible(A)) < latest_possible(B)` answers exactly `date(A) < date(B)` on complete dates and date-times. A "may" reading of a same-day boundary (an element that ends on the day a date-only visit starts *may* still be in progress) needs its own term; `CDISC-CG0218` spells it as `… < … or (date(earliest_possible(SVSTDTC)) == latest_possible(SE.SEENDTC) and (SVSTDTC !~ /T/ or SE.SEENDTC !~ /T/))` — the same-day equality on the bounds (so a partial value whose first or last possible day is the boundary day counts too), granted only when at least one side carries no time.
 
-**List form (element-wise)** — over a list at `x` — the cells of several columns ([`values`](#values): `earliest_possible(values([X, Y]))`), a per-row list such as `split_by(…)`, or a `$`-list — the function answers **a list of the same length**, each element's earliest possible instant, exactly as the scalar call answers it (runbook W2 E5); a missing element answers as the scalar call answers a missing value, in its position, `[]` gives `[]` and a missing list stays that missing. The list is a per-row membership set on the right of `in`, and on the left of `in` it asks whether **any** element is a member; compared with a single value (`==`, `<`, …) it fails the rule's load when the list is known statically — over an unknown-typed `$` value it is the rule's run-time ERROR. `[X, Y]` with bare names is a list of column *names*: read the values with `values([X, Y])`.
+**List form (element-wise)** — over a list at `x` — the cells of several columns ([`values`](#values): `earliest_possible(values([X, Y]))`), a per-row list such as `split_by(…)`, or a `$`-list — the function answers **a list of the same length**, each element's earliest possible instant, exactly as the scalar call answers it; a missing element answers as the scalar call answers a missing value, in its position, `[]` gives `[]` and a missing list stays that missing. The list is a per-row membership set on the right of `in`, and on the left of `in` it asks whether **any** element is a member; compared with a single value (`==`, `<`, …) it fails the rule's load when the list is known statically — over an unknown-typed `$` value it is the rule's run-time ERROR. `[X, Y]` with bare names is a list of column *names*: read the values with `values([X, Y])`.
 
 ### interval_uncertainty_precision_mismatch
 
@@ -1570,7 +1566,7 @@ True on a row whose ISO 8601 interval of uncertainty (`a/b`) states its two halv
 | `name` | column | yes | The interval column (`--DTC`, `--STDTC`, `--ENDTC`) |
 | `delimiter` | string | no | The separator between the halves; default `"/"`. Read per row, so any expression of string type may supply it; a missing or empty one is `"/"` |
 
-`name` is a **column reference**; a quoted name (`"LBDTC"`) is a string literal and fails to load. An absent column is a column of blanks, so the rule runs and fires on no row. (Until wave 3 of the operation→function programme this was an operation.)
+`name` is a **column reference**; a quoted name (`"LBDTC"`) is a string literal and fails to load. An absent column is a column of blanks, so the rule runs and fires on no row.
 
 **Example**
 
@@ -1770,7 +1766,7 @@ Check:
 
 **Missing and empty** — As [`earliest_possible`](#earliest_possible): a missing input yields **that missing value**, identity kept (rulings register `D85c`); `""` and an unplaceable value yield the plain missing (`MIS`). Over a `duration(…)` operand it is the hull's upper end as a point duration (`P1M` ⇒ `P31D`), see there.
 
-**List form (element-wise)** — over a list at `x` — the cells of several columns ([`values`](#values): `latest_possible(values([X, Y]))`), a per-row list such as `split_by(…)`, or a `$`-list — the function answers **a list of the same length**, each element's latest possible instant, exactly as the scalar call answers it (runbook W2 E5); a missing element answers as the scalar call answers a missing value, in its position, `[]` gives `[]` and a missing list stays that missing. The list is a per-row membership set on the right of `in`, and on the left of `in` it asks whether **any** element is a member; compared with a single value (`==`, `<`, …) it fails the rule's load when the list is known statically — over an unknown-typed `$` value it is the rule's run-time ERROR. `[X, Y]` with bare names is a list of column *names*: read the values with `values([X, Y])`.
+**List form (element-wise)** — over a list at `x` — the cells of several columns ([`values`](#values): `latest_possible(values([X, Y]))`), a per-row list such as `split_by(…)`, or a `$`-list — the function answers **a list of the same length**, each element's latest possible instant, exactly as the scalar call answers it; a missing element answers as the scalar call answers a missing value, in its position, `[]` gives `[]` and a missing list stays that missing. The list is a per-row membership set on the right of `in`, and on the left of `in` it asks whether **any** element is a member; compared with a single value (`==`, `<`, …) it fails the rule's load when the list is known statically — over an unknown-typed `$` value it is the rule's run-time ERROR. `[X, Y]` with bare names is a list of column *names*: read the values with `values([X, Y])`.
 
 ### month
 
@@ -1790,7 +1786,7 @@ expression: 'is_complete_date(AESTDTC) and month(AESTDTC) > 12'
 
 **Missing and empty** — A missing input yields **that missing value**, identity kept (`month(.A)` is `.A`, rulings register `D85c`). `""` carries no date component and yields the plain missing (`MIS`).
 
-**List form (element-wise)** — over a list at `x` — the cells of several columns ([`values`](#values): `month(values([X, Y]))`), a per-row list such as `split_by(…)`, or a `$`-list — the function answers **a list of the same length**, each element's month, exactly as the scalar call answers it (runbook W2 E5); a missing element answers as the scalar call answers a missing value, in its position, `[]` gives `[]` and a missing list stays that missing. The list is a per-row membership set on the right of `in`, and on the left of `in` it asks whether **any** element is a member; compared with a single value (`==`, `<`, …) it fails the rule's load when the list is known statically — over an unknown-typed `$` value it is the rule's run-time ERROR. `[X, Y]` with bare names is a list of column *names*: read the values with `values([X, Y])`.
+**List form (element-wise)** — over a list at `x` — the cells of several columns ([`values`](#values): `month(values([X, Y]))`), a per-row list such as `split_by(…)`, or a `$`-list — the function answers **a list of the same length**, each element's month, exactly as the scalar call answers it; a missing element answers as the scalar call answers a missing value, in its position, `[]` gives `[]` and a missing list stays that missing. The list is a per-row membership set on the right of `in`, and on the left of `in` it asks whether **any** element is a member; compared with a single value (`==`, `<`, …) it fails the rule's load when the list is known statically — over an unknown-typed `$` value it is the rule's run-time ERROR. `[X, Y]` with bare names is a list of column *names*: read the values with `values([X, Y])`.
 
 ### time_contains
 
@@ -1847,15 +1843,14 @@ expression: 'year(BRTHDTC) < 1900'
 
 ## Aggregates over rows and groups
 
-**List form (element-wise)** — over a list at `x` — the cells of several columns ([`values`](#values): `year(values([X, Y]))`), a per-row list such as `split_by(…)`, or a `$`-list — the function answers **a list of the same length**, each element's year, exactly as the scalar call answers it (runbook W2 E5); a missing element answers as the scalar call answers a missing value, in its position, `[]` gives `[]` and a missing list stays that missing. The list is a per-row membership set on the right of `in`, and on the left of `in` it asks whether **any** element is a member; compared with a single value (`==`, `<`, …) it fails the rule's load when the list is known statically — over an unknown-typed `$` value it is the rule's run-time ERROR. `[X, Y]` with bare names is a list of column *names*: read the values with `values([X, Y])`.
+**List form (element-wise)** — over a list at `x` — the cells of several columns ([`values`](#values): `year(values([X, Y]))`), a per-row list such as `split_by(…)`, or a `$`-list — the function answers **a list of the same length**, each element's year, exactly as the scalar call answers it; a missing element answers as the scalar call answers a missing value, in its position, `[]` gives `[]` and a missing list stays that missing. The list is a per-row membership set on the right of `in`, and on the left of `in` it asks whether **any** element is a member; compared with a single value (`==`, `<`, …) it fails the rule's load when the list is known statically — over an unknown-typed `$` value it is the rule's run-time ERROR. `[X, Y]` with bare names is a list of column *names*: read the values with `values([X, Y])`.
 
 ### distinct
 
 `distinct(name, domain=, filter=, group=, keep_missings=)` → **value (a list)**
 
 The distinct values of a column, or the distinct row tuples over a list of columns — a registry
-function since runbook W7 (`PLAN-distinct-function`), on the grouped cross-dataset plan `max` /
-`max_date` / `min_date` (W5) and `record_count` (W6) established. Without `group=` it is **one list
+function on the grouped cross-dataset plan of `max` / `max_date` / `min_date` and `record_count`. Without `group=` it is **one list
 for the dataset**; with `group=` (a column target only) it is each row's group's list, read per row
 of the evaluated dataset. The answer is a **set by content and a list by carrier**: membership is
 what it is for — `X not in $set`, `X in $set`, `tuple(A, B) not in $pairs`, `contains($per_row,
@@ -1863,7 +1858,7 @@ what it is for — `X not in $set`, `X in $set`, `tuple(A, B) not in $pairs`, `c
 
 | parameter | type | required | description |
 |---|---|---|---|
-| `name` | column, a value expression, or a **list of columns** | yes | The positional target. A column (`USUBJID`, `--BLFL`, `upper(ARM)`) collects its distinct **values**; a list (`[VISIT, VISITNUM]`) collects the distinct **row tuples** in that order — see [The target of `distinct`](#the-target-of-distinct-one-column-or-a-list-of-columns). A quoted name is a string literal and fails to load. A `$`-binding — bare, or inside a computed target — is one of the rule's own **dataset-level** values, pre-resolved as a `$` inside `filter=` is (`$x: upper("a"); distinct($x)` answers as `distinct(upper("a"))`, runbook W1b DT); a per-row binding there is a load error, and a binding holding a quoted name keeps the literal refusal (the target is not a name slot) |
+| `name` | column, a value expression, or a **list of columns** | yes | The positional target. A column (`USUBJID`, `--BLFL`, `upper(ARM)`) collects its distinct **values**; a list (`[VISIT, VISITNUM]`) collects the distinct **row tuples** in that order — see [The target of `distinct`](#the-target-of-distinct-one-column-or-a-list-of-columns). A quoted name is a string literal and fails to load. A `$`-binding — bare, or inside a computed target — is one of the rule's own **dataset-level** values, pre-resolved as a `$` inside `filter=` is (`$x: upper("a"); distinct($x)` answers as `distinct(upper("a"))`); a per-row binding there is a load error, and a binding holding a quoted name keeps the literal refusal (the target is not a name slot) |
 | `domain` | dataset reference | no | The dataset to read: `TA` or `"TA"`. Absent ⇒ the dataset under evaluation. With `domain`, **every** column argument names a column of that dataset. A family name reads every member: `domain="SUPPAE"` on a study shipping `SUPPAE1` + `SUPPAE2` (both `RDOMAIN = AE`) reads both, as `LB` reads `LB1` + `LB2`. A `--` in the dataset name is the supplemental family of the dataset under evaluation's **domain**: `domain="SUPP--"` reads `SUPPAE` on `AE`, `SUPPLB` on `LBCH` (every SUPP of the LB family) and `SQAPMH` on `APMH` (the SDTMIG-AP name; `SQAP--` is its synonym) — and `SUPPAE` on a `SUPPAE` primary too — as `Match_Datasets` names do |
 | `filter` | boolean over the target dataset's columns | no | Which rows are read, in parentheses: `filter=(DSDECOD == "DEATH")`, `filter=(DSDECOD in ["TERMINAL SACRIFICE", "INTERIM SACRIFICE"])`, `filter=(RDOMAIN == "AE" and IDVAR == "AESEQ" and QNAM == "AESOSP")`. Only bare columns of the target dataset — a dotted or `--` reference (under `domain`) is a load error. A `$` reference is one of the rule's own bindings, read as **one dataset-level value of the rule's dataset** (never of the target: `filter=(TSVAL in $c)` with `$c: distinct(FLAG)` compares against the evaluated dataset's `FLAG` values) — a per-row binding there is a load error. The retired map spelling `filter=filter(K="v")` fails to load, naming this one |
 | `group` | list of columns | no | Columns whose combined value defines a group — on the target dataset; the list is read per row of the evaluated dataset by the same columns (an absent group column partitions nothing, on both sides). **A column target only**: `group=` beside a list target is a load error (the retired operation ignored it silently). A member may be [qualified](#qualified-group-members) (`DM.RPATHCD`) with `domain`. A member may be a `$`-reference to a dataset-level **list of column names**, or the expression such a binding holds, written in place — spliced exactly as [`record_count`](#record_count)'s `group=` splices it (a dataset-level string is one name; a per-row binding or expression is a load error; a bare `group=$names` / `group=<expression>` is the one-member list); a spliced member is never qualified under `domain`. |
@@ -1946,7 +1941,7 @@ True when a row other than the ordered-last one is unpopulated
 |---|---|---|---|
 | `name` | any | yes | The column to read |
 | `group` | one column reference, or a one-element list | yes | The column whose value defines a group. May be a `$`-reference to a dataset-level string or one-element list of column names, or the expression such a binding holds, written in place — spliced as [`record_count`](#record_count)'s `group=` splices it (a per-row binding or expression is a load error; two or more spliced names make the rule ERROR: the slot takes one column). |
-| `by` | one column reference, or a one-element list `[asc(COL)]` / `[COL]` | yes | The sort key, ascending — since runbook W1b SK (owner O17) the one sort-key parameter of every function (`by=AESEQ` or `by=[asc(AESEQ)]`); exactly one ascending key here, **required** as `ordering=` was (a call without it fails to load) — `desc(…)`, two keys or a `nulls=` placement fail to load (*"not supported for …"*). The older spelling `ordering=` is retired — write `by=`: `ordering=` fails to load with the hint *"ordering= is retired — write by=…"* (runbook W4 OR2, owner O17). Written **by keyword only** — a positional key (`empty_within_except_last_row(…, AESEQ)`) fails to load with the hint *"empty_within_except_last_row takes its sort key by keyword — write by=AESEQ"* (W4 fold; before, it loaded and the rule degraded). May be a `$`-reference to a dataset-level string or one-element list of column names, or the expression such a binding holds, written in place — spliced as [`record_count`](#record_count)'s `group=` splices it (a per-row binding or expression is a load error; two or more spliced names make the rule ERROR: the slot takes one column). |
+| `by` | one column reference, or a one-element list `[asc(COL)]` / `[COL]` | yes | The sort key, ascending: exactly one column (`by=AESEQ` or `by=[asc(AESEQ)]`), **required** (a call without it fails to load) — `desc(…)`, two keys or a `nulls=` placement fail to load (*"… is not supported for …"*). The rows are ordered by the key cells' **text**, whatever the column's type — a numeric `AESEQ` of `10` sorts before `9` — a missing cell sorts as `""`, and a tie keeps file order; this is neither [`is_last_in_group`](#is_last_in_group)'s order (by the column's type) nor [`sequence`](#sequence) / [`is_sorted_by`](#is_sorted_by)'s (numeric when every present cell of the key is a number). The retired spelling `ordering=` fails to load with the hint *"ordering= is retired — write by=…"*. Written **by keyword only** — a positional key (`empty_within_except_last_row(…, AESEQ)`) fails to load with the hint *"empty_within_except_last_row takes its sort key by keyword — write by=AESEQ"*. May be a `$`-reference to a dataset-level string or one-element list of column names, or the expression such a binding holds, written in place — spliced as [`record_count`](#record_count)'s `group=` splices it (a per-row binding or expression is a load error; two or more spliced names make the rule ERROR: the slot takes one column). |
 | `keep_missings` | boolean | no | Whether a row with a missing key stays in its group |
 
 **Example**
@@ -1977,7 +1972,7 @@ Check:
 | `qualifying_any_populated` | list of columns | no | Rows on which none of these columns is populated are out of scope (EC-23); an all-absent list qualifies no row. A member may be a `$`-reference to a dataset-level **list of column names**, or the expression such a binding holds, written in place — spliced exactly as [`record_count`](#record_count)'s `group=` splices it (a dataset-level string is one name; a per-row binding or expression is a load error; a bare `qualifying_any_populated=$names` / `qualifying_any_populated=<expression>` is the one-member list). |
 | `keep_missings` | boolean | no | Whether a group whose key is missing is kept as its own group (default `true`, the fold) or dropped; requires a non-empty `group` |
 
-Column parameters are **column references** — a quoted name is a string literal and fails to load — and an absent group column is dropped from the key (EC-44). An absent subject column is all-unpopulated, so no group is mixed (EC-45). The group key is compared by identity (`4.9999999999994` and `5.0` are two groups, `-0.0` and `0.0` one). (Until wave 1 of the operation→function programme this was an operation; the spelling is unchanged.)
+Column parameters are **column references** — a quoted name is a string literal and fails to load — and an absent group column is dropped from the key (EC-44). An absent subject column is all-unpopulated, so no group is mixed (EC-45). The group key is compared by identity (`4.9999999999994` and `5.0` are two groups, `-0.0` and `0.0` one).
 
 **Example**
 
@@ -2009,11 +2004,11 @@ Check:
 
 | parameter | type | required | description |
 |---|---|---|---|
-| `by` | one column reference, or a one-element list `[asc(COL)]` / `[COL]` | yes | The column that orders the group (`SESEQ`), ascending. It orders by its **type**: a numeric column numerically, a character column as **text** — `"10"` < `"9"`, and `"5"` and `"5.0"` (or `"-0.0"` and `"0.0"`) are two values — even when its values look like numbers. A missing value ranks lowest (two missing markers by their value byte), then a blank `""`. The order is total, so the answer never depends on row order. ⚠ `by` takes a plain column; a numeric order of a character column (`num(X)`) is not spellable here yet. The sort key — since runbook W1b SK (owner O17) the one sort-key parameter of every function (`by=AESEQ` or `by=[asc(AESEQ)]`); exactly one ascending key here, **required** as `ordering=` was (a call without it fails to load) — `desc(…)`, two keys or a `nulls=` placement fail to load (*"not supported for …"*). The older spelling `ordering=` is retired — write `by=`: `ordering=` fails to load with the hint *"ordering= is retired — write by=…"* (runbook W4 OR2, owner O17; renamed in place, so a positional key keeps its meaning here: `is_last_in_group(AESEQ, [USUBJID])` reads as `by=AESEQ`). May be a `$`-reference to a dataset-level string or one-element list of column names, or the expression such a binding holds, written in place — spliced as [`record_count`](#record_count)'s `group=` splices it (a per-row binding or expression is a load error; two or more spliced names make the rule ERROR: the slot takes one column). |
+| `by` | one column reference, or a one-element list `[asc(COL)]` / `[COL]` | yes | The column that orders the group (`SESEQ`), ascending. It orders by its **type**: a numeric column numerically, a character column as **text** — `"10"` < `"9"`, and `"5"` and `"5.0"` (or `"-0.0"` and `"0.0"`) are two values — even when its values look like numbers. A missing value ranks lowest (two missing markers by their value byte), then a blank `""`. The order is total, so the answer never depends on row order. ⚠ This differs from [`sequence`](#sequence) / [`is_sorted_by`](#is_sorted_by), which classify each key over its cells and order a character column whose every present cell is a number numerically; here such a column orders as text. `by` takes a plain column; a numeric order of a character column (`num(X)`) is not spellable here yet. Exactly one key (`by=SESEQ` or `by=[asc(SESEQ)]`), **required** (a call without it fails to load) — `desc(…)`, two keys or a `nulls=` placement fail to load (*"… is not supported for …"*). The retired spelling `ordering=` fails to load with the hint *"ordering= is retired — write by=…"*. A positional key is read as `by`: `is_last_in_group(AESEQ, [USUBJID])` reads as `by=AESEQ`. May be a `$`-reference to a dataset-level string or one-element list of column names, or the expression such a binding holds, written in place — spliced as [`record_count`](#record_count)'s `group=` splices it (a per-row binding or expression is a load error; two or more spliced names make the rule ERROR: the slot takes one column). |
 | `group` | list of columns | yes | Columns whose combined value defines a group (`USUBJID`); absent ones are dropped, all absent answers nothing. A member may be a `$`-reference to a dataset-level **list of column names**, or the expression such a binding holds, written in place — spliced exactly as [`record_count`](#record_count)'s `group=` splices it (a dataset-level string is one name; a per-row binding or expression is a load error; a bare `group=$names` / `group=<expression>` is the one-member list). |
 | `keep_missings` | boolean | no | Whether a group whose key is missing is kept as its own group or dropped (default `false`, the drop); requires a non-empty `group` |
 
-It takes **no target**: it reads only `by` and `group`. Both are **column references** — `by="SESEQ"` is a string literal and fails to load. "Identical" has one meaning, the key identity: a numeric `-0.0` is `0.0`, `4.9999999999994` is not `5.0`, a character `5` is not `5.0` and a character `-0.0` is not `0.0`, and a missing is identical to the same missing. So **every tied row is last**: the copies a one-to-many `Match_Datasets` join makes of one record, a duplicated `SESEQ` in the source, and every row of a group whose ordering values are all missing. (Until wave 1 of the operation→function programme this was an operation whose tied rows all read `false`.)
+It takes **no target**: it reads only `by` and `group`. Both are **column references** — `by="SESEQ"` is a string literal and fails to load. "Identical" has one meaning, the key identity: a numeric `-0.0` is `0.0`, `4.9999999999994` is not `5.0`, a character `5` is not `5.0` and a character `-0.0` is not `0.0`, and a missing is identical to the same missing. So **every tied row is last**: the copies a one-to-many `Match_Datasets` join makes of one record, a duplicated `SESEQ` in the source, and every row of a group whose ordering values are all missing.
 
 **Example**
 
@@ -2032,12 +2027,11 @@ Check:
 `max(name, group=, domain=, filter=, keep_missings=)` → **value**
 
 The largest value of a column **per group**, broadcast to every row of the group — a registry
-function since runbook W5 (`PLAN-grouped-aggregate-functions`), the pilot of the grouped
-cross-dataset plan `record_count` and `distinct` follow.
+function on the grouped cross-dataset plan that `record_count` and `distinct` share.
 
 | parameter | type | required | description |
 |---|---|---|---|
-| `name` | column of the target dataset, or any value expression over it | yes | The column to aggregate — bare, never quoted (`max("AyIND", …)` fails to load: a quoted name is a string). An expression is allowed: `max(num(ATOXGR), …)` ranks a character grade numerically. A dataset-level `$`-binding is admitted as on [`distinct`](#distinct) (runbook W1b DT): pre-resolved against the rule's dataset; a per-row one is a load error; a binding holding a quoted name keeps the literal refusal |
+| `name` | column of the target dataset, or any value expression over it | yes | The column to aggregate — bare, never quoted (`max("AyIND", …)` fails to load: a quoted name is a string). An expression is allowed: `max(num(ATOXGR), …)` ranks a character grade numerically. A dataset-level `$`-binding is admitted as on [`distinct`](#distinct): pre-resolved against the rule's dataset; a per-row one is a load error; a binding holding a quoted name keeps the literal refusal |
 | `domain` | dataset reference | no | The dataset to read from: `DS` or `"DS"`. Absent ⇒ the dataset under evaluation. With `domain`, **every** column argument names a column of that dataset. A family name reads every member: `domain="SUPPAE"` on a study shipping `SUPPAE1` + `SUPPAE2` (both `RDOMAIN = AE`) reads both, as `LB` reads `LB1` + `LB2`. A `--` in the dataset name is the supplemental family of the dataset under evaluation's **domain**: `domain="SUPP--"` reads `SUPPAE` on `AE`, `SUPPLB` on `LBCH` (every SUPP of the LB family) and `SQAPMH` on `APMH` (the SDTMIG-AP name; `SQAP--` is its synonym) — and `SUPPAE` on a `SUPPAE` primary too — as `Match_Datasets` names do |
 | `filter` | boolean over the target dataset's columns | no | Which rows take part, in parentheses: `filter=(ABLFL == "Y")`. Only bare columns of the target dataset — a dotted or `--` reference (under `domain`) is a load error. A `$` reference is one of the rule's own bindings, read as **one dataset-level value of the rule's dataset** (never of the target: `filter=(TSVAL in $c)` with `$c: distinct(FLAG)` compares against the evaluated dataset's `FLAG` values) — a per-row binding there is a load error. The retired `filter=filter(K="v")` spelling fails to load, naming this one |
 | `group` | list of columns | **yes** | Columns whose combined value defines a group — on the target dataset; the value is read per row of the evaluated dataset by the same columns (an absent group column partitions nothing, on both sides). A member may be [qualified](#qualified-group-members) (`DM.RPATHCD`) with `domain`. A member may be a `$`-reference to a dataset-level **list of column names**, or the expression such a binding holds, written in place — spliced exactly as [`record_count`](#record_count)'s `group=` splices it (a dataset-level string is one name; a per-row binding or expression is a load error; a bare `group=$names` / `group=<expression>` is the one-member list); a spliced member is never qualified under `domain`. |
@@ -2053,8 +2047,8 @@ is no candidate). A numeric column ranks numerically; a character column ranks a
 `"9"` is above `"10"`, and `"3"` and `"3.0"` are two different values (a string is a string,
 `D-W1-2a`). The answer is the winning **cell**, with the column's own type, so a comparison against
 it is numeric for a numeric column and textual for a character one. Numeric order of a character
-grade is spelled `max(num(ATOXGR), …)`. **Text is text** (owner K3, 2026-09-30: *"no special
-handling for special texts"*): a character value that looks like a date ranks as text like any
+grade is spelled `max(num(ATOXGR), …)`. **Text is text** (no special
+handling for special texts): a character value that looks like a date ranks as text like any
 other — `max` over `2024-01` and `2024-01-15` answers `2024-01-15` — and never takes the date rule;
 `max` is not the function for dates — author `max_date`, which is.
 
@@ -2082,7 +2076,7 @@ Check:
 missing or blank, or a filter that keeps no row), and for a row of the evaluated dataset whose key
 has no group (a subject with no `DS` row). An **absent `domain` dataset**, or a target **column the
 dataset does not carry**, answers what that column would answer read directly at the call's
-position (owner 2026-10-05, `PLAN-column-typed-function-absent-type` A1): the missing where the call
+position: the missing where the call
 — or the binding it is bound to — is read as a number (`--DY > $max_ds_dsstdy`), `""` everywhere else
 (`empty()` is true either way; until 2026-10-05 the missing everywhere). A `max` over a computed
 target keeps the missing. `!=` against the missing fires (a missing is not equal to any value — rulings register `D34a`); `==` is true only against the same missing; an order comparison treats it as the lowest value (`D34 #5`): `X > it` and `it < X` fire, `X < it` does not; `empty()` is true. A group whose inputs are all missing carries their missing
@@ -2094,12 +2088,12 @@ identity.
 `max_date(name, group=, domain=, filter=, keep_missings=, missing_values=)` → **value**
 
 The latest date in a column **per group**, broadcast to every row of the group; a value that
-cannot be positioned yields no value. A registry function since runbook W5; the parameters are
+cannot be positioned yields no value. A registry function; the parameters are
 `max`'s, plus `missing_values`:
 
 | parameter | type | required | description |
 |---|---|---|---|
-| `name` | column of the target dataset, or any value expression over it | yes | The column to aggregate — bare, never quoted (`max("AyIND", …)` fails to load: a quoted name is a string). An expression is allowed: `max(num(ATOXGR), …)` ranks a character grade numerically. A dataset-level `$`-binding is admitted as on [`distinct`](#distinct) (runbook W1b DT): pre-resolved against the rule's dataset; a per-row one is a load error; a binding holding a quoted name keeps the literal refusal |
+| `name` | column of the target dataset, or any value expression over it | yes | The column to aggregate — bare, never quoted (`max("AyIND", …)` fails to load: a quoted name is a string). An expression is allowed: `max(num(ATOXGR), …)` ranks a character grade numerically. A dataset-level `$`-binding is admitted as on [`distinct`](#distinct): pre-resolved against the rule's dataset; a per-row one is a load error; a binding holding a quoted name keeps the literal refusal |
 | `domain` | dataset reference | no | The dataset to read from: `DS` or `"DS"`. Absent ⇒ the dataset under evaluation. With `domain`, **every** column argument names a column of that dataset. A family name reads every member: `domain="SUPPAE"` on a study shipping `SUPPAE1` + `SUPPAE2` (both `RDOMAIN = AE`) reads both, as `LB` reads `LB1` + `LB2`. A `--` in the dataset name is the supplemental family of the dataset under evaluation's **domain**: `domain="SUPP--"` reads `SUPPAE` on `AE`, `SUPPLB` on `LBCH` (every SUPP of the LB family) and `SQAPMH` on `APMH` (the SDTMIG-AP name; `SQAP--` is its synonym) — and `SUPPAE` on a `SUPPAE` primary too — as `Match_Datasets` names do |
 | `filter` | boolean over the target dataset's columns | no | Which rows take part, in parentheses: `filter=(ABLFL == "Y")`. Only bare columns of the target dataset — a dotted or `--` reference (under `domain`) is a load error. A `$` reference is one of the rule's own bindings, read as **one dataset-level value of the rule's dataset** (never of the target: `filter=(TSVAL in $c)` with `$c: distinct(FLAG)` compares against the evaluated dataset's `FLAG` values) — a per-row binding there is a load error. The retired `filter=filter(K="v")` spelling fails to load, naming this one |
 | `group` | list of columns | **yes** | Columns whose combined value defines a group — on the target dataset; the value is read per row of the evaluated dataset by the same columns (an absent group column partitions nothing, on both sides). A member may be [qualified](#qualified-group-members) (`DM.RPATHCD`) with `domain`. A member may be a `$`-reference to a dataset-level **list of column names**, or the expression such a binding holds, written in place — spliced exactly as [`record_count`](#record_count)'s `group=` splices it (a dataset-level string is one name; a per-row binding or expression is a load error; a bare `group=$names` / `group=<expression>` is the one-member list); a spliced member is never qualified under `domain`. |
@@ -2151,7 +2145,7 @@ keyword spelling.
 
 | parameter | type | required | description |
 |---|---|---|---|
-| `name` | column of the target dataset, or any value expression over it | yes | The column to aggregate — bare, never quoted (`max("AyIND", …)` fails to load: a quoted name is a string). An expression is allowed: `max(num(ATOXGR), …)` ranks a character grade numerically. A dataset-level `$`-binding is admitted as on [`distinct`](#distinct) (runbook W1b DT): pre-resolved against the rule's dataset; a per-row one is a load error; a binding holding a quoted name keeps the literal refusal |
+| `name` | column of the target dataset, or any value expression over it | yes | The column to aggregate — bare, never quoted (`max("AyIND", …)` fails to load: a quoted name is a string). An expression is allowed: `max(num(ATOXGR), …)` ranks a character grade numerically. A dataset-level `$`-binding is admitted as on [`distinct`](#distinct): pre-resolved against the rule's dataset; a per-row one is a load error; a binding holding a quoted name keeps the literal refusal |
 | `domain` | dataset reference | no | The dataset to read from: `DS` or `"DS"`. Absent ⇒ the dataset under evaluation. With `domain`, **every** column argument names a column of that dataset. A family name reads every member: `domain="SUPPAE"` on a study shipping `SUPPAE1` + `SUPPAE2` (both `RDOMAIN = AE`) reads both, as `LB` reads `LB1` + `LB2`. A `--` in the dataset name is the supplemental family of the dataset under evaluation's **domain**: `domain="SUPP--"` reads `SUPPAE` on `AE`, `SUPPLB` on `LBCH` (every SUPP of the LB family) and `SQAPMH` on `APMH` (the SDTMIG-AP name; `SQAP--` is its synonym) — and `SUPPAE` on a `SUPPAE` primary too — as `Match_Datasets` names do |
 | `filter` | boolean over the target dataset's columns | no | Which rows take part, in parentheses: `filter=(ABLFL == "Y")`. Only bare columns of the target dataset — a dotted or `--` reference (under `domain`) is a load error. A `$` reference is one of the rule's own bindings, read as **one dataset-level value of the rule's dataset** (never of the target: `filter=(TSVAL in $c)` with `$c: distinct(FLAG)` compares against the evaluated dataset's `FLAG` values) — a per-row binding there is a load error. The retired `filter=filter(K="v")` spelling fails to load, naming this one |
 | `group` | list of columns | **yes** | Columns whose combined value defines a group — on the target dataset; the value is read per row of the evaluated dataset by the same columns (an absent group column partitions nothing, on both sides). A member may be [qualified](#qualified-group-members) (`DM.RPATHCD`) with `domain`. A member may be a `$`-reference to a dataset-level **list of column names**, or the expression such a binding holds, written in place — spliced exactly as [`record_count`](#record_count)'s `group=` splices it (a dataset-level string is one name; a per-row binding or expression is a load error; a bare `group=$names` / `group=<expression>` is the one-member list); a spliced member is never qualified under `domain`. |
@@ -2221,8 +2215,8 @@ Check:
 
 `record_count(domain=, filter=, group=, keep_missings=, regex=)` → **value**
 
-The number of rows of a dataset — a registry function since runbook W6 (`PLAN-record-count-function`),
-on the grouped cross-dataset plan `max` / `max_date` / `min_date` established (runbook W5). Without
+The number of rows of a dataset — a registry function on the grouped cross-dataset plan of
+`max` / `max_date` / `min_date`. Without
 `group=` it is **one value for the dataset**; with `group=` it is the count of each row's group,
 read per row of the evaluated dataset. The bare `record_count()` is the dataset's row count.
 
@@ -2285,7 +2279,7 @@ The largest populated value, per row, among the columns whose names match a regu
 |---|---|---|---|
 | `name_pattern` | string | yes | A regular expression over column names, matched in full and in any letter case. A static string literal — anything else, or a pattern that does not compile, fails to load |
 
-`row_max` takes **no column target**: the pattern chooses the columns (`row_max(TRTEDT, name_pattern=…)` fails to load). Blank and missing cells are not candidates. The candidates rank **by the matched columns' declared type**, decided once for the dataset, never per row: a set of Num columns ranks numerically; a set of Char columns as text — **text is text** (owner K3, 2026-09-30): a date-looking value ranks as text like any other, so `2012-06` against `2012-06-15` answers `2012-06-15`, never the date rule (`max_date` is the date function). A matched column with no candidate on any row takes no part in that decision — a CSV or Excel file delivers an all-blank `TR02EDT` as a Char column, and beside a numeric `TR01EDT` it is ignored rather than a mix. When Num **and** Char columns both carry values, the rule **errors** (a column-type mismatch): the two have no common order. A text value is never read as a number: CHAR `"9"` is larger than CHAR `"12"`; convert with `num(…)` for numeric order. On a tie the first candidate in column order wins. The winning cell is returned as it is, type and all.
+`row_max` takes **no column target**: the pattern chooses the columns (`row_max(TRTEDT, name_pattern=…)` fails to load). Blank and missing cells are not candidates. The candidates rank **by the matched columns' declared type**, decided once for the dataset, never per row: a set of Num columns ranks numerically; a set of Char columns as text — **text is text**: a date-looking value ranks as text like any other, so `2012-06` against `2012-06-15` answers `2012-06-15`, never the date rule (`max_date` is the date function). A matched column with no candidate on any row takes no part in that decision — a CSV or Excel file delivers an all-blank `TR02EDT` as a Char column, and beside a numeric `TR01EDT` it is ignored rather than a mix. When Num **and** Char columns both carry values, the rule **errors** (a column-type mismatch): the two have no common order. A text value is never read as a number: CHAR `"9"` is larger than CHAR `"12"`; convert with `num(…)` for numeric order. On a tie the first candidate in column order wins. The winning cell is returned as it is, type and all.
 
 **Example**
 
@@ -2299,14 +2293,14 @@ Check:
 
 The example above is the complete call.
 
-**When there is nothing to answer** — **missing**: a row whose matched cells are all missing answers their missing value (identity kept when they agree); a row of blanks or an undeterminable date extreme answers the plain missing. A dataset with **no matching column** answers what an absent column would answer at the call's position (owner 2026-10-05, `PLAN-column-typed-function-absent-type` A1): the missing where the call — or the binding it is bound to — is read as a number, `""` everywhere else (the example's `TRTEDT != $trxx_max` is no numeric position, so `""`; until 2026-10-05 the missing everywhere). `empty()` on either is true, so guard with `not empty($x)` as the example does. (Until wave 3 of the operation→function programme this was an operation; it also accepted `name` / `names`, which it never read.)
+**When there is nothing to answer** — **missing**: a row whose matched cells are all missing answers their missing value (identity kept when they agree); a row of blanks or an undeterminable date extreme answers the plain missing. A dataset with **no matching column** answers what an absent column would answer at the call's position: the missing where the call — or the binding it is bound to — is read as a number, `""` everywhere else (the example's `TRTEDT != $trxx_max` is no numeric position, so `""`; until 2026-10-05 the missing everywhere). `empty()` on either is true, so guard with `not empty($x)` as the example does.
 
 ### sequence
 
 `sequence(name, domain=, filter=, group=, by=[asc(COL), desc(COL)], keep_missings=)` → **value (a list)**
 
 The values of a column **in order** — per row, its group's values in sort-key order, duplicates
-kept, a missing cell at its position (runbook W1b RO, `PLAN-engine-gap-row-ordinal` R1); the
+kept, a missing cell at its position; the
 ordered sibling of [`distinct`](#distinct)`(name, group=)` on the same grouped plan, so `domain=`,
 `filter=`, the splice of `group=`, an absent group column and the no-group row (the empty list)
 behave as there. Without `group=` it is **one list for the dataset**. Read it with
@@ -2315,11 +2309,11 @@ behave as there. Without `group=` it is **one list for the dataset**. Read it wi
 
 | parameter | type | required | description |
 |---|---|---|---|
-| `name` | column, or a value expression | yes | The positional target: the column whose values are listed (`ETCD`, `--SEQ`, `upper(ETCD)`). One column only — `distinct([A, B])` collects row tuples, `sequence` orders one column's values. A quoted name is a string literal and fails to load. A dataset-level `$`-binding is admitted as on [`distinct`](#distinct) (runbook W1b DT): pre-resolved; a per-row one is a load error; a binding holding a quoted name keeps the literal refusal |
+| `name` | column, or a value expression | yes | The positional target: the column whose values are listed (`ETCD`, `--SEQ`, `upper(ETCD)`). One column only — `distinct([A, B])` collects row tuples, `sequence` orders one column's values. A quoted name is a string literal and fails to load. A dataset-level `$`-binding is admitted as on [`distinct`](#distinct): pre-resolved; a per-row one is a load error; a binding holding a quoted name keeps the literal refusal |
 | `domain` | dataset reference | no | The dataset to read, as [`distinct`](#distinct)'s: `TA` or `"TA"`; absent ⇒ the dataset under evaluation; with `domain`, every column argument names a column of that dataset |
 | `filter` | boolean over the target dataset's columns | no | Which rows are read, in parentheses — as [`distinct`](#distinct)'s `filter=` |
 | `group` | list of columns | no | Columns whose combined value defines a group, as [`distinct`](#distinct)'s — spliced, [qualified](#qualified-group-members) with `domain`, or **sided** (`[{left: ACTARMCD, right: ARMCD}]`: this row's `ACTARMCD` keys the other table's `ARMCD` groups) |
-| `by` | list of sort keys: `asc(COL)`, `desc(COL)`, or a bare `COL` (= `asc`) | no | The order inside a group — the SQL default is ascending, so `by=[SESTDTC]` is `by=[asc(SESTDTC)]`; a tie keeps file order; absent ⇒ file order. Each key is **classified over its cells**: a key whose every present cell is a number orders numerically (`9` before `10`); any other key orders ISO dates and datetimes **part by part** — year, month, day, hour, minute, second, millisecond, a missing part before every present value of that part (owner O24): `2012` before `2012---15` before `2012-01-01`, `2015` before `2015-01` before `2015-01-01` before `2015-01-01T08`, a year-masked `----06-15` before every dated value; a UTC offset is applied first where there is a time to shift (`T10:00+02:00` before `T09:00Z`); equal parts fall back to the text; a four-digit cell is a **year** — `2021` after `2020-06-15`; a value that cannot be placed (`2020-02-30`, `2015-UN-UN`, `2020-01-15 08:00`) sorts after every dated value, with other text, as text — `desc` reverses the whole order (a missing part then sorts last). A whitespace-only cell is blank. A blank or missing key cell sorts **first** unless the descriptor says `nulls="last"` (`asc(COL, nulls="last")`), and under `desc` too — the placement is independent of the direction, as on [`is_sorted_by`](#is_sorted_by); two blank or missing cells tie (file order) (runbook W2 fold, R5 PC-1; before, a blank and a missing sorted last and `desc` put them first). Since runbook W4 SB3 `nulls=` takes the string literal `"first"` or `"last"` only — a case variant (`"Last"`), another string or a non-literal fails to load (*"… nulls= takes "first" or "last" (lower case), not "Last""*), and so does any other descriptor keyword (`asc(COL, null="last")`). A key may be a `$`-reference to a dataset-level list of column names (`by=$keys`, each key ascending) or a string naming one column inside a descriptor (`asc($c)`), or the expression such a binding holds, written in place — spliced once per run (a per-row binding or expression is a load error) |
+| `by` | list of sort keys: `asc(COL)`, `desc(COL)`, or a bare `COL` (= `asc`) | no | The order inside a group — the SQL default is ascending, so `by=[SESTDTC]` is `by=[asc(SESTDTC)]`; a tie keeps file order; absent ⇒ file order. Each key is **classified over its cells**: a key whose every present cell is a number orders numerically (`9` before `10`); any other key orders ISO dates and datetimes **part by part** — year, month, day, hour, minute, second, millisecond, a missing part before every present value of that part: `2012` before `2012---15` before `2012-01-01`, `2015` before `2015-01` before `2015-01-01` before `2015-01-01T08`, a year-masked `----06-15` before every dated value; a UTC offset is applied first where there is a time to shift (`T10:00+02:00` before `T09:00Z`); equal parts fall back to the text; a four-digit cell is a **year** — `2021` after `2020-06-15`; a value that cannot be placed (`2020-02-30`, `2015-UN-UN`, `2020-01-15 08:00`) sorts after every dated value, with other text, as text — `desc` reverses the whole order (a missing part then sorts last). A whitespace-only cell is blank. A blank or missing key cell sorts **first** unless the descriptor says `nulls="last"` (`asc(COL, nulls="last")`), and under `desc` too — the placement is independent of the direction, as on [`is_sorted_by`](#is_sorted_by); two blank or missing cells tie (file order). `nulls=` takes the string literal `"first"` or `"last"` only — a case variant (`"Last"`), another string or a non-literal fails to load (*"… nulls= takes "first" or "last" (lower case), not "Last""*), and so does any other descriptor keyword (`asc(COL, null="last")`). A key may be a `$`-reference to a dataset-level list of column names (`by=$keys`, each key ascending) or a string naming one column inside a descriptor (`asc($c)`), or the expression such a binding holds, written in place — spliced once per run (a per-row binding or expression is a load error). ⚠ A character column of numeric-looking text is a **numeric** key here (`"9"` before `"10"`), as on [`is_sorted_by`](#is_sorted_by) — unlike the single-key readers: [`is_last_in_group`](#is_last_in_group) orders a character column as text, and [`empty_within_except_last_row`](#empty_within_except_last_row) / [`has_next_corresponding_record`](#has_next_corresponding_record) order every key by its text |
 | `keep_missings` | boolean | no | Whether a row with a missing group key stays in its group (default `true`). Requires `group=` |
 
 **What is a value.** A present cell contributes its **text** (a numeric cell its canonical text,
@@ -2360,7 +2354,7 @@ Builds a composite key from two to six columns, for whole-tuple membership
 | `c2` | column | yes | A column of the composite key |
 | `columns` | list of columns (absorbs the remaining arguments) | no | The columns forming the composite key |
 
-Positional arguments only: a named argument (`tuple(A, B, c1=C)`) fails to load (*"'tuple' takes positional arguments only — a named argument (c1=) cannot address a collector's elements …"*; runbook W4 U2 — before, it was silently dropped).
+Positional arguments only: a named argument (`tuple(A, B, c1=C)`) fails to load (*"'tuple' takes positional arguments only — a named argument (c1=) cannot address a collector's elements …"*).
 
 **Example**
 
@@ -2392,7 +2386,7 @@ A count of variables, in one of three forms — give the template **or** the pat
 | `name` | string | no | A `--` variable-name template, resolved per dataset of the study — any **dataset-level** string: a literal (`"--LNKGRP"`), a `$`-binding holding one, or the expression such a binding would hold, written inline |
 | `name_pattern` | regex | no | A regular expression over the current dataset's column names |
 
-A **registry function** since wave 4b of the operations→functions programme (`PLAN-scalar-metadata-functions`). It is an **aggregate**: one value for the dataset, computed once per rule and dataset and read by every row. Its arguments are read once per call: the template is any **dataset-level** string — a literal (`"--LNKGRP"`), a `$`-binding or the same expression inline, judged alike — and a per-row value there (a column, `upper(AETERM)`) fails to load as the level finding, the same for both spellings; `name_pattern` is a regex **literal**. The template names a column of every dataset, not of the current one, so a bare `--LNKGRP` is a per-row value and fails to load. An invalid `name_pattern` fails to load (the retired operation counted 0, silently). The study-wide form reads the study inventory; a run whose dataset resolver cannot enumerate the study is a wiring defect and reports a rule **ERROR** (the retired operation counted the current dataset only).
+A **registry function**. It is an **aggregate**: one value for the dataset, computed once per rule and dataset and read by every row. Its arguments are read once per call: the template is any **dataset-level** string — a literal (`"--LNKGRP"`), a `$`-binding or the same expression inline, judged alike — and a per-row value there (a column, `upper(AETERM)`) fails to load as the level finding, the same for both spellings; `name_pattern` is a regex **literal**. The template names a column of every dataset, not of the current one, so a bare `--LNKGRP` is a per-row value and fails to load. An invalid `name_pattern` fails to load (the retired operation counted 0, silently). The study-wide form reads the study inventory; a run whose dataset resolver cannot enumerate the study is a wiring defect and reports a rule **ERROR** (the retired operation counted the current dataset only).
 
 **Example**
 
@@ -2428,8 +2422,8 @@ True when one `key` maps to more than one `name` — a functional-dependency vio
 |---|---|---|---|
 | `name` | column reference (bare, or a `--`prefix reference) | yes | The column to read — a quoted literal is a load error |
 | `key` | column reference (bare, or a `--`prefix reference) | yes | The column whose value acts as the key — a quoted literal is a load error |
-| `within` | column reference or list of column references (bare, or `--`prefix) | no | A member may be a `$`-reference to a dataset-level list of column names (or a string naming one column), or the expression such a binding holds, written in place — spliced as [`record_count`](#record_count)'s `group=` splices it (a per-row binding or expression is a load error); a nested coalesce component splices inside as at top level. Columns that partition the rows, read **by keyword only** — a positional third argument (`has_multiple_values_for(A, B, USUBJID)`) is a load error since runbook W8 (it used to be bound and silently ignored), and so is a quoted literal |
-| `keep_missings` | boolean | no | Whether a row with a missing key stays in its group — **requires `within=`**: with no grouping key it would have no effect, so `keep_missings=` without `within=` — or with the empty `within=[]`, which groups by nothing — fails to load (*"`keep_missings` on has_multiple_values_for requires `within=`; with no grouping key it would have no effect"*, runbook W4 KM; `within=[]` since the W4 fold) |
+| `within` | column reference or list of column references (bare, or `--`prefix) | no | A member may be a `$`-reference to a dataset-level list of column names (or a string naming one column), or the expression such a binding holds, written in place — spliced as [`record_count`](#record_count)'s `group=` splices it (a per-row binding or expression is a load error); a nested coalesce component splices inside as at top level. Columns that partition the rows, read **by keyword only** — a positional third argument (`has_multiple_values_for(A, B, USUBJID)`) is a load error (*"`within` on has_multiple_values_for is read by keyword only — write within=USUBJID"*), and so is a quoted literal |
+| `keep_missings` | boolean | no | Whether a row with a missing key stays in its group — **requires `within=`**: with no grouping key it would have no effect, so `keep_missings=` without `within=` — or with the empty `within=[]`, which groups by nothing — fails to load (*"`keep_missings` on has_multiple_values_for requires `within=`; with no grouping key it would have no effect"*). Read **by keyword only**, like `within=`: a positional fourth argument is a load error |
 | `include_empty` | boolean | no | Whether a blank key or value takes part |
 
 **Example**
@@ -2490,7 +2484,7 @@ True on the minority rows of a group that disagrees; blank targets excluded unle
 | parameter | type | required | description |
 |---|---|---|---|
 | `name` | any | yes | The column to read |
-| `key` | any | no | The column whose value acts as the key. A `$`-binding here fails to load (*"argument 'key' of 'is_inconsistent_across_dataset' takes a column, not the binding $k — a binding of column names is spliced through keys=[$k]"*, runbook W4 KP): a binding of column names goes in `keys=[$k]` — before, the binding's name was read as a column and the key silently dropped. |
+| `key` | any | no | The column whose value acts as the key. A `$`-binding here fails to load (*"argument 'key' of 'is_inconsistent_across_dataset' takes a column, not the binding $k — a binding of column names is spliced through keys=[$k]"*): a binding of column names goes in `keys=[$k]`. |
 | `keys` | list of columns | no | The values that must all be present. A member may be a `$`-reference to a dataset-level **list of column names**, or the expression such a binding holds, written in place — spliced exactly as [`record_count`](#record_count)'s `group=` splices it (a dataset-level string is one name; a per-row binding or expression is a load error; a bare `keys=$names` / `keys=<expression>` is the one-member list). |
 | `include_empty` | boolean | no | Whether a blank key or value takes part |
 | `keep_missings` | boolean | no | Whether a row with a missing key stays in its group |
@@ -2543,7 +2537,7 @@ True when `a` and `b` are in a strict one-to-one relationship. A negated spellin
 | parameter | type | required | description |
 |---|---|---|---|
 | `name` | any | yes | The column to read |
-| `value` | any | no | The column to compare against — a column, read per row. A `$`-binding here fails to load (*"argument 'value' of 'is_unique_relationship' takes a column, not the binding $k — a binding of column names is spliced through keys=[$k]"*, runbook W4 KP): a binding of column names goes in `keys=[$k]` — before, the binding's name was read as a column and the key silently dropped. |
+| `value` | any | no | The column to compare against — a column, read per row. A `$`-binding here fails to load (*"argument 'value' of 'is_unique_relationship' takes a column, not the binding $k — a binding of column names is spliced through keys=[$k]"*): a binding of column names goes in `keys=[$k]`. |
 | `keys` | list of columns | no | The values that must all be present. A member may be a `$`-reference to a dataset-level **list of column names**, or the expression such a binding holds, written in place — spliced exactly as [`record_count`](#record_count)'s `group=` splices it (a dataset-level string is one name; a per-row binding or expression is a load error; a bare `keys=$names` / `keys=<expression>` is the one-member list). |
 
 **Example**
@@ -2648,8 +2642,7 @@ Check:
 
 `collapse_runs(list)` → **value (a list)**
 
-The list with adjacent duplicates collapsed — `[S, T, T, F, T]` becomes `[S, T, F, T]` (runbook
-W1b RO, `PLAN-engine-gap-row-ordinal` R4). Over a per-row list ([`sequence`](#sequence)'s output)
+The list with adjacent duplicates collapsed — `[S, T, T, F, T]` becomes `[S, T, F, T]`. Over a per-row list ([`sequence`](#sequence)'s output)
 and a dataset-level list alike; elements compare as the set operations compare them (text exact,
 a missing by its marker); a missing list is the empty list.
 
@@ -2672,10 +2665,10 @@ True when a following record in the group matches under `relation=`; authored un
 
 | parameter | type | required | description |
 |---|---|---|---|
-| `name` | column reference — or `duration(COL)` | yes | The column read on the current record. Written as `duration(COL)` on **both** operands (runbook W1b DO, `PLAN-engine-gap-dur-order` Q3), the cells are compared as [durations](#duration) — under `relation="<="` / `">="` the hull order, under the default the hull equality, so `P1W` corresponds to `P7D`; on one operand only it is a load error. Unmarked, the cells compare as today (text identity, widened by `relation=`'s numeric / date reading), whatever they contain |
+| `name` | column reference — or `duration(COL)` | yes | The column read on the current record. Written as `duration(COL)` on **both** operands, the cells are compared as [durations](#duration) — under `relation="<="` / `">="` the hull order, under the default the hull equality, so `P1W` corresponds to `P7D`; on one operand only it is a load error. Unmarked, the cells compare as today (text identity, widened by `relation=`'s numeric / date reading), whatever they contain |
 | `value` | column reference — or `duration(COL)` | yes | The column read on the next record, marked exactly as `name` is |
 | `within` | one column reference, or a one-element list | yes | The column that partitions the rows. May be a `$`-reference to a dataset-level string or one-element list of column names, or the expression such a binding holds, written in place — spliced as [`record_count`](#record_count)'s `group=` splices it (a per-row binding or expression is a load error; two or more spliced names make the rule ERROR: the slot takes one column). |
-| `by` | one column reference, or a one-element list `[asc(COL)]` / `[COL]` | yes | The sort key, ascending — since runbook W1b SK (owner O17) the one sort-key parameter of every function (`by=AESEQ` or `by=[asc(AESEQ)]`); exactly one ascending key here, **required** as `ordering=` was (a call without it fails to load) — `desc(…)`, two keys or a `nulls=` placement fail to load (*"not supported for …"*). The older spelling `ordering=` is retired — write `by=`: `ordering=` fails to load with the hint *"ordering= is retired — write by=…"* (runbook W4 OR2, owner O17). Written **by keyword only** — a positional key (`has_next_corresponding_record(…, AESEQ)`) fails to load with the hint *"has_next_corresponding_record takes its sort key by keyword — write by=AESEQ"* (W4 fold; before, it loaded and the rule degraded). May be a `$`-reference to a dataset-level string or one-element list of column names, or the expression such a binding holds, written in place — spliced as [`record_count`](#record_count)'s `group=` splices it (a per-row binding or expression is a load error; two or more spliced names make the rule ERROR: the slot takes one column). |
+| `by` | one column reference, or a one-element list `[asc(COL)]` / `[COL]` | yes | The sort key, ascending: exactly one column (`by=AESEQ` or `by=[asc(AESEQ)]`), **required** (a call without it fails to load) — `desc(…)`, two keys or a `nulls=` placement fail to load (*"… is not supported for …"*). The rows are ordered by the key cells' **text**, whatever the column's type — a numeric `AESEQ` of `10` sorts before `9` — a missing cell sorts as `""`, and a tie keeps file order; this is neither [`is_last_in_group`](#is_last_in_group)'s order (by the column's type) nor [`sequence`](#sequence) / [`is_sorted_by`](#is_sorted_by)'s (numeric when every present cell of the key is a number). The retired spelling `ordering=` fails to load with the hint *"ordering= is retired — write by=…"*. Written **by keyword only** — a positional key (`has_next_corresponding_record(…, AESEQ)`) fails to load with the hint *"has_next_corresponding_record takes its sort key by keyword — write by=AESEQ"*. May be a `$`-reference to a dataset-level string or one-element list of column names, or the expression such a binding holds, written in place — spliced as [`record_count`](#record_count)'s `group=` splices it (a per-row binding or expression is a load error; two or more spliced names make the rule ERROR: the slot takes one column). |
 | `relation` | string | no | How a record must relate to the next one: `"=="` (the default), `"<="` or `">="`, applied **in disjunction with** identity (it only widens what corresponds). Numeric cells compare as numbers, ISO dates under the date hull rule, and — only when both operands are written `duration(COL)` — durations under the duration hull rule |
 | `keep_missings` | boolean | no | Whether a row with a missing key stays in its group |
 
@@ -2700,15 +2693,12 @@ Check:
 
 `is_increasing(list)` → **boolean**
 
-True when every element is **strictly** greater than its predecessor (runbook W1b RO,
-`PLAN-engine-gap-row-ordinal` R6, owner 2026-10-07: *"agreed to strict"*). Numerically when
+True when every element is **strictly** greater than its predecessor. Numerically when
 **every** element is a number (a numeric cell, or text that reads as one: `"9"` before `"10"`),
 else as text; an empty or one-element list is increasing; a list holding a **missing element**
 answers `true` — vacuously, as the empty list does — so the authored `not is_increasing(…)` gives
-**no finding** on it (the owner ruled a missing element *"answers missing, so no finding"*; the
-BOOLEAN functions are two-valued, and `true` is the answer that fires nothing — coordinator D22,
-runbook W1b P5a; until then it answered `false`). A **missing list** — `split_by` of a blank cell —
-answers `true` the same way (owner O22, runbook W1b fold). Over a per-row list ([`sequence`](#sequence)'s
+**no finding** on it (the BOOLEAN functions are two-valued, and `true` is the answer that fires
+nothing). A **missing list** — `split_by` of a blank cell — answers `true` the same way. Over a per-row list ([`sequence`](#sequence)'s
 output) and a dataset-level list alike.
 
 | parameter | type | required | description |
@@ -2750,8 +2740,7 @@ expression: 'not is_ordered_subset_of($column_order_from_dataset, $model_column_
 
 `is_prefix_of(a, b)` → **boolean**
 
-True when `a`'s elements equal `b`'s first `|a|` elements — `a` starts `b` (runbook W1b RO,
-`PLAN-engine-gap-row-ordinal` R2). Element identity is the set operations' (text exact, a missing by
+True when `a`'s elements equal `b`'s first `|a|` elements — `a` starts `b`. Element identity is the set operations' (text exact, a missing by
 its marker); the empty list is a prefix of every list, a list is its own prefix; a missing list on
 either side answers `false`. Over per-row lists ([`sequence`](#sequence)'s output) and dataset-level
 lists alike. A negated spelling `is_not_prefix_of(a, b)` exists; prefer `not is_prefix_of(a, b)`.
@@ -2777,7 +2766,7 @@ True when the target is sorted by `by=`; authored under `not`, it fires the whol
 | parameter | type | required | description |
 |---|---|---|---|
 | `target` | column reference (bare, or a `--`prefix reference) | yes | The column the function is about — a quoted literal is a load error |
-| `by` | list of sort keys: `asc(COL)`, `desc(COL)`, or a bare `COL` (= `asc`, the SQL default — runbook W1b SK) | yes | Sort keys — `COL` is bare (or `--`prefix); the quoted `asc("COL")` the engine used to require is a string literal since runbook W8 and fails to load. A key may be a `$`-reference to a dataset-level list of column names (`by=$keys`) or a string naming one column inside a descriptor (`asc($c)`), or the expression such a binding holds, written in place — spliced once per run (a per-row binding or expression is a load error). Each key is ordered in its own direction — `desc(COL)` reverses it (runbook W2 SB1, `PLAN-is-sorted-by-direction`; before, the direction was ignored and every key read as `asc`). A blank or missing key cell sorts **first** unless the descriptor says `nulls="last"` (`asc(COL, nulls="last")`), and under `desc` too — the placement is independent of the direction; two blank or missing cells tie (file order). Since runbook W4 SB3 `nulls=` takes the string literal `"first"` or `"last"` only — a case variant (`"Last"`), another string or a non-literal fails to load (*"… nulls= takes "first" or "last" (lower case), not "Last""*), and so does any other descriptor keyword (`asc(COL, null="last")`). The other cells of a key are **classified over the group** as [`sequence`](#sequence)'s keys are (runbook W2 SB2): a key whose every present cell is a number orders numerically (`9` before `10`); any other key orders ISO dates and datetimes **part by part** — year, month, day, hour, minute, second, millisecond, a missing part before every present value of that part (owner O24): `2012` before `2012---15` before `2012-01-01`, `2015` before `2015-01` before `2015-01-01` before `2015-01-01T08`, a year-masked `----06-15` before every dated value; a UTC offset is applied first where there is a time to shift (`T10:00+02:00` before `T09:00Z`); equal parts fall back to the text; a four-digit cell is a **year** — `2021` after `2020-06-15`; a value that cannot be placed (`2020-02-30`, `2015-UN-UN`, `2020-01-15 08:00`) sorts after every dated value, with other text, as text — `desc` reverses the whole order (a missing part then sorts last). A whitespace-only cell is blank — until SB2, every key compared as text. Written **by keyword only** — a positional key (`is_sorted_by(SESEQ, [SESTDTC])`) fails to load with the hint *"is_sorted_by takes its sort keys by keyword — write by=[SESTDTC]"* (T2 fold; before, it loaded and the rule degraded) |
+| `by` | list of sort keys: `asc(COL)`, `desc(COL)`, or a bare `COL` (= `asc`, the SQL default) | yes | Sort keys — `COL` is bare (or `--`prefix); a quoted `asc("COL")` is a string literal and fails to load. A key may be a `$`-reference to a dataset-level list of column names (`by=$keys`) or a string naming one column inside a descriptor (`asc($c)`), or the expression such a binding holds, written in place — spliced once per run (a per-row binding or expression is a load error). Each key is ordered in its own direction — `desc(COL)` reverses it. A blank or missing key cell sorts **first** unless the descriptor says `nulls="last"` (`asc(COL, nulls="last")`), and under `desc` too — the placement is independent of the direction; two blank or missing cells tie (file order). `nulls=` takes the string literal `"first"` or `"last"` only — a case variant (`"Last"`), another string or a non-literal fails to load (*"… nulls= takes "first" or "last" (lower case), not "Last""*), and so does any other descriptor keyword (`asc(COL, null="last")`). The other cells of a key are **classified over the group** as [`sequence`](#sequence)'s keys are: a key whose every present cell is a number orders numerically (`9` before `10`); any other key orders ISO dates and datetimes **part by part** — year, month, day, hour, minute, second, millisecond, a missing part before every present value of that part: `2012` before `2012---15` before `2012-01-01`, `2015` before `2015-01` before `2015-01-01` before `2015-01-01T08`, a year-masked `----06-15` before every dated value; a UTC offset is applied first where there is a time to shift (`T10:00+02:00` before `T09:00Z`); equal parts fall back to the text; a four-digit cell is a **year** — `2021` after `2020-06-15`; a value that cannot be placed (`2020-02-30`, `2015-UN-UN`, `2020-01-15 08:00`) sorts after every dated value, with other text, as text — `desc` reverses the whole order (a missing part then sorts last). A whitespace-only cell is blank. A character column of numeric-looking text is therefore a numeric key, unlike on the single-key readers ([`is_last_in_group`](#is_last_in_group), [`empty_within_except_last_row`](#empty_within_except_last_row), [`has_next_corresponding_record`](#has_next_corresponding_record)). Written **by keyword only** — a positional key (`is_sorted_by(SESEQ, [SESTDTC])`) fails to load with the hint *"is_sorted_by takes its sort keys by keyword — write by=[SESTDTC]"* |
 | `within` | one column reference, or a one-element list (bare, or `--`prefix) | no | The column that partitions the rows — a quoted literal is a load error, and so is a list of two or more columns (it used to run ungrouped). May be a `$`-reference to a dataset-level string or one-element list of column names, or the expression such a binding holds, written in place — spliced as [`record_count`](#record_count)'s `group=` splices it (a per-row binding or expression is a load error; two or more spliced names make the rule ERROR: the slot takes one column). |
 | `keep_missings` | boolean | no | Whether a row with a missing key stays in its group |
 
@@ -2804,8 +2793,8 @@ Check:
 
 True when the two lists have at least one member in common. A negated spelling `shares_no_elements_with($a, $b)` exists; prefer `not shares_elements_with($a, $b)`.
 
-Each operand is a **dataset-level** set: a `$`-binding, or — since runbook W1b SH
-(`PLAN-binding-substitutability`) — the expression such a binding holds, written in place
+Each operand is a **dataset-level** set: a `$`-binding, or the expression such a binding holds,
+written in place
 (`shares_elements_with(distinct(USUBJID, domain="AE"), keys=[USUBJID])`), evaluated once over the
 rule's dataset exactly as the binding is; a scalar is the one-member set. A **per-row** operand — a
 bare column, `upper(AETERM)`, or a binding holding one — fails the rule's load, bound and inline
@@ -3030,7 +3019,7 @@ Check:
 
 The CDISC Library's class name of the current dataset's domain (e.g. `"BASIC DATA STRUCTURE"`), looked up by the dataset's domain code.
 
-A **registry function** since wave 4b of the operations→functions programme (`PLAN-scalar-metadata-functions`). It is an **aggregate**: one value for the dataset, computed once per rule and dataset and read by every row. It needs the CDISC Library: without one — or with one that could not be consulted — the rule is **SKIPPED** (*"Rule skipped — no Library access"*). Under the Define-XML fallback for an unreachable Library, a blank class means the define could not answer and the rule is **SKIPPED** too. (`ds_class("LIBRARY")` is not the same question: its tiered lookup answers where this one does not.)
+A **registry function**. It is an **aggregate**: one value for the dataset, computed once per rule and dataset and read by every row. It needs the CDISC Library: without one — or with one that could not be consulted — the rule is **SKIPPED** (*"Rule skipped — no Library access"*). Under the Define-XML fallback for an unreachable Library, a blank class means the define could not answer and the rule is **SKIPPED** too. (`ds_class("LIBRARY")` is not the same question: its tiered lookup answers where this one does not.)
 
 **Example**
 
@@ -3039,7 +3028,7 @@ Bindings:
 - name: "$dataset_class"
   expression: 'dataset_class_from_library()'
 Check:
-  expression: 'starts_with(ds_name("DATA"), "AD") and empty($dataset_class)'
+  expression: 'starts_with(ds_name(), "AD") and empty($dataset_class)'
 ```
 
 The example above is the complete call.
@@ -3052,7 +3041,7 @@ The example above is the complete call.
 
 The names of every dataset in the study, upper-cased, as a list — split members as themselves (`LBCH`, not `LB`; that is [`study_domains()`](#study_domains)'s question), `SUPP--` and `RELREC` included.
 
-A **registry function** since wave 4 of the operations→functions programme (`PLAN-list-functions`). It takes **no column target** — the `name` / `names` rows of the retired operation are gone, and `dataset_names(X)` fails to load. It is an **aggregate**: one list for the dataset, computed once per rule and dataset and read by every row. It reads the study inventory; a run whose dataset resolver cannot enumerate the study is a wiring defect and reports a rule **ERROR** (the retired operation answered the empty set there, silently).
+A **registry function**. It takes **no column target** — the `name` / `names` rows of the retired operation are gone, and `dataset_names(X)` fails to load. It is an **aggregate**: one list for the dataset, computed once per rule and dataset and read by every row. It reads the study inventory; a run whose dataset resolver cannot enumerate the study is a wiring defect and reports a rule **ERROR** (the retired operation answered the empty set there, silently).
 
 **Example**
 
@@ -3075,7 +3064,7 @@ The example above is the complete call.
 
 Whether the CDISC Library declares the current dataset's domain a **custom** (sponsor) domain, looked up by the dataset's domain code: `true` or `false`.
 
-A **registry function** since wave 4b of the operations→functions programme (`PLAN-scalar-metadata-functions`). It is an **aggregate**: one value for the dataset, computed once per rule and dataset and read by every row. It needs the CDISC Library: without one — or with one that could not be consulted — the rule is **SKIPPED** (*"Rule skipped — no Library access"*). ⚠ A Library that could not be consulted SKIPs the rule **even under the Define-XML fallback**: `false` ("not custom") is the answer that lets a rule fire, and a define cannot tell a custom domain — "custom" means "not in the standard", and the standard is what is missing.
+A **registry function**. It is an **aggregate**: one value for the dataset, computed once per rule and dataset and read by every row. It needs the CDISC Library: without one — or with one that could not be consulted — the rule is **SKIPPED** (*"Rule skipped — no Library access"*). ⚠ A Library that could not be consulted SKIPs the rule **even under the Define-XML fallback**: `false` ("not custom") is the answer that lets a rule fire, and a define cannot tell a custom domain — "custom" means "not in the standard", and the standard is what is missing.
 
 **Example**
 
@@ -3097,11 +3086,11 @@ The example above is the complete call.
 
 The dataset's observation class; available at every level
 
-At `DATA` it takes no argument: the DATA-level class is the evaluated dataset's, so `ds_class("DM", "DATA")` fails to load — write `ds_class("DATA")`, or read another dataset's class at `DEFINE` / `LIBRARY`.
+At `DATA` it takes no argument: the DATA-level class is the evaluated dataset's, so `ds_class("DM", "DATA")` fails to load — write `ds_class()`, or read another dataset's class at `DEFINE` / `LIBRARY`.
 
 | parameter | type | required | description |
 |---|---|---|---|
-| `x` | column | no | The column to read; defaults to the variable being iterated |
+| `x` | string | no | The dataset's name as a string (`"DM"`); a bare column fails to load; defaults to the dataset under evaluation |
 | `level` | level | no | Which metadata to read — supported here: `DATA/DEFINE/LIBRARY` — with no dataset name, an omitted level reads `DATA` (`ds_class()`); a dataset name needs its level |
 
 **Example**
@@ -3112,7 +3101,7 @@ expression: 'not empty(ds_class("DEFINE"))'
 
 ### ds_domain
 
-`ds_domain(["DATA"])` → **value**
+`ds_domain([[x,] level])` → **value**
 
 The dataset's domain as `Scope.Domains` resolves it — `SUPPLB`, not the parent, on a SUPP dataset; `DATA` only
 
@@ -3120,13 +3109,13 @@ At `DATA` an argument names the dataset read (`ds_domain("DM", "DATA")`), resolv
 
 | parameter | type | required | description |
 |---|---|---|---|
-| `x` | column | no | The column to read; defaults to the variable being iterated |
+| `x` | string | no | The dataset's name as a string (`"DM"`); a bare column fails to load; defaults to the dataset under evaluation |
 | `level` | level | no | Which metadata to read — supported here: `DATA` — with no dataset name, an omitted level reads `DATA` (`ds_domain()`); a dataset name needs its level |
 
 **Example**
 
 ```yaml
-expression: 'ds_domain("DATA") == "AE"'
+expression: 'ds_domain() == "AE"'
 ```
 
 ### ds_label
@@ -3139,13 +3128,13 @@ At `DATA` an argument names the dataset read (`ds_label("DM", "DATA")`), resolve
 
 | parameter | type | required | description |
 |---|---|---|---|
-| `x` | column | no | The column to read; defaults to the variable being iterated |
+| `x` | string | no | The dataset's name as a string (`"DM"`); a bare column fails to load; defaults to the dataset under evaluation |
 | `level` | level | no | Which metadata to read — supported here: `DATA/DEFINE/LIBRARY` — with no dataset name, an omitted level reads `DATA` (`ds_label()`); a dataset name needs its level |
 
 **Example**
 
 ```yaml
-expression: 'ds_label("DATA") != "Device-level Analysis Dataset"'
+expression: 'ds_label() != "Device-level Analysis Dataset"'
 ```
 
 ### ds_name
@@ -3158,13 +3147,13 @@ At `DATA` an argument names the dataset read (`ds_name("DM", "DATA")`), resolved
 
 | parameter | type | required | description |
 |---|---|---|---|
-| `x` | column | no | The column to read; defaults to the variable being iterated |
+| `x` | string | no | The dataset's name as a string (`"DM"`); a bare column fails to load; defaults to the dataset under evaluation |
 | `level` | level | no | Which metadata to read — supported here: `DATA/DEFINE/LIBRARY` — with no dataset name, an omitted level reads `DATA` (`ds_name()`); a dataset name needs its level |
 
 **Example**
 
 ```yaml
-expression: 'ds_name("DATA") !~ /^[A-Z0-9_]{1,8}$/'
+expression: 'ds_name() !~ /^[A-Z0-9_]{1,8}$/'
 ```
 
 ### ds_structure
@@ -3175,7 +3164,7 @@ The dataset's ADaM data structure; `DEFINE` and `LIBRARY` only
 
 | parameter | type | required | description |
 |---|---|---|---|
-| `x` | column | no | The column to read; defaults to the variable being iterated |
+| `x` | string | no | The dataset's name as a string (`"DM"`); a bare column fails to load; defaults to the dataset under evaluation |
 | `level` | level | yes | Which metadata to read — supported here: `DEFINE/LIBRARY` |
 
 **Example**
@@ -3198,7 +3187,7 @@ Its result type follows the key: `"dataset_size"` is a **number**; `"dataset_nam
 |---|---|---|---|
 | `name` | string | yes | The metadata key — any **dataset-level** string: a literal (`"dataset_name"`), a `$`-binding holding one, or the expression such a binding would hold, written inline |
 
-A **registry function** since wave 4b of the operations→functions programme (`PLAN-scalar-metadata-functions`). It is an **aggregate**: one value for the dataset, computed once per rule and dataset and read by every row. Its argument is read once per call, so it takes any **dataset-level** string — a literal, a `$`-binding or the same expression inline, judged alike — and a per-row value there (a column, `upper(AETERM)`) fails to load as the level finding, the same for both spellings.
+A **registry function**. It is an **aggregate**: one value for the dataset, computed once per rule and dataset and read by every row. Its argument is read once per call, so it takes any **dataset-level** string — a literal, a `$`-binding or the same expression inline, judged alike — and a per-row value there (a column, `upper(AETERM)`) fails to load as the level finding, the same for both spellings.
 
 **Example**
 
@@ -3220,9 +3209,7 @@ The example above is the complete call.
 
 The variable names of the dataset **named in a column value**, per row — the list a SUPP-- / CO /
 RELREC record's `RDOMAIN` refers to, so a Check tests the row's `IDVAR` against *its* referenced
-dataset's columns, never a flat union over every referenced domain. A registry function since
-runbook W7 (`PLAN-distinct-function`), replacing `distinct(IDVAR, value_is_reference=true)`,
-which never read its target.
+dataset's columns, never a flat union over every referenced domain. A registry function.
 
 | parameter | type | required | description |
 |---|---|---|---|
@@ -3236,7 +3223,7 @@ out. Per row the answer is the column-name list of every dataset member whose do
 carries, answers the **empty list**. The function reads the study's own datasets, never the CDISC
 Library.
 
-**`qualifiers=true`** (runbook W1b, `PLAN-engine-gap-value-addressed` V3) appends the supplemental
+**`qualifiers=true`** appends the supplemental
 qualifier names the referenced dataset's `SUPP--` companion(s) deliver — every `QNAM` of
 `SUPP<dataset>` and of the domain-level members of its `SUPP<domain>` family, the same sources the
 merged evaluation table reads — after the columns, in sorted order. It is what ADaM's `SRCVAR` may
@@ -3275,7 +3262,7 @@ The CDISC Library observation class of the domain **named in a column value**, p
 |---|---|---|---|
 | `name` | column | yes | The column naming a domain (`RDOMAIN`) |
 
-`name` is a **column reference** and is required — the former `RDOMAIN` default is gone. A missing cell answers that missing value. The function needs the CDISC Library: with none configured, or one that could not be consulted, the rule reports **SKIPPED**. (Until wave 3 of the operation→function programme this was an operation.)
+`name` is a **column reference** and is required — the former `RDOMAIN` default is gone. A missing cell answers that missing value. The function needs the CDISC Library: with none configured, or one that could not be consulted, the rule reports **SKIPPED**.
 
 **Example**
 
@@ -3296,8 +3283,7 @@ The example above is the complete call.
 `referenced_record_count(dataset, value, key_variable=[, keys=])` → **value**
 
 How many records of the dataset **named in a column value** carry this row's pointer value in the
-column `key_variable` names and this row's `keys` — per row. The value-addressed record lookup of
-runbook W1b (`PLAN-engine-gap-value-addressed` V1): a `SUPP--` row's `RDOMAIN` / `IDVAR` /
+column `key_variable` names and this row's `keys` — per row. The value-addressed record lookup: a `SUPP--` row's `RDOMAIN` / `IDVAR` /
 `IDVARVAL`, a RELREC link, ADaM's `SRCDOM` / `SRCSEQ` traceability triple. It is a **count, never a
 merge**: a `Child` entry pairs a pointer row with every parent record it addresses (`n:m`), and a
 `1` side refuses a duplicate as a rule ERROR, so "resolves to exactly one record" is observable only
@@ -3342,10 +3328,9 @@ Check:
 `!= 1` **fires** on it (the register: `X != "Y"` on a missing value fires) — guard with
 `not empty(IDVARVAL)` where the pointer may be blank. The dataset under evaluation is read through
 the run's resolver; the referenced dataset is indexed once per rule and dataset and the index is
-shared across rules — keyed on a compact hash of the key text, each hit verified (T2 fold). The count
+shared across rules — keyed on a compact hash of the key text, each hit verified. The count
 is **per pointer row** whatever its operands are: with a string `dataset` and `value` and a bound
-name list at `keys=` (`keys=$k`) it still reads this row's keys (T2 fold; before, a binding holding it
-folded to the first row's count).
+name list at `keys=` (`keys=$k`) it still reads this row's keys.
 
 ### referenced_key_is_unique
 
@@ -3354,8 +3339,7 @@ folded to the first row's count).
 Whether the dataset **named in a column value** has at most one record per (`keys`, the column
 `key_variable` names) — per row. The `keys` name columns of the **referenced** dataset, so they are
 no read of this row: with a string `dataset` and a candidate `key_variable` the verdict is one fact
-for the dataset, written keys and a bound name list alike (T2 fold). The value-addressed uniqueness verdict of runbook W1b
-(`PLAN-engine-gap-value-addressed` V4): RELREC declares `RELTYPE = "ONE"` for a dataset and a column,
+for the dataset, written keys and a bound name list alike. The value-addressed uniqueness verdict: RELREC declares `RELTYPE = "ONE"` for a dataset and a column,
 and the declaration is checked against that dataset.
 
 | parameter | type | required | description |
@@ -3393,7 +3377,7 @@ unknown dataset or a blank `IDVAR`.
 
 The variables whose declared column length differs across the current dataset's split-family members (every dataset whose data-driven unsplit name equals the current one's), as a list — library-independent.
 
-A **registry function** since wave 4 of the operations→functions programme (`PLAN-list-functions`). It takes **no column target** — the `name` / `names` rows of the retired operation are gone, and `split_sibling_length_mismatch(X)` fails to load. It is an **aggregate**: one list for the dataset, computed once per rule and dataset and read by every row. It reads the study inventory; a run whose dataset resolver cannot enumerate the study is a wiring defect and reports a rule **ERROR** (the retired operation answered the empty set there, silently).
+A **registry function**. It takes **no column target** — the `name` / `names` rows of the retired operation are gone, and `split_sibling_length_mismatch(X)` fails to load. It is an **aggregate**: one list for the dataset, computed once per rule and dataset and read by every row. It reads the study inventory; a run whose dataset resolver cannot enumerate the study is a wiring defect and reports a rule **ERROR** (the retired operation answered the empty set there, silently).
 
 **Example**
 
@@ -3416,7 +3400,7 @@ The example above is the complete call.
 
 The domain codes the standard publishes, as a list.
 
-A **registry function** since wave 4 of the operations→functions programme (`PLAN-list-functions`). It takes **no column target** — the `name` / `names` rows of the retired operation are gone, and `standard_domains(X)` fails to load. It is an **aggregate**: one list for the dataset, computed once per rule and dataset and read by every row. It needs the CDISC Library: without one the rule is **SKIPPED** (*"Rule skipped — no Library access"*).
+A **registry function**. It takes **no column target** — the `name` / `names` rows of the retired operation are gone, and `standard_domains(X)` fails to load. It is an **aggregate**: one list for the dataset, computed once per rule and dataset and read by every row. It needs the CDISC Library: without one the rule is **SKIPPED** (*"Rule skipped — no Library access"*).
 
 **Example**
 
@@ -3439,7 +3423,7 @@ The example above is the complete call.
 
 The distinct data-driven SDTM domain codes across the study — the `DOMAIN` cell of each dataset, not its member name — as a list: a split `LB` (`lbch` / `lbhe`) contributes one `LB`, which is what an `RDOMAIN` of `LB` matches; the no-domain datasets (`SUPP--`, `RELREC`) contribute `""`. Each code is **upper-cased** and listed **once after upper-casing**: a `DOMAIN` cell spelled `lb` or `Lb` is the one `LB` in the list (dataset names match ignoring case). To compare a value that may itself be lower case, upper-case it too — `upper(RDOMAIN) not in $study_domains`.
 
-A **registry function** since wave 4 of the operations→functions programme (`PLAN-list-functions`). It takes **no column target** — the `name` / `names` rows of the retired operation are gone, and `study_domains(X)` fails to load. It is an **aggregate**: one list for the dataset, computed once per rule and dataset and read by every row. It reads the study inventory; a run whose dataset resolver cannot enumerate the study is a wiring defect and reports a rule **ERROR** (the retired operation answered the empty set there, silently).
+A **registry function**. It takes **no column target** — the `name` / `names` rows of the retired operation are gone, and `study_domains(X)` fails to load. It is an **aggregate**: one list for the dataset, computed once per rule and dataset and read by every row. It reads the study inventory; a run whose dataset resolver cannot enumerate the study is a wiring defect and reports a rule **ERROR** (the retired operation answered the empty set there, silently).
 
 **Example**
 
@@ -3459,18 +3443,18 @@ The example above is the complete call.
 ## Variable metadata
 
 The `var_*` accessors read the metadata of a variable **of the dataset under evaluation**, so the
-name they take is written **bare**: a qualified literal (`var_label("DM.AGE", "DATA")`,
-`var_core("DM.AGE", "LIBRARY")`) fails to load at every level, naming the bare spelling. Another
+name they take is the variable's own name. A qualified literal (`var_label("DM.AGE")`) names column
+`AGE` of the rule's declared join `DM` — read from the merged table at `DATA`, from the dataset `DM`
+at `DEFINE` / `LIBRARY`; a qualifier naming no join of the rule answers a missing, and a qualified
+name together with `dataset=` fails to load (only the `vlm_*` accessors refuse a qualified name). Another
 dataset's DATA-level label, type, length or format is read with `dataset=`
-(`var_label("AGE", "DATA", dataset="DM")`), whose variable name matches in any letter case.
+(`var_label("AGE", dataset="DM")`), whose variable name matches in any letter case.
 With no level an accessor that has a `DATA` reading reads `DATA`: `var_label()` is the label of the
 variable being iterated, `var_label("AETERM")` that of `AETERM` (in the one-argument form a string
 is the name unless it is a level — `"DATA"`, `"DEFINE"`, `"LIBRARY"`). The name is a **string**: a
 bare column, `var_label(AETERM)`, fails to load in either form, naming `var_label("AETERM")`. An
 accessor with no `DATA` reading (`var_role`, `var_core`, …) must name its level — `var_role()` fails
 to load, naming `var_role("DEFINE")` and `var_role("LIBRARY")`.
-(Until 2026-10-01 a qualified literal was looked up verbatim and answered a missing — at `LIBRARY`
-a false finding on every row of `var_core("DM.AGE", "LIBRARY") != "Req"`.)
 
 ### column_series_metadata
 
@@ -3484,7 +3468,7 @@ Whether a numbered column series (`COVAL1..n`) is **incomplete**: its members ar
 | `name_pattern` | regex | yes | A regular expression over column names |
 | `min_length` | number | no | The length every non-terminal member must reach |
 
-A **registry function** since wave 4b of the operations→functions programme (`PLAN-scalar-metadata-functions`). It is an **aggregate**: one value for the dataset, computed once per rule and dataset and read by every row. Its arguments are read once per call, so each is a **literal** — a column or any other expression there fails to load. The base column is named by a **string** (`"COVAL"`) — its metadata is read, not its values — so a bare `COVAL` fails to load; an invalid `name_pattern` or a non-integer `min_length` fails to load too.
+A **registry function**. It is an **aggregate**: one value for the dataset, computed once per rule and dataset and read by every row. Its arguments are read once per call, so each is a **literal** — a column or any other expression there fails to load. The base column is named by a **string** (`"COVAL"`) — its metadata is read, not its values — so a bare `COVAL` fails to load; an invalid `name_pattern` or a non-integer `min_length` fails to load too.
 
 **Example**
 
@@ -3519,7 +3503,7 @@ Per variable of the current dataset, one metadata attribute — `"label"`, `"dat
 | `name` | string | yes | The attribute: `label`, `data_type`, `length` or `format` |
 | `domain` | string | yes | The dataset to read from, or `"*"` for the whole study |
 
-A **registry function** since wave 4b of the operations→functions programme (`PLAN-scalar-metadata-functions`). It is an **aggregate**: one value for the dataset, computed once per rule and dataset and read by every row. Its arguments are read once per call, so each is a **literal** — a column or any other expression there fails to load. Its one value is the whole **per-variable** answer, which the rule reads variable by variable: a Check comparing `var_label("DATA") != $x` runs once per variable and sees that variable's value (reported in the finding too). It is read **only through a binding** — written inline in a Check it fails to load. `domain` is a **string**, since `"*"` is a pattern, not a dataset; an attribute outside the four fails to load (the retired operation answered nothing, silently). The binding is therefore the rule's **variable cursor** — the one declared exception to *"where `$x` is accepted, the expression it holds is accepted too"* (`PLAN-binding-substitutability` Q5): written inline, the call would be the whole map, not the current variable's value, so it is a load error that says why (*"… is read only through a binding: that binding is the rule's variable cursor (the rule runs once per variable, $x is that variable's value), so the inline call — the whole map, not one value — cannot stand for it"*).
+A **registry function**. It is an **aggregate**: one value for the dataset, computed once per rule and dataset and read by every row. Its arguments are read once per call, so each is a **literal** — a column or any other expression there fails to load. Its one value is the whole **per-variable** answer, which the rule reads variable by variable: a Check comparing `var_label() != $x` runs once per variable and sees that variable's value (reported in the finding too). It is read **only through a binding** — written inline in a Check it fails to load. `domain` is a **string**, since `"*"` is a pattern, not a dataset; an attribute outside the four fails to load (the retired operation answered nothing, silently). The binding is therefore the rule's **variable cursor** — the one declared exception to *"where `$x` is accepted, the expression it holds is accepted too"*: written inline, the call would be the whole map, not the current variable's value, so it is a load error that says why (*"… is read only through a binding: that binding is the rule's variable cursor (the rule runs once per variable, $x is that variable's value), so the inline call — the whole map, not one value — cannot stand for it"*).
 
 **Example**
 
@@ -3528,7 +3512,7 @@ Bindings:
 - name: "$adsl_data_type"
   expression: 'cross_dataset_variable_metadata("data_type", domain="ADSL")'
 Check:
-  expression: 'not empty($adsl_data_type) and var_type("DATA") != $adsl_data_type'
+  expression: 'not empty($adsl_data_type) and var_type() != $adsl_data_type'
 ```
 
 **Minimal — required parameters only**
@@ -3538,7 +3522,7 @@ Bindings:
 - name: "$sdtm_label"
   expression: 'cross_dataset_variable_metadata("label", domain="*")'
 Check:
-  expression: 'not empty($sdtm_label) and var_label("DATA") != $sdtm_label'
+  expression: 'not empty($sdtm_label) and var_label() != $sdtm_label'
 ```
 
 **When there is nothing to answer** — **missing** for a variable the other dataset does not carry, and for every variable when the named dataset is not in the study. `!=` against it fires (a missing is not equal to any value — rulings register `D34a`); `==` is true only against the same missing; an order comparison treats it as the lowest value (`D34 #5`): `X > it` and `it < X` fire, `X < it` does not; `empty()` is true.
@@ -3549,7 +3533,7 @@ Check:
 
 The variables of the current dataset whose declared label is shared by another of its columns, as a list; a blank label is never a duplicate.
 
-A **registry function** since wave 4 of the operations→functions programme (`PLAN-list-functions`). It takes **no column target** — the `name` / `names` rows of the retired operation are gone, and `duplicate_label_variables(X)` fails to load. It is an **aggregate**: one list for the dataset, computed once per rule and dataset and read by every row.
+A **registry function**. It takes **no column target** — the `name` / `names` rows of the retired operation are gone, and `duplicate_label_variables(X)` fails to load. It is an **aggregate**: one list for the dataset, computed once per rule and dataset and read by every row.
 
 **Example**
 
@@ -3572,7 +3556,7 @@ The example above is the complete call.
 
 The variables the CDISC Library marks Expected for this dataset, as a list — for an ADaM dataset, the expected variables of its detected data structure(s), naming templates substituted against the dataset's own columns, and `--` and domain-prefixed names resolved as [`required_variables()`](#required_variables) describes.
 
-A **registry function** since wave 4 of the operations→functions programme (`PLAN-list-functions`). It takes **no column target** — the `name` / `names` rows of the retired operation are gone, and `expected_variables(X)` fails to load. It is an **aggregate**: one list for the dataset, computed once per rule and dataset and read by every row. It needs the CDISC Library: without one the rule is **SKIPPED** (*"Rule skipped — no Library access"*).
+A **registry function**. It takes **no column target** — the `name` / `names` rows of the retired operation are gone, and `expected_variables(X)` fails to load. It is an **aggregate**: one list for the dataset, computed once per rule and dataset and read by every row. It needs the CDISC Library: without one the rule is **SKIPPED** (*"Rule skipped — no Library access"*).
 
 **Example**
 
@@ -3595,7 +3579,7 @@ The example above is the complete call.
 
 The dataset's own column names in declaration order, in the dataset's own spelling, as a list — the "actual" side of a presence or ordering check.
 
-A **registry function** since wave 4 of the operations→functions programme (`PLAN-list-functions`). It takes **no column target** — the `name` / `names` rows of the retired operation are gone, and `get_column_order_from_dataset(X)` fails to load. It is an **aggregate**: one list for the dataset, computed once per rule and dataset and read by every row.
+A **registry function**. It takes **no column target** — the `name` / `names` rows of the retired operation are gone, and `get_column_order_from_dataset(X)` fails to load. It is an **aggregate**: one list for the dataset, computed once per rule and dataset and read by every row.
 
 **Example**
 
@@ -3618,7 +3602,7 @@ The example above is the complete call.
 
 The column order the CDISC Library publishes for this dataset, as a list — the IG-defined variable order for the dataset's domain, the "expected" side of an ordering check.
 
-A **registry function** since wave 4 of the operations→functions programme (`PLAN-list-functions`). It takes **no column target** — the `name` / `names` rows of the retired operation are gone, and `get_column_order_from_library(X)` fails to load. It is an **aggregate**: one list for the dataset, computed once per rule and dataset and read by every row. It needs the CDISC Library: without one the rule is **SKIPPED** (*"Rule skipped — no Library access"*).
+A **registry function**. It takes **no column target** — the `name` / `names` rows of the retired operation are gone, and `get_column_order_from_library(X)` fails to load. It is an **aggregate**: one list for the dataset, computed once per rule and dataset and read by every row. It needs the CDISC Library: without one the rule is **SKIPPED** (*"Rule skipped — no Library access"*).
 
 **Example**
 
@@ -3648,7 +3632,7 @@ Library variables of the current dataset filtered by metadata, intersected with 
 | `key_name` | string | no | The metadata attribute to filter on — a static string literal naming an attribute the Library publishes for a variable (`role`, `core`, `label`, `simpleDatatype`, …); any other name fails to load, naming the attributes that exist |
 | `key_value` | string | no | The value that attribute must have — any **dataset-level** string (a literal, a `$`-binding or the same expression inline; a per-row value fails to load), compared exactly |
 
-A **registry function** since wave 4 of the operations→functions programme (`PLAN-list-functions`). It takes **no column target** — the `name` / `names` rows of the retired operation are gone, and `get_dataset_filtered_variables(X)` fails to load. It is an **aggregate**: one list for the dataset, computed once per rule and dataset and read by every row. It needs the CDISC Library: without one the rule is **SKIPPED** (*"Rule skipped — no Library access"*). Both parameters are read once per call, which is why they must be literals (a column bound there would be read at row 0 and silently stand for every row). A `key_name` the dataset's own Library rows do not carry (`core` on a model-only walk, `role` on an ADaM dataset) is legal and logs a WARNING, because servability is a per-dataset fact.
+A **registry function**. It takes **no column target** — the `name` / `names` rows of the retired operation are gone, and `get_dataset_filtered_variables(X)` fails to load. It is an **aggregate**: one list for the dataset, computed once per rule and dataset and read by every row. It needs the CDISC Library: without one the rule is **SKIPPED** (*"Rule skipped — no Library access"*). Both parameters are read once per call, which is why they must be literals (a column bound there would be read at row 0 and silently stand for every row). A `key_name` the dataset's own Library rows do not carry (`core` on a model-only walk, `role` on an ADaM dataset) is legal and logs a WARNING, because servability is a per-dataset fact.
 
 **Example**
 
@@ -3681,7 +3665,7 @@ The column order of the standard's model for the dataset's observation class, as
 
 It is the **pure SDTM model walk** for the dataset's observation class: the IG's own dataset variables are never merged in. Where an IG runs ahead of the model version it links to, a variable the IG defines for the dataset is therefore **absent** from this list (60 of them at SENDIG 3.0, 5 at SDTMIG 3.3, none at SDTMIG 3.4). `FDA-SD0058` binds it next to the IG list from [`get_dataset_filtered_variables()`](#get_dataset_filtered_variables) and reports such a variable at `WARNING`, a variable in neither list at `ERROR`.
 
-A **registry function** since wave 4 of the operations→functions programme (`PLAN-list-functions`). It takes **no column target** — the `name` / `names` rows of the retired operation are gone, and `get_model_column_order(X)` fails to load. It is an **aggregate**: one list for the dataset, computed once per rule and dataset and read by every row. It needs the CDISC Library: without one the rule is **SKIPPED** (*"Rule skipped — no Library access"*).
+A **registry function**. It takes **no column target** — the `name` / `names` rows of the retired operation are gone, and `get_model_column_order(X)` fails to load. It is an **aggregate**: one list for the dataset, computed once per rule and dataset and read by every row. It needs the CDISC Library: without one the rule is **SKIPPED** (*"Rule skipped — no Library access"*).
 
 **Example**
 
@@ -3712,7 +3696,7 @@ Model variables filtered by metadata, **not** intersected with the dataset's col
 | `key_value` | string | no | The value that attribute must have — any **dataset-level** string (a literal, a `$`-binding or the same expression inline; a per-row value fails to load), compared exactly |
 | `model_class` | string | no | The general-observation class whose model table to walk — a static string literal; `Events`, `Interventions`, `Findings`, `Findings About` in any letter case and spacing (`"EVENTS"`, `" Findings About "`), any other spelling fails to load |
 
-A **registry function** since wave 4 of the operations→functions programme (`PLAN-list-functions`). It takes **no column target** — the `name` / `names` rows of the retired operation are gone, and `get_model_filtered_variables(X)` fails to load. It is an **aggregate**: one list for the dataset, computed once per rule and dataset and read by every row. It needs the CDISC Library: without one the rule is **SKIPPED** (*"Rule skipped — no Library access"*). The three parameters are read once per call and must be literals. A `key_name` the walked rows do not carry (`core` on a model walk of a standard SDTM domain) is legal and logs a WARNING — SUPP--/SQ-- datasets and every ADaM dataset publish `core` on this walk.
+A **registry function**. It takes **no column target** — the `name` / `names` rows of the retired operation are gone, and `get_model_filtered_variables(X)` fails to load. It is an **aggregate**: one list for the dataset, computed once per rule and dataset and read by every row. It needs the CDISC Library: without one the rule is **SKIPPED** (*"Rule skipped — no Library access"*). The three parameters are read once per call and must be literals. A `key_name` the walked rows do not carry (`core` on a model walk of a standard SDTM domain) is legal and logs a WARNING — SUPP--/SQ-- datasets and every ADaM dataset publish `core` on this walk.
 
 **Example**
 
@@ -3747,7 +3731,7 @@ The model column order of the **parent domain named in a column value**, per row
 |---|---|---|---|
 | `name` | column | yes | The column holding the parent domain code (`RDOMAIN`) — a column reference; a quoted name fails to load |
 
-A **registry function** since wave 4 of the operations→functions programme (`PLAN-list-functions`); the retired operation took no argument and always read `RDOMAIN`, so `get_parent_model_column_order()` fails to load — name the column. It needs the CDISC Library: without one the rule is **SKIPPED** (*"Rule skipped — no Library access"*). Unlike the other list functions it answers **per row**: each row reads the list of the parent its own cell names (the lists are computed once per distinct parent). ⭐ **A split parent resolves** (fixed in wave 4, defect D2): when the parent domain is submitted as split members (`LBCH` + `LBHE` for `RDOMAIN = LB`), the list is the union of the members' model column orders, in member-name order (members sorted by dataset name, `LBCH` before `LBHE`), so the list is the same on every run; a dataset named exactly like the parent is used alone when it exists, and a study dataset that cannot be opened is never a member and does not stop the parent resolving — the retired operation looked for a dataset literally named `LB`, found none, and answered nothing for every such row.
+A **registry function**; it takes the column naming the parent — `get_parent_model_column_order()` with no argument fails to load. It needs the CDISC Library: without one the rule is **SKIPPED** (*"Rule skipped — no Library access"*). Unlike the other list functions it answers **per row**: each row reads the list of the parent its own cell names (the lists are computed once per distinct parent). ⭐ **A split parent resolves**: when the parent domain is submitted as split members (`LBCH` + `LBHE` for `RDOMAIN = LB`), the list is the union of the members' model column orders, in member-name order (members sorted by dataset name, `LBCH` before `LBHE`), so the list is the same on every run; a dataset named exactly like the parent is used alone when it exists, and a study dataset that cannot be opened is never a member and does not stop the parent resolving — the retired operation looked for a dataset literally named `LB`, found none, and answered nothing for every such row.
 
 **Example**
 
@@ -3819,14 +3803,14 @@ The variable's library label as a **template**, in the grammar of [`matches_labe
 
 | parameter | type | required | description |
 |---|---|---|---|
-| `x` | column | no | The column to read; defaults to the variable being iterated |
+| `x` | string, or a per-row expression | no | The variable's name as a string (`"AETERM"`) or an expression whose value names it; a bare column fails to load; defaults to the variable being iterated |
 | `level` | level | yes | Which metadata to read — supported here: `LIBRARY` |
 | `stem` | string literal | no | A published `*`-stem (`"*DT"`): read that stem's template instead of the column's own (the stem-selecting form below) |
 
 **Example**
 
 ```yaml
-expression: 'not empty(label_template("LIBRARY")) and not matches_label_template(var_label("DATA"), label_template("LIBRARY"))'
+expression: 'not empty(label_template("LIBRARY")) and not matches_label_template(var_label(), label_template("LIBRARY"))'
 ```
 
 **How the column finds its template.** An ADaM product's variables are keyed by **data structure** (ADSL, BDS, OCCDS …), and the dataset's structures are detected as the `Scope.Data_Structures` gate detects them (the Define-XML declaration first). Within the governing structure the column resolves, in order: by its **literal** name; through a published **index template** — `TRT01P` is `TRTxxP`, `AVALCAT1` is `AVALCATy`, `P02S1SDT` is `PxxSwSDT`, with `xx`/`zz` two digits, `y` any number and `w` one digit; through the **ADSL** structure (an ADSL variable copied into a BDS or OCCDS dataset keeps its ADSL definition); and last through the longest published `*`-**stem** (`XXSDT` is `*SDT`'s, never `*DT`'s). `var_name("LIBRARY")` then names what resolved — the published spelling, the template (`TRTxxP`) or the stem (`*SDT`) — and `var_label("LIBRARY")` the label with the column's digits substituted as whole words (`Planned Treatment for Period 01`). A `*`-stem serves **no label** and no type, only its phrase here, so a rule guarded by `not empty(var_label("LIBRARY"))` never judges a stem column — the stem rules (`CDISC-AD0503`–`AD0520`) read the stem-selecting form below.
@@ -3836,7 +3820,7 @@ expression: 'not empty(label_template("LIBRARY")) and not matches_label_template
 **The stem-selecting form.** `label_template("LIBRARY", stem="*DT")` answers the **named** stem's template when the column's name ends in that stem's suffix and the column is a stem case — no literal, index template or ADSL name claims it — and a **missing** otherwise (a library variable such as `ADT` or `TRTSDT` is governed by its own published label, never by the suffix convention). A nested column answers every stem it ends in: `RANDSDT` is `{Date}` for `stem="*DT"` and `{Start Date}` for `stem="*SDT"`, so each stem rule judges every column its suffix matches with its **own** phrase, and `RANDSDT` is judged by `CDISC-AD0503` and `AD0509` alike. The stem is a string literal rooted at `*` with at least one character after it; any other value, and `stem=` on any other accessor, is a load error. A finding of a rule whose `label_template` reads all name one stem reports **that** stem's template as `library_variable_label_template`; the plain form keeps the column's own template (the longest stem it ends in).
 
 ```yaml
-expression: 'ends_with(upper(varname()), "DT") and not empty(label_template("LIBRARY", stem="*DT")) and not matches_label_template(var_label("DATA"), label_template("LIBRARY", stem="*DT"))'
+expression: 'ends_with(upper(varname()), "DT") and not empty(label_template("LIBRARY", stem="*DT")) and not matches_label_template(var_label(), label_template("LIBRARY", stem="*DT"))'
 ```
 
 **An ADaMIG 1.1 run and ADAE.** ADaMIG 1.1 publishes no occurrence structure; the OCCDS product of the IG's own generation is added for the run (OCCDS 1.0 for ADaMIG 1.1, OCCDS 1.1 for 1.2 and 1.3) unless a product publishing one is declared with `-mp`, and the run log names it. Nothing is added for ADaMIG 1.0 or a TIG leg.
@@ -3847,7 +3831,7 @@ expression: 'ends_with(upper(varname()), "DT") and not empty(label_template("LIB
 
 The natural-key-forming role variables present in the dataset — the Library variables of the dataset's domain whose role is Timing, Record Qualifier, Variable Qualifier, Result Qualifier, Synonym Qualifier or Grouping Qualifier, intersected with the columns present.
 
-A **registry function** since wave 4 of the operations→functions programme (`PLAN-list-functions`). It takes **no column target** — the `name` / `names` rows of the retired operation are gone, and `natural_key_variables(X)` fails to load. It is an **aggregate**: one list for the dataset, computed once per rule and dataset and read by every row. It needs the CDISC Library: without one the rule is **SKIPPED** (*"Rule skipped — no Library access"*).
+A **registry function**. It takes **no column target** — the `name` / `names` rows of the retired operation are gone, and `natural_key_variables(X)` fails to load. It is an **aggregate**: one list for the dataset, computed once per rule and dataset and read by every row. It needs the CDISC Library: without one the rule is **SKIPPED** (*"Rule skipped — no Library access"*).
 
 **Example**
 
@@ -3872,7 +3856,7 @@ The variables the CDISC Library marks Required (`Req`) for this dataset, as a li
 
 **An ADaM occurrence dataset's domain-bound names.** An occurrence structure publishes the variables it copies from an SDTM domain as `--` names (`--SEQ`, `--TERM`), and the base OCCDS structures mix the AE and CM conventions (`CMTRT` and `AESER` are both Required in OCCDS 1.0). The dataset's **source domains** come from the occurrence variables it carries, as ADaMIG-OCCDS says (*"the 2-letter prefix of the variable name is the SDTM domain name"*), never from its name: a domain is named only by its sequence or topic variable — every column named a two-letter prefix plus `SEQ`, `TERM` or `TRT` (letter case ignored) names its prefix, so `AESEQ` and `AETERM` both name `AE` — while a `--DECOD` column alone names nothing (an ADSL `DCDECOD` copied onto an `ADAE` does not make it a two-domain dataset), and neither do `ASEQ`, `SRCSEQ` or timing variables. With **one** domain a `--` name resolves to it and is listed whether or not the column is present: an `ADAE` with `AETERM` and no `AESEQ` is asked for `AESEQ`. With **several** (a multi-domain dataset, for which the IG offers `--SEQ` per domain or `SRCDOM` / `SRCSEQ`) or **none**, no `--` name is listed: the function never names a variable it cannot tie to one domain. A name that carries a domain's prefix — its published description opens with that domain's source token (`CMTRT`: `CM.CMTRT`) — is left out only when the dataset's occurrence variables name other domains and not that one, so an `ADAE` whose variables name `AE` is not asked for `CMTRT`; a dataset with no occurrence variable at all is still asked for every such name, so a missing column never hides its own requirement. ADSL, BDS and TTE publish no such names.
 
-A **registry function** since wave 4 of the operations→functions programme (`PLAN-list-functions`). It takes **no column target** — the `name` / `names` rows of the retired operation are gone, and `required_variables(X)` fails to load. It is an **aggregate**: one list for the dataset, computed once per rule and dataset and read by every row. It needs the CDISC Library: without one the rule is **SKIPPED** (*"Rule skipped — no Library access"*).
+A **registry function**. It takes **no column target** — the `name` / `names` rows of the retired operation are gone, and `required_variables(X)` fails to load. It is an **aggregate**: one list for the dataset, computed once per rule and dataset and read by every row. It needs the CDISC Library: without one the rule is **SKIPPED** (*"Rule skipped — no Library access"*).
 
 **Example**
 
@@ -3891,13 +3875,13 @@ The example above is the complete call.
 
 ### var_ccode
 
-`var_ccode(x, "DEFINE")` → **value**
+`var_ccode([x,] level)` → **value**
 
 The NCI C-code of the bound codelist; `DEFINE` and `LIBRARY` only
 
 | parameter | type | required | description |
 |---|---|---|---|
-| `x` | column | no | The column to read; defaults to the variable being iterated |
+| `x` | string, or a per-row expression | no | The variable's name as a string (`"AETERM"`) or an expression whose value names it; a bare column fails to load; defaults to the variable being iterated |
 | `level` | level | yes | Which metadata to read — supported here: `DEFINE/LIBRARY` |
 
 **Example**
@@ -3914,7 +3898,7 @@ The name of the codelist bound to the variable; `DEFINE` and `LIBRARY` only
 
 | parameter | type | required | description |
 |---|---|---|---|
-| `x` | column | no | The column to read; defaults to the variable being iterated |
+| `x` | string, or a per-row expression | no | The variable's name as a string (`"AETERM"`) or an expression whose value names it; a bare column fails to load; defaults to the variable being iterated |
 | `level` | level | yes | Which metadata to read — supported here: `DEFINE/LIBRARY` |
 
 **Example**
@@ -3925,13 +3909,13 @@ expression: 'not empty(var_codelist("LIBRARY"))'
 
 ### var_codelist_coded_codes
 
-`var_codelist_coded_codes(x, level)` → **value**
+`var_codelist_coded_codes([x,] level)` → **value**
 
 The codes of the bound codelist's terms, as a list; `DEFINE` and `LIBRARY` only
 
 | parameter | type | required | description |
 |---|---|---|---|
-| `x` | column | no | The column to read; defaults to the variable being iterated |
+| `x` | string, or a per-row expression | no | The variable's name as a string (`"AETERM"`) or an expression whose value names it; a bare column fails to load; defaults to the variable being iterated |
 | `level` | level | yes | Which metadata to read — supported here: `DEFINE/LIBRARY` |
 
 **Example**
@@ -3942,13 +3926,13 @@ expression: 'not empty(var_codelist_coded_codes("LIBRARY"))'
 
 ### var_codelist_coded_values
 
-`var_codelist_coded_values(x, level)` → **value**
+`var_codelist_coded_values([x,] level)` → **value**
 
 The submission values of the bound codelist's terms, as a list; `DEFINE` and `LIBRARY` only
 
 | parameter | type | required | description |
 |---|---|---|---|
-| `x` | column | no | The column to read; defaults to the variable being iterated |
+| `x` | string, or a per-row expression | no | The variable's name as a string (`"AETERM"`) or an expression whose value names it; a bare column fails to load; defaults to the variable being iterated |
 | `level` | level | yes | Which metadata to read — supported here: `DEFINE/LIBRARY` |
 
 **Example**
@@ -3959,13 +3943,13 @@ expression: 'not empty(var_codelist_coded_values("LIBRARY"))'
 
 ### var_codelist_extended_values
 
-`var_codelist_extended_values(x, "DEFINE")` → **value**
+`var_codelist_extended_values([x,] "DEFINE")` → **value**
 
 The sponsor-added values of an extended codelist, as a list; `DEFINE` only
 
 | parameter | type | required | description |
 |---|---|---|---|
-| `x` | column | no | The column to read; defaults to the variable being iterated |
+| `x` | string, or a per-row expression | no | The variable's name as a string (`"AETERM"`) or an expression whose value names it; a bare column fails to load; defaults to the variable being iterated |
 | `level` | level | yes | Which metadata to read — supported here: `DEFINE` |
 
 **Example**
@@ -3976,13 +3960,13 @@ expression: 'not empty(var_codelist_extended_values("DEFINE"))'
 
 ### var_codelist_extensible
 
-`var_codelist_extensible(x, "LIBRARY")` → **value**
+`var_codelist_extensible([x,] "LIBRARY")` → **value**
 
 Whether the bound codelist is extensible; `LIBRARY` only
 
 | parameter | type | required | description |
 |---|---|---|---|
-| `x` | column | no | The column to read; defaults to the variable being iterated |
+| `x` | string, or a per-row expression | no | The variable's name as a string (`"AETERM"`) or an expression whose value names it; a bare column fails to load; defaults to the variable being iterated |
 | `level` | level | yes | Which metadata to read — supported here: `LIBRARY` |
 
 **Example**
@@ -3999,7 +3983,7 @@ The variable's core designation — Required, Expected or Permissible; `DEFINE` 
 
 | parameter | type | required | description |
 |---|---|---|---|
-| `x` | column | no | The column to read; defaults to the variable being iterated |
+| `x` | string, or a per-row expression | no | The variable's name as a string (`"AETERM"`) or an expression whose value names it; a bare column fails to load; defaults to the variable being iterated |
 | `level` | level | yes | Which metadata to read — supported here: `DEFINE/LIBRARY` |
 
 **Example**
@@ -4010,13 +3994,13 @@ expression: 'var_core("LIBRARY") == "Perm"'
 
 ### var_external_dictionary
 
-`var_external_dictionary(x, "DEFINE")` → **value**
+`var_external_dictionary([x,] "DEFINE")` → **value**
 
 The external dictionary the variable is coded against; `DEFINE` only
 
 | parameter | type | required | description |
 |---|---|---|---|
-| `x` | column | no | The column to read; defaults to the variable being iterated |
+| `x` | string, or a per-row expression | no | The variable's name as a string (`"AETERM"`) or an expression whose value names it; a bare column fails to load; defaults to the variable being iterated |
 | `level` | level | yes | Which metadata to read — supported here: `DEFINE` |
 
 **Example**
@@ -4027,13 +4011,13 @@ expression: 'var_name("DEFINE") in ["LBTOX", "LBTOXGR"] and empty(var_external_d
 
 ### var_external_dictionary_version
 
-`var_external_dictionary_version(x, "DEFINE")` → **value**
+`var_external_dictionary_version([x,] "DEFINE")` → **value**
 
 The version of that external dictionary; `DEFINE` only
 
 | parameter | type | required | description |
 |---|---|---|---|
-| `x` | column | no | The column to read; defaults to the variable being iterated |
+| `x` | string, or a per-row expression | no | The variable's name as a string (`"AETERM"`) or an expression whose value names it; a bare column fails to load; defaults to the variable being iterated |
 | `level` | level | yes | Which metadata to read — supported here: `DEFINE` |
 
 **Example**
@@ -4050,24 +4034,24 @@ The variable's display format; `DATA` and `DEFINE` only
 
 | parameter | type | required | description |
 |---|---|---|---|
-| `x` | column | no | The column to read; defaults to the variable being iterated |
+| `x` | string, or a per-row expression | no | The variable's name as a string (`"AETERM"`) or an expression whose value names it; a bare column fails to load; defaults to the variable being iterated |
 | `level` | level | no | Which metadata to read — supported here: `DATA/DEFINE` — omitted, it reads `DATA` (`var_format()`, `var_format("AETERM")`) |
 
 **Example**
 
 ```yaml
-expression: 'empty(var_format("DATA"))'
+expression: 'empty(var_format())'
 ```
 
 ### var_has_codelist
 
-`var_has_codelist(x, "DEFINE")` → **value**
+`var_has_codelist([x,] "DEFINE")` → **value**
 
 Whether the variable binds a codelist at all; `DEFINE` only
 
 | parameter | type | required | description |
 |---|---|---|---|
-| `x` | column | no | The column to read; defaults to the variable being iterated |
+| `x` | string, or a per-row expression | no | The variable's name as a string (`"AETERM"`) or an expression whose value names it; a bare column fails to load; defaults to the variable being iterated |
 | `level` | level | yes | Which metadata to read — supported here: `DEFINE` |
 
 **Example**
@@ -4078,13 +4062,13 @@ expression: 'var_has_codelist("DEFINE") == true'
 
 ### var_has_comment
 
-`var_has_comment(x, "DEFINE")` → **value**
+`var_has_comment([x,] "DEFINE")` → **value**
 
 Whether Define-XML attaches a comment to the variable; `DEFINE` only
 
 | parameter | type | required | description |
 |---|---|---|---|
-| `x` | column | no | The column to read; defaults to the variable being iterated |
+| `x` | string, or a per-row expression | no | The variable's name as a string (`"AETERM"`) or an expression whose value names it; a bare column fails to load; defaults to the variable being iterated |
 | `level` | level | yes | Which metadata to read — supported here: `DEFINE` |
 
 **Example**
@@ -4095,13 +4079,13 @@ expression: 'not empty(var_name("DEFINE")) and var_has_comment("DEFINE") == fals
 
 ### var_has_method
 
-`var_has_method(x, "DEFINE")` → **value**
+`var_has_method([x,] "DEFINE")` → **value**
 
 Whether Define-XML attaches a derivation method to the variable; `DEFINE` only
 
 | parameter | type | required | description |
 |---|---|---|---|
-| `x` | column | no | The column to read; defaults to the variable being iterated |
+| `x` | string, or a per-row expression | no | The variable's name as a string (`"AETERM"`) or an expression whose value names it; a bare column fails to load; defaults to the variable being iterated |
 | `level` | level | yes | Which metadata to read — supported here: `DEFINE` |
 
 **Example**
@@ -4112,13 +4096,13 @@ expression: 'var_has_method("DEFINE") == false'
 
 ### var_has_value_list
 
-`var_has_value_list(x, "DEFINE")` → **value**
+`var_has_value_list([x,] "DEFINE")` → **value**
 
 Whether Define-XML documents the variable per value — its `ItemDef` carries a `def:ValueListRef`; `DEFINE` only. Missing for a variable the define does not declare.
 
 | parameter | type | required | description |
 |---|---|---|---|
-| `x` | column | no | The column to read; defaults to the variable being iterated |
+| `x` | string, or a per-row expression | no | The variable's name as a string (`"AETERM"`) or an expression whose value names it; a bare column fails to load; defaults to the variable being iterated |
 | `level` | level | yes | Which metadata to read — supported here: `DEFINE` |
 
 **Example**
@@ -4135,13 +4119,13 @@ The variable's label; available at every level
 
 | parameter | type | required | description |
 |---|---|---|---|
-| `x` | column | no | The column to read; defaults to the variable being iterated |
+| `x` | string, or a per-row expression | no | The variable's name as a string (`"AETERM"`) or an expression whose value names it; a bare column fails to load; defaults to the variable being iterated |
 | `level` | level | no | Which metadata to read — supported here: `DATA/DEFINE/LIBRARY` — omitted, it reads `DATA` (`var_label()`, `var_label("AETERM")`) |
 
 **Example**
 
 ```yaml
-expression: 'var_label("DATA") =~ /^[a-z]/'
+expression: 'var_label() =~ /^[a-z]/'
 ```
 
 **At `LIBRARY`, a dataset whose domain the run's IG does not define has no label** — nor a codelist, core designation or ordinal: the SDTM model's labels are class-level ones, not the label a standard gives the domain, and a sponsor may adjust the labels of a domain it defines. A rule guarded by `not empty(var_label("LIBRARY"))` therefore does not judge such a dataset. Its name, data type and role do come from the model (see [`var_type`](#var_type)).
@@ -4156,24 +4140,24 @@ The variable's declared length; available at every level
 
 | parameter | type | required | description |
 |---|---|---|---|
-| `x` | column | no | The column to read; defaults to the variable being iterated |
+| `x` | string, or a per-row expression | no | The variable's name as a string (`"AETERM"`) or an expression whose value names it; a bare column fails to load; defaults to the variable being iterated |
 | `level` | level | no | Which metadata to read — supported here: `DATA/DEFINE/LIBRARY` — omitted, it reads `DATA` (`var_length()`, `var_length("AETERM")`) |
 
 **Example**
 
 ```yaml
-expression: 'var_length("DATA") > 200'
+expression: 'var_length() > 200'
 ```
 
 ### var_mandatory
 
-`var_mandatory(x, "DEFINE")` → **value**
+`var_mandatory([x,] "DEFINE")` → **value**
 
 Whether Define-XML marks the variable mandatory; `DEFINE` only
 
 | parameter | type | required | description |
 |---|---|---|---|
-| `x` | column | no | The column to read; defaults to the variable being iterated |
+| `x` | string, or a per-row expression | no | The variable's name as a string (`"AETERM"`) or an expression whose value names it; a bare column fails to load; defaults to the variable being iterated |
 | `level` | level | yes | Which metadata to read — supported here: `DEFINE` |
 
 **Example**
@@ -4190,7 +4174,7 @@ The variable's name; available at every level
 
 | parameter | type | required | description |
 |---|---|---|---|
-| `x` | column | no | The column to read; defaults to the variable being iterated |
+| `x` | string, or a per-row expression | no | The variable's name as a string (`"AETERM"`) or an expression whose value names it; a bare column fails to load; defaults to the variable being iterated |
 | `level` | level | no | Which metadata to read — supported here: `DATA/DEFINE/LIBRARY` — omitted, it reads `DATA` (`var_name()`, `var_name("AETERM")`) |
 
 **Example**
@@ -4209,7 +4193,7 @@ The variable's position in the declared column order; available at every level
 
 | parameter | type | required | description |
 |---|---|---|---|
-| `x` | column | no | The column to read; defaults to the variable being iterated |
+| `x` | string, or a per-row expression | no | The variable's name as a string (`"AETERM"`) or an expression whose value names it; a bare column fails to load; defaults to the variable being iterated |
 | `level` | level | no | Which metadata to read — supported here: `DATA/DEFINE/LIBRARY` — omitted, it reads `DATA` (`var_ordinal()`, `var_ordinal("AETERM")`) |
 
 **Example**
@@ -4220,13 +4204,13 @@ expression: 'var_ordinal("DEFINE")'
 
 ### var_origin_type
 
-`var_origin_type(x, "DEFINE")` → **value**
+`var_origin_type([x,] "DEFINE")` → **value**
 
 The variable's Define-XML origin type — Collected, Derived and so on; `DEFINE` only
 
 | parameter | type | required | description |
 |---|---|---|---|
-| `x` | column | no | The column to read; defaults to the variable being iterated |
+| `x` | string, or a per-row expression | no | The variable's name as a string (`"AETERM"`) or an expression whose value names it; a bare column fails to load; defaults to the variable being iterated |
 | `level` | level | yes | Which metadata to read — supported here: `DEFINE` |
 
 **Example**
@@ -4243,7 +4227,7 @@ The variable's role — identifier, topic, qualifier and so on; `DEFINE` and `LI
 
 | parameter | type | required | description |
 |---|---|---|---|
-| `x` | column | no | The column to read; defaults to the variable being iterated |
+| `x` | string, or a per-row expression | no | The variable's name as a string (`"AETERM"`) or an expression whose value names it; a bare column fails to load; defaults to the variable being iterated |
 | `level` | level | yes | Which metadata to read — supported here: `DEFINE/LIBRARY` |
 
 **Example**
@@ -4262,13 +4246,13 @@ The variable's data type; available at every level
 
 | parameter | type | required | description |
 |---|---|---|---|
-| `x` | column | no | The column to read; defaults to the variable being iterated |
+| `x` | string, or a per-row expression | no | The variable's name as a string (`"AETERM"`) or an expression whose value names it; a bare column fails to load; defaults to the variable being iterated |
 | `level` | level | no | Which metadata to read — supported here: `DATA/DEFINE/LIBRARY` — omitted, it reads `DATA` (`var_type()`, `var_type("AETERM")`) |
 
 **Example**
 
 ```yaml
-expression: 'var_type("DATA") != "Num"'
+expression: 'var_type() != "Num"'
 ```
 
 **At `LIBRARY`, a dataset whose domain the run's IG does not define** — a sponsor-defined domain, or a standard one the IG leaves out (at SENDIG-AR 1.0 every SEND domain but DM, CM, FA and MH; at SENDIG-DART 1.1 EG, PM, TF, VS, CV and RE) — takes its data type from the SDTM model's variable of the observation class the scope matcher gives the dataset. If no class places the dataset, if the class is a special-purpose, trial-design or relationship one, or if the model has no such variable (a sponsor's own variable), there is no value, as for any variable the Library does not know.
@@ -4279,7 +4263,7 @@ expression: 'var_type("DATA") != "Num"'
 
 Every variable name the standard publishes, across all of its datasets, as a list — the standard's whole variable vocabulary, not the current dataset's.
 
-A **registry function** since wave 4 of the operations→functions programme (`PLAN-list-functions`). It takes **no column target** — the `name` / `names` rows of the retired operation are gone, and `variable_names(X)` fails to load. It is an **aggregate**: one list for the dataset, computed once per rule and dataset and read by every row. It needs the CDISC Library: without one the rule is **SKIPPED** (*"Rule skipped — no Library access"*).
+A **registry function**. It takes **no column target** — the `name` / `names` rows of the retired operation are gone, and `variable_names(X)` fails to load. It is an **aggregate**: one list for the dataset, computed once per rule and dataset and read by every row. It needs the CDISC Library: without one the rule is **SKIPPED** (*"Rule skipped — no Library access"*).
 
 **Example**
 
@@ -4309,7 +4293,7 @@ metadata is not served. (Until 2026-10-01 it never matched a value-level definit
 
 The dataset names the Define-XML declares, upper-cased, as a list.
 
-A **registry function** since wave 4 of the operations→functions programme (`PLAN-list-functions`). It takes **no column target** — the `name` / `names` rows of the retired operation are gone, and `define_dataset_names(X)` fails to load. It is an **aggregate**: one list for the dataset, computed once per rule and dataset and read by every row. It needs the sponsor Define-XML: without one the rule is **SKIPPED** before any row is read.
+A **registry function**. It takes **no column target** — the `name` / `names` rows of the retired operation are gone, and `define_dataset_names(X)` fails to load. It is an **aggregate**: one list for the dataset, computed once per rule and dataset and read by every row. It needs the sponsor Define-XML: without one the rule is **SKIPPED** before any row is read.
 
 **Example**
 
@@ -4332,7 +4316,7 @@ The example above is the complete call.
 
 The key variables the Define-XML declares for the current dataset's domain, in key order, as a list.
 
-A **registry function** since wave 4 of the operations→functions programme (`PLAN-list-functions`). It takes **no column target** — the `name` / `names` rows of the retired operation are gone, and `define_key_variables(X)` fails to load. It is an **aggregate**: one list for the dataset, computed once per rule and dataset and read by every row. It needs the sponsor Define-XML: without one the rule is **SKIPPED** before any row is read.
+A **registry function**. It takes **no column target** — the `name` / `names` rows of the retired operation are gone, and `define_key_variables(X)` fails to load. It is an **aggregate**: one list for the dataset, computed once per rule and dataset and read by every row. It needs the sponsor Define-XML: without one the rule is **SKIPPED** before any row is read.
 
 **Example**
 
@@ -4399,7 +4383,7 @@ Define-XML the rule is SKIPPED.
 
 The Define-XML ItemDef names for the current dataset's domain, in Define order, as a list.
 
-A **registry function** since wave 4 of the operations→functions programme (`PLAN-list-functions`). It takes **no column target** — the `name` / `names` rows of the retired operation are gone, and `define_variable_names(X)` fails to load. It is an **aggregate**: one list for the dataset, computed once per rule and dataset and read by every row. It needs the sponsor Define-XML: without one the rule is **SKIPPED** before any row is read.
+A **registry function**. It takes **no column target** — the `name` / `names` rows of the retired operation are gone, and `define_variable_names(X)` fails to load. It is an **aggregate**: one list for the dataset, computed once per rule and dataset and read by every row. It needs the sponsor Define-XML: without one the rule is **SKIPPED** before any row is read.
 
 **Example**
 
@@ -4728,7 +4712,7 @@ The terms of the named CT codelists, in the representation `level=` / `returntyp
 | `level` | string | yes | `"term"` reads the terms of each codelist; `"codelist"` reads the codelist's own entry. Any other value fails to load |
 | `returntype` | string | no | Which attribute to return: `"value"` (submission value), `"code"` (NCI concept id, the C-code), `"pref_term"` (NCI preferred term) or `"synonym"` (the CDISC synonyms — every synonym of every term at `level="term"`, the codelist's own at `level="codelist"`). Any other value fails to load. Absent: `code` at `level="term"`, `value` at `level="codelist"` |
 
-A **registry function** since wave 4 of the operations→functions programme (`PLAN-list-functions`). It takes **no column target** — the `name` / `names` rows of the retired operation are gone, and `codelist_terms(X)` fails to load. It is an **aggregate**: one list for the dataset, computed once per rule and dataset and read by every row. It needs the CDISC Library: without one the rule is **SKIPPED** (*"Rule skipped — no Library access"*). The three parameters are read once per call and must be literals — a bare `codelists=[DOMAIN]` names the `DOMAIN` column and fails to load, naming the quoted spelling. The eight `level` × `returntype` shapes: `term`/`value` the terms' submission values · `term`/`code` their C-codes · `term`/`pref_term` their preferred terms · `term`/`synonym` their CDISC synonyms, flattened in Library order without repeats (a term without synonyms contributes nothing) · `codelist`/`value` the codelist's own submission value · `codelist`/`code` its C-code · `codelist`/`pref_term` its preferred term · `codelist`/`synonym` its own synonyms. A synonym can equal a submission value — of its own term or of another one — so a rule that asks "a known synonym, not a submission value" writes both tests: `X not in $values and X in $synonyms`. ⚠ Compare the representation the other operand really carries: a codelist compared against 2-character submission values wants `"value"`, one compared against `C…` codes wants `"code"`.
+A **registry function**. It takes **no column target** — the `name` / `names` rows of the retired operation are gone, and `codelist_terms(X)` fails to load. It is an **aggregate**: one list for the dataset, computed once per rule and dataset and read by every row. It needs the CDISC Library: without one the rule is **SKIPPED** (*"Rule skipped — no Library access"*). The three parameters are read once per call and must be literals — a bare `codelists=[DOMAIN]` names the `DOMAIN` column and fails to load, naming the quoted spelling. The eight `level` × `returntype` shapes: `term`/`value` the terms' submission values · `term`/`code` their C-codes · `term`/`pref_term` their preferred terms · `term`/`synonym` their CDISC synonyms, flattened in Library order without repeats (a term without synonyms contributes nothing) · `codelist`/`value` the codelist's own submission value · `codelist`/`code` its C-code · `codelist`/`pref_term` its preferred term · `codelist`/`synonym` its own synonyms. A synonym can equal a submission value — of its own term or of another one — so a rule that asks "a known synonym, not a submission value" writes both tests: `X not in $values and X in $synonyms`. ⚠ Compare the representation the other operand really carries: a codelist compared against 2-character submission values wants `"value"`, one compared against `C…` codes wants `"code"`.
 
 **Example**
 
@@ -4772,7 +4756,7 @@ Check:
 
 `dictionary_available(type)` → **boolean**
 
-The external-dictionary availability gate: `true` on every row when a dictionary of the named type is loaded for the run, else `false`. The loader injects it as a Precondition for every inline `valid_external_dictionary_*` call, so a rule whose dictionary is not supplied SKIPs instead of passing; a declared (`$`-bound) dictionary function needs no gate, because the runner skips the rule from the function's own dictionary need. (The `dictionary_available(external_dictionary_type=…)` **operation** form was deleted by wave 1 of the operation→function programme; only this builtin remains.)
+The external-dictionary availability gate: `true` on every row when a dictionary of the named type is loaded for the run, else `false`. The loader injects it as a Precondition for every inline `valid_external_dictionary_*` call, so a rule whose dictionary is not supplied SKIPs instead of passing; a declared (`$`-bound) dictionary function needs no gate, because the runner skips the rule from the function's own dictionary need.
 
 | parameter | type | required | description |
 |---|---|---|---|
@@ -4799,7 +4783,7 @@ Decode presence against an external dictionary: `true` on a row whose code has *
 | `external_dictionary_type` | string | yes | Which external dictionary to check against — a string literal (`"whodrug"`) |
 | `case_sensitive` | boolean | no | Default `true`; only `false` folds case. Any **dataset-level** boolean — a literal, a `$`-binding or the same expression inline; a per-row value fails to load |
 
-`name` is a **column reference**; a quoted name fails to load, and an absent column answers `false` on every row. The dictionary type must be a static string literal: the function declares the dictionary it needs from it, so a rule whose dictionary is not loaded reports **SKIPPED** — never a finding, never a silent pass — before any row is read, and a run's provider forecast lists the type. Reached without its dictionary the function reports a rule ERROR, never `false`. (Until wave 3 of the operation→function programme this was an operation.)
+`name` is a **column reference**; a quoted name fails to load, and an absent column answers `false` on every row. The dictionary type must be a static string literal: the function declares the dictionary it needs from it, so a rule whose dictionary is not loaded reports **SKIPPED** — never a finding, never a silent pass — before any row is read, and a run's provider forecast lists the type. Reached without its dictionary the function reports a rule ERROR, never `false`.
 
 **Example**
 
@@ -4829,10 +4813,8 @@ answer is the order-preserving union over all rows — **one list for the datase
 | `version` | any | yes | The column holding the per-row CT version (`TSVCDVER`) |
 | `ct_attribute` | string | yes | Which CT-package attribute to extract, e.g. `"Term CCODE"` |
 
-A **registry function** since PLAN-binding-expressions (wave 0 of the operations→functions
-programme): the version column is the second positional argument — a column reference, **not** the
-quoted `version="TSVCDVER"` of the retired operation, which would now be the string literal
-`"TSVCDVER"`. It is an **aggregate**: it folds every row of the dataset whichever row reads it, and
+A **registry function**: the version column is the second positional argument — a column reference;
+a quoted `version="TSVCDVER"` is the string literal `"TSVCDVER"`, never a column. It is an **aggregate**: it folds every row of the dataset whichever row reads it, and
 it is computed once per rule and dataset. It needs the CDISC Library.
 
 **Example**
@@ -4896,7 +4878,7 @@ The publication dates of the CT packages the Library publishes for the applicabl
 |---|---|---|---|
 | `ct_package_types` | list of strings | no | The CT package families to consider — any **dataset-level** list of strings: a list literal of string literals (`["SDTM"]`, `["SDTM", "ADAM"]`), a `$`-binding holding one, or the same expression inline (a family maps to its package type by lower-casing and appending `ct`). Omitted: the families of the rule's standard — `sdtmig` ⇒ SDTM CT, `sendig` ⇒ SEND CT, `cdashig` ⇒ CDASH CT, `adamig` ⇒ SDTM + ADaM CT, `usdm` ⇒ DDF + SDTM CT |
 
-A **registry function** since wave 4 of the operations→functions programme (`PLAN-list-functions`). It takes **no column target** — the `name` / `names` rows of the retired operation are gone, and `valid_codelist_dates(X)` fails to load. It is an **aggregate**: one list for the dataset, computed once per rule and dataset and read by every row. It needs the CDISC Library: without one the rule is **SKIPPED** (*"Rule skipped — no Library access"*). The list is read once per call and must be a list literal of string literals — a bare `[SDTM]` names a column and fails to load, naming the quoted spelling.
+A **registry function**. It takes **no column target** — the `name` / `names` rows of the retired operation are gone, and `valid_codelist_dates(X)` fails to load. It is an **aggregate**: one list for the dataset, computed once per rule and dataset and read by every row. It needs the CDISC Library: without one the rule is **SKIPPED** (*"Rule skipped — no Library access"*). The list is read once per call and must be a list literal of string literals — a bare `[SDTM]` names a column and fails to load, naming the quoted spelling.
 
 **Example**
 
@@ -4934,7 +4916,7 @@ Code validity against an external dictionary: `true` on a row whose value is a m
 | `dictionary_term_type` | string | yes | Which level of the dictionary to check. A static string literal — anything else fails to load |
 | `case_sensitive` | boolean | no | Default `true` (the preferred case); `false` accepts any case. Any **dataset-level** boolean — a literal, a `$`-binding or the same expression inline; a per-row value fails to load |
 
-`name` is a **column reference**; a quoted name fails to load, and an absent column is a column of blanks (valid on every row). The dictionary type must be a static string literal: the function declares the dictionary it needs from it, so a rule whose dictionary is not loaded reports **SKIPPED** — never a finding, never a silent pass — before any row is read, and a run's provider forecast lists the type. Reached without its dictionary the function reports a rule ERROR, never `false`. (Until wave 3 of the operation→function programme this was an operation.)
+`name` is a **column reference**; a quoted name fails to load, and an absent column is a column of blanks (valid on every row). The dictionary type must be a static string literal: the function declares the dictionary it needs from it, so a rule whose dictionary is not loaded reports **SKIPPED** — never a finding, never a silent pass — before any row is read, and a run's provider forecast lists the type. Reached without its dictionary the function reports a rule ERROR, never `false`.
 
 **Example**
 
@@ -4969,7 +4951,7 @@ Code↔decode pairing against an external dictionary: `true` on a row whose code
 | `external_dictionary_type` | string | yes | Which external dictionary to check against — a string literal (`"unii"`, `"snomed"`, `"medrt"`, `"neoplasm"`) |
 | `case_sensitive` | boolean | no | Whether the comparison is case-sensitive; default `true` (compares verbatim). Only `false` folds case. Any **dataset-level** boolean — a literal, a `$`-binding or the same expression inline; a per-row value fails to load |
 
-Both column parameters are **column references**; a quoted name (`external_dictionary_term_variable="TSVAL"`) is a string literal and fails to load, and a call without the term column fails to load. The dictionary type must be a string literal: the function declares the dictionary it needs from it, so a rule whose dictionary is not loaded reports **SKIPPED** — never a finding, never a silent pass — before any row is read, and a run's provider forecast lists the type. (Until wave 1 of the operation→function programme this was an operation taking `external_dictionary_term_variable="TSVAL"` as a quoted string.)
+Both column parameters are **column references**; a quoted name (`external_dictionary_term_variable="TSVAL"`) is a string literal and fails to load, and a call without the term column fails to load. The dictionary type must be a string literal: the function declares the dictionary it needs from it, so a rule whose dictionary is not loaded reports **SKIPPED** — never a finding, never a silent pass — before any row is read, and a run's provider forecast lists the type.
 
 **Example**
 
@@ -5009,7 +4991,7 @@ Hierarchy ancestor test against an external dictionary: `true` on a row whose ch
 
 Both column parameters are **column references**: the `--` in `--HLT` / `--SOC` is resolved like any other variable name, and a quoted name (`dictionary_parent="--SOC"`) is a string literal and fails to load. The dictionary type must be a string literal; a rule whose dictionary is not loaded reports **SKIPPED** before any row is read.
 
-**The level of each column decides the lookup.** A MedDRA name can sit at more than one level (a PT name can also be an HLT or an LLT name), so the dictionary is read at the level of the variable — child **and** parent — derived from the column's name when the rule loads: `--DECOD` is the PT, `--LLT`, `--HLT`, `--HLGT`, `--SOC` their levels, and `--PTCD`, `--LLTCD`, `--HLTCD`, `--HLGTCD`, `--SOCCD` the code levels. The path is the **primary** one: a PT (or its code) lies under its one primary HLT, HLGT and SOC, an LLT under its PT's path, an HLT / HLGT under the SOCs it reaches primarily — so `valid_external_dictionary_hierarchy(--DECOD, --SOC, external_dictionary_type="meddra")` is `false` for a secondary SOC, and an HLT name in `--SOC` is no SOC. `--BODSYS` maps to no level (it may hold a secondary SOC). **A column that names no MedDRA level fails to load** — `--BODSYS`, a `$`-binding or a computed operand in either position: there is no level to read the dictionary at. **The MedDRA house file must carry the level-scoped section** (`hierarchy_by_level`, written by the dictionary converter: PT, HLT and HLGT and their codes, never LLT). On a file converted before that section existed, or for a child level the section lacks (`--LLT`, `--LLTCD`), the rule reports **SKIPPED** with the reason — *"external dictionary meddra cannot answer the HLT → SOC hierarchy: its house file has no level-scoped hierarchy (hierarchy_by_level) — it was converted before this release; re-install meddra to re-convert it"* — while the file's membership and pair rules still answer, and the run's `Dictionary_Basis` names the file. Re-installing MedDRA re-converts it (an install without the section succeeds with a warning naming the gap). There is no bare-name fallback for MedDRA (runbook W4 DI2). ⚠ **The level-scoped read, the load error for a column naming no level and the stale-file SKIP are MedDRA's only**: on any other `external_dictionary_type` (`whodrug`, …) the call reads that dictionary's bare-name `hierarchy` map at any column, exactly as before runbook W4 (W4 fold).
+**The level of each column decides the lookup.** A MedDRA name can sit at more than one level (a PT name can also be an HLT or an LLT name), so the dictionary is read at the level of the variable — child **and** parent — derived from the column's name when the rule loads: `--DECOD` is the PT, `--LLT`, `--HLT`, `--HLGT`, `--SOC` their levels, and `--PTCD`, `--LLTCD`, `--HLTCD`, `--HLGTCD`, `--SOCCD` the code levels. The path is the **primary** one: a PT (or its code) lies under its one primary HLT, HLGT and SOC, an LLT under its PT's path, an HLT / HLGT under the SOCs it reaches primarily — so `valid_external_dictionary_hierarchy(--DECOD, --SOC, external_dictionary_type="meddra")` is `false` for a secondary SOC, and an HLT name in `--SOC` is no SOC. `--BODSYS` maps to no level (it may hold a secondary SOC). **A column that names no MedDRA level fails to load** — `--BODSYS`, a `$`-binding or a computed operand in either position: there is no level to read the dictionary at. **The MedDRA house file must carry the level-scoped section** (`hierarchy_by_level`, written by the dictionary converter: PT, HLT and HLGT and their codes, never LLT). On a file converted before that section existed, or for a child level the section lacks (`--LLT`, `--LLTCD`), the rule reports **SKIPPED** with the reason — *"external dictionary meddra cannot answer the HLT → SOC hierarchy: its house file has no level-scoped hierarchy (hierarchy_by_level) — it was converted before this release; re-install meddra to re-convert it"* — while the file's membership and pair rules still answer, and the run's `Dictionary_Basis` names the file. Re-installing MedDRA re-converts it (an install without the section succeeds with a warning naming the gap). There is no bare-name fallback for MedDRA. ⚠ **The level-scoped read, the load error for a column naming no level and the stale-file SKIP are MedDRA's only**: on any other `external_dictionary_type` (`whodrug`, …) the call reads that dictionary's bare-name `hierarchy` map at any column.
 
 **Example**
 
@@ -5047,7 +5029,7 @@ Term validity against an external dictionary: `true` on a row whose value is a m
 | `dictionary_term_type` | string | yes | Which level of the dictionary to check. A static string literal — anything else fails to load |
 | `case_sensitive` | boolean | no | Default `true` (the preferred case); `false` accepts any case. Any **dataset-level** boolean — a literal, a `$`-binding or the same expression inline; a per-row value fails to load |
 
-`name` is a **column reference**; a quoted name fails to load, and an absent column is a column of blanks (valid on every row). The dictionary type must be a static string literal: the function declares the dictionary it needs from it, so a rule whose dictionary is not loaded reports **SKIPPED** — never a finding, never a silent pass — before any row is read, and a run's provider forecast lists the type. Reached without its dictionary the function reports a rule ERROR, never `false`. (Until wave 3 of the operation→function programme this was an operation.)
+`name` is a **column reference**; a quoted name fails to load, and an absent column is a column of blanks (valid on every row). The dictionary type must be a static string literal: the function declares the dictionary it needs from it, so a rule whose dictionary is not loaded reports **SKIPPED** — never a finding, never a silent pass — before any row is read, and a run's provider forecast lists the type. Reached without its dictionary the function reports a rule ERROR, never `false`.
 
 **Example**
 
@@ -5078,7 +5060,7 @@ Check:
 
 One value of another dataset, read once per rule execution and broadcast to every row: the `name`
 column of `domain`, taken from the rows a `filter` over that dataset's own columns selects, by the
-`mode` the author names. Replaced `ts_parameter_value` (runbook W2a): the TS/TX parameter lookup is
+`mode` the author names. The TS/TX parameter lookup (formerly `ts_parameter_value`) is
 `read_value(TSVAL, domain=TS, filter=(TSPARMCD == "SPECIES"), mode="FIRST")`.
 
 | parameter | type | required | description |
@@ -5087,7 +5069,7 @@ column of `domain`, taken from the rows a `filter` over that dataset's own colum
 | `domain` | dataset reference | yes | The dataset to read from: `TS` or `"TS"` (both spellings name the dataset). A `--` in the dataset name resolves against the dataset under evaluation: `domain="SUPP--"` on `AE` reads `SUPPAE` (and on `SUPPAE` too), as `Match_Datasets` names do. The dataset is read **raw**: the declared SUPP merge (`Supp_Merge`) serves the dataset under evaluation only, so a `SUPP--` qualifier is never a column of `domain` — neither as `name` nor in `filter` |
 | `filter` | boolean over `domain`'s columns | no | Which rows qualify, in parentheses: `filter=(TSPARMCD == "SPECIES")`. Only columns of `domain` — a dotted or `--` reference is a load error. A `$` reference is one of the rule's own bindings, read as **one dataset-level value of the rule's dataset** (never of `domain`) — a per-row binding there is a load error. Absent ⇒ every row |
 | `mode` | `"FIRST"` · `"ONLY"` · `"MIN"` · `"MAX"` | yes | Which qualifying row answers: the first in dataset order; exactly one (a second qualifying row is a rule **ERROR**); the smallest / largest `name` by the engine's one ordering (a missing below every value, numbers numerically, text as text) |
-| `group` | list of columns of `domain` | no | Per-group reading (runbook W5): the `mode` selects **within each group** of `domain`, and every row of the evaluated dataset reads its own group's value by the same columns. `ONLY` then asserts one qualifying row per group. A row whose key has no group reads the type default. A member may be [qualified](#qualified-group-members) (`DM.RPATHCD`): the record reads the group of its bound `DM` record's value. A member may be a `$`-reference to a dataset-level **list of column names**, or the expression such a binding holds, written in place — spliced exactly as [`record_count`](#record_count)'s `group=` splices it (a dataset-level string is one name; a per-row binding or expression is a load error; a bare `group=$names` / `group=<expression>` is the one-member list); a spliced member is never qualified under `domain`. |
+| `group` | list of columns of `domain` | no | Per-group reading: the `mode` selects **within each group** of `domain`, and every row of the evaluated dataset reads its own group's value by the same columns. `ONLY` then asserts one qualifying row per group. A row whose key has no group reads the type default. A member may be [qualified](#qualified-group-members) (`DM.RPATHCD`): the record reads the group of its bound `DM` record's value. A member may be a `$`-reference to a dataset-level **list of column names**, or the expression such a binding holds, written in place — spliced exactly as [`record_count`](#record_count)'s `group=` splices it (a dataset-level string is one name; a per-row binding or expression is a load error; a bare `group=$names` / `group=<expression>` is the one-member list); a spliced member is never qualified under `domain`. |
 | `keep_missings` | boolean | no | With `group`: whether a row with a missing group key stays in its group (default `true`) |
 
 **Example**
@@ -5120,7 +5102,7 @@ default `""` is an ordinary empty text: `$x == ""` is true, and `!=` against a p
 value (`D34 #5`): `X > $x` and `$x < X` fire, `X < $x` does not. That is the answer for a filter no row satisfies.
 An **absent `domain` dataset**, or a **`name` the dataset does not carry**, has no column type to take a
 default from, so the call answers what that column would answer read directly **at the call's
-position** (owner 2026-10-05, `PLAN-column-typed-function-absent-type` A1): the missing where the
+position**: the missing where the
 call — or the binding it is bound to — is read as a number (`$x > 5`, `$x + 1`, `X > $x`), `""`
 everywhere else; where the uses disagree the number wins, and with no typed use at all (`empty($x)`,
 a reported value) it is `""`. The uses that count are those of **every** `read_value` / `max` call
@@ -5161,7 +5143,7 @@ expression: 'not empty(PARAMCD) and not between(char(PARAMCD), char("A"), char("
 
 **Missing and empty** — A missing input yields **that missing value**, identity kept (`char(.A)` is `.A`, rulings register `D85c`); `""` has no first character to take and yields the plain missing (`MIS`).
 
-**List form (element-wise)** — over a list at `x` — the cells of several columns ([`values`](#values): `char(values([X, Y]))`), a per-row list such as `split_by(…)`, or a `$`-list — the function answers **a list of the same length**, each element's first code point, exactly as the scalar call answers it (runbook W2 E5); a missing element answers as the scalar call answers a missing value, in its position, `[]` gives `[]` and a missing list stays that missing. The list is a per-row membership set on the right of `in`, and on the left of `in` it asks whether **any** element is a member; compared with a single value (`==`, `<`, …) it fails the rule's load when the list is known statically — over an unknown-typed `$` value it is the rule's run-time ERROR. `[X, Y]` with bare names is a list of column *names*: read the values with `values([X, Y])`.
+**List form (element-wise)** — over a list at `x` — the cells of several columns ([`values`](#values): `char(values([X, Y]))`), a per-row list such as `split_by(…)`, or a `$`-list — the function answers **a list of the same length**, each element's first code point, exactly as the scalar call answers it; a missing element answers as the scalar call answers a missing value, in its position, `[]` gives `[]` and a missing list stays that missing. The list is a per-row membership set on the right of `in`, and on the left of `in` it asks whether **any** element is a member; compared with a single value (`==`, `<`, …) it fails the rule's load when the list is known statically — over an unknown-typed `$` value it is the rule's run-time ERROR. `[X, Y]` with bare names is a list of column *names*: read the values with `values([X, Y])`.
 
 ### colref
 
@@ -5199,8 +5181,7 @@ take at the same position: the plain missing where the expression expects a numb
 (`D85c`); a present `x` that is not text names no column and yields the plain missing (`DCF Q7`);
 a list keeps a missing member as a member (`DCF Q4`). Through a binding the position is the
 binding's **use**: `$x < 3` over `$x: colref("X")` defaults to the missing, exactly as
-`colref("X") < 3` and `$x: X` do (owner 2026-10-05, `PLAN-column-typed-function-absent-type` A2;
-until then a binding reference carried no kind and both read `""`).
+`colref("X") < 3` and `$x: X` do.
 
 **Names.** A name matches its column whatever its case, and so does the absent default:
 `colref("zz")` and `colref("ZZ")` answer alike. A **written** `--` name (`colref("--SEQ")`) is
@@ -5217,8 +5198,7 @@ unless the rule declares it in `Requirements.Variables` (then the rule is skippe
 computed per row cannot be checked before the run.
 
 **Supplemental qualifiers too.** `colref("AETRTEM")` reads the `SUPPAE` qualifier exactly as the
-written `AETRTEM` does (`PLAN-merged-evaluation-table`, closing `PLAN-dynamic-column-functions`
-F1), and a qualifier the SUPP merge could not serve (a duplicate supplemental row, an `IDVAR` the
+written `AETRTEM` does, and a qualifier the SUPP merge could not serve (a duplicate supplemental row, an `IDVAR` the
 domain lacks) fails the rule when `colref` reads it, as the written name does.
 
 **A `Child: true` parent** is read qualified with its domain, so the referenced-record check builds
@@ -5320,7 +5300,7 @@ as a date at any precision — `""`, malformed text — is not an error: every c
 answers false ([Junk answers false](../semantics/comparison.md#junk-answers-false)), so guard it with
 `is_valid_date(…)` or `not empty(…)` when that is not what you want.
 
-**List form (element-wise)** — over a list at `x` — the cells of several columns ([`values`](#values): `date(values([X, Y]))`), a per-row list such as `split_by(…)`, or a `$`-list — the function answers **a list of the same length**, each element read as a date; `date(values([X, Y])) in [date("…")]` compares each element by the date rule, a partial date a range, exactly as `date(X) in […]` does, exactly as the scalar call answers it (runbook W2 E5); a missing element answers as the scalar call answers a missing value, in its position, `[]` gives `[]` and a missing list stays that missing. The list is a per-row membership set on the right of `in`, and on the left of `in` it asks whether **any** element is a member; compared with a single value (`==`, `<`, …) it fails the rule's load when the list is known statically — over an unknown-typed `$` value it is the rule's run-time ERROR. `[X, Y]` with bare names is a list of column *names*: read the values with `values([X, Y])`.
+**List form (element-wise)** — over a list at `x` — the cells of several columns ([`values`](#values): `date(values([X, Y]))`), a per-row list such as `split_by(…)`, or a `$`-list — the function answers **a list of the same length**, each element read as a date; `date(values([X, Y])) in [date("…")]` compares each element by the date rule, a partial date a range, exactly as `date(X) in […]` does, exactly as the scalar call answers it; a missing element answers as the scalar call answers a missing value, in its position, `[]` gives `[]` and a missing list stays that missing. The list is a per-row membership set on the right of `in`, and on the left of `in` it asks whether **any** element is a member; compared with a single value (`==`, `<`, …) it fails the rule's load when the list is known statically — over an unknown-typed `$` value it is the rule's run-time ERROR. `[X, Y]` with bare names is a list of column *names*: read the values with `values([X, Y])`.
 
 ### duration
 
@@ -5328,8 +5308,8 @@ answers false ([Junk answers false](../semantics/comparison.md#junk-answers-fals
 
 The value read as an ISO-8601 **duration** (`P1W`, `PT90M`, `P1Y2M`, `-P1D`), the ISO text itself the
 carrier. Written on either side of a comparison it makes the comparison a **duration comparison**
-— the [hull rule on durations](../semantics/comparison.md#duration--the-hull-rule-on-durations)
-(runbook W1b DO, `PLAN-engine-gap-dur-order`): `PT90M` and `PT1H30M` are the same point, `P2D` is
+— the [hull rule on durations](../semantics/comparison.md#duration--the-hull-rule-on-durations):
+`PT90M` and `PT1H30M` are the same point, `P2D` is
 longer than `PT5H`, and a **month or year** is a range (`P1M` is any length from 28 to 31 days), so
 `duration(--STINT) > duration(--ENINT)` fires only where the start offset is *definitely* later.
 Without the marker a comparison on duration text is a text comparison (`"PT9H" > "PT10H"` holds) —
@@ -5342,7 +5322,7 @@ duration when written on both operands.
 
 | parameter | type | required | description |
 |---|---|---|---|
-| `x` | any | yes | The ISO-8601 duration — a column, a string literal or a binding. One value per row: `duration` is **not element-wise** (coordinator O11) — a list at `x` fails to load where its type is known (*"duration() converts a string, not list<…>"*) and is the rule's ERROR where only the run sees it (T2 fold; before, the list's text was compared, and `!=` fired on every row) |
+| `x` | any | yes | The ISO-8601 duration — a column, a string literal or a binding. One value per row: `duration` is **not element-wise** — a list at `x` fails to load where its type is known (*"duration() converts a string, not list<…>"*) and is the rule's ERROR where only the run sees it |
 
 **Example — a planned interval's start must not denote a later point than its end** (SENDIG 3.1.1)
 
@@ -5419,7 +5399,7 @@ fine, `lpad(X, 3, 10)` is not), fail the rule at load.
 When `width` or `fill` comes from the data, a missing, negative or non-whole `width`, a `width`
 above 32767, or a `fill` that is not exactly one character yields the plain missing (`MIS`).
 
-**List form (element-wise)** — over a list at `x` — the cells of several columns ([`values`](#values): `lpad(values([X, Y]), 3, "0")`), a per-row list such as `split_by(…)`, or a `$`-list — the function answers **a list of the same length**, each element left-padded, the row's `width` / `fill` applied to every element, exactly as the scalar call answers it (runbook W2 E5); a missing element answers as the scalar call answers a missing value, in its position, `[]` gives `[]` and a missing list stays that missing. The list is a per-row membership set on the right of `in`, and on the left of `in` it asks whether **any** element is a member; compared with a single value (`==`, `<`, …) it fails the rule's load when the list is known statically — over an unknown-typed `$` value it is the rule's run-time ERROR. `[X, Y]` with bare names is a list of column *names*: read the values with `values([X, Y])`.
+**List form (element-wise)** — over a list at `x` — the cells of several columns ([`values`](#values): `lpad(values([X, Y]), 3, "0")`), a per-row list such as `split_by(…)`, or a `$`-list — the function answers **a list of the same length**, each element left-padded, the row's `width` / `fill` applied to every element, exactly as the scalar call answers it; a missing element answers as the scalar call answers a missing value, in its position, `[]` gives `[]` and a missing list stays that missing. The list is a per-row membership set on the right of `in`, and on the left of `in` it asks whether **any** element is a member; compared with a single value (`==`, `<`, …) it fails the rule's load when the list is known statically — over an unknown-typed `$` value it is the rule's run-time ERROR. `[X, Y]` with bare names is a list of column *names*: read the values with `values([X, Y])`.
 
 ### num
 
@@ -5441,7 +5421,7 @@ expression: 'num(QVAL) > 8'
 **Missing and empty** — A missing input yields **that missing value**; text that is not a number,
 and `""`, yield the plain missing (`MIS`).
 
-**List form (element-wise)** — over a list at `x` — the cells of several columns ([`values`](#values): `num(values([X, Y]))`), a per-row list such as `split_by(…)`, or a `$`-list — the function answers **a list of the same length**, each element read as a number; `num(values([X, Y])) in [1, 2]` compares each element numerically, exactly as the scalar call answers it (runbook W2 E5); a missing element answers as the scalar call answers a missing value, in its position, `[]` gives `[]` and a missing list stays that missing. The list is a per-row membership set on the right of `in`, and on the left of `in` it asks whether **any** element is a member; compared with a single value (`==`, `<`, …) it fails the rule's load when the list is known statically — over an unknown-typed `$` value it is the rule's run-time ERROR. `[X, Y]` with bare names is a list of column *names*: read the values with `values([X, Y])`.
+**List form (element-wise)** — over a list at `x` — the cells of several columns ([`values`](#values): `num(values([X, Y]))`), a per-row list such as `split_by(…)`, or a `$`-list — the function answers **a list of the same length**, each element read as a number; `num(values([X, Y])) in [1, 2]` compares each element numerically, exactly as the scalar call answers it; a missing element answers as the scalar call answers a missing value, in its position, `[]` gives `[]` and a missing list stays that missing. The list is a per-row membership set on the right of `in`, and on the left of `in` it asks whether **any** element is a member; compared with a single value (`==`, `<`, …) it fails the rule's load when the list is known statically — over an unknown-typed `$` value it is the rule's run-time ERROR. `[X, Y]` with bare names is a list of column *names*: read the values with `values([X, Y])`.
 
 ### printf
 
@@ -5467,8 +5447,7 @@ expression: 'printf("%02d", APERIOD) == "01"'
 ⛔ **Load errors.** A computed format, any other conversion (`%n`, `%t…`, `%1$s`), a number of
 arguments that differs from the conversions, a string literal at a numeric conversion (`%d %f %e
 %x`), a written number that is not whole at `%d` / `%x` (`printf("%d", 1.5)`), and any named argument
-(`printf("%s", format="x")` — positional arguments only, runbook W4 U2; before, it was silently
-dropped) fail the rule at load.
+(`printf("%s", format="x")` — positional arguments only) fail the rule at load.
 
 **Missing and empty** — A missing argument makes the result **that missing value** (two different
 missing arguments give the plain missing). `%d` / `%x` of a value that is not a whole number (`1.5`,
@@ -5484,9 +5463,8 @@ The value as text — a cell's own text: a floating-point cell's cleaned plain t
 digits (a large integer stays exact), a character value as it is. A computed number (`str(AGE +
 1)`) is written in the same plain notation, and so is a written number (`str(3.0)` is `"3"`).
 `str(A) == str(B)` compares two values as text, whatever their column types. ⚑ Until 2026-09-30
-that comparison read a number written on its **left** side as `"3.0"`; whether the new plain
-notation stands there is an open owner question (`PLAN-dynamic-column-functions` F3) — no shipped
-rule writes a number inside `str`.
+that comparison read a number written on its **left** side as `"3.0"`; whether the plain
+notation stays there is not yet settled — no shipped rule writes a number inside `str`.
 
 | parameter | type | required | description |
 |---|---|---|---|
@@ -5500,7 +5478,7 @@ expression: 'str(IDVARVAL) != str(colref(concat(RDOMAIN, ".", IDVAR)))'
 
 **Missing and empty** — A missing input yields **that missing value**, identity kept.
 
-**List form (element-wise)** — over a list at `x` — the cells of several columns ([`values`](#values): `str(values([X, Y]))`), a per-row list such as `split_by(…)`, or a `$`-list — the function answers **a list of the same length**, each element's text, exactly as the scalar call answers it (runbook W2 E5); a missing element answers as the scalar call answers a missing value, in its position, `[]` gives `[]` and a missing list stays that missing. The list is a per-row membership set on the right of `in`, and on the left of `in` it asks whether **any** element is a member; compared with a single value (`==`, `<`, …) it fails the rule's load when the list is known statically — over an unknown-typed `$` value it is the rule's run-time ERROR. `[X, Y]` with bare names is a list of column *names*: read the values with `values([X, Y])`.
+**List form (element-wise)** — over a list at `x` — the cells of several columns ([`values`](#values): `str(values([X, Y]))`), a per-row list such as `split_by(…)`, or a `$`-list — the function answers **a list of the same length**, each element's text, exactly as the scalar call answers it; a missing element answers as the scalar call answers a missing value, in its position, `[]` gives `[]` and a missing list stays that missing. The list is a per-row membership set on the right of `in`, and on the left of `in` it asks whether **any** element is a member; compared with a single value (`==`, `<`, …) it fails the rule's load when the list is known statically — over an unknown-typed `$` value it is the rule's run-time ERROR. `[X, Y]` with bare names is a list of column *names*: read the values with `values([X, Y])`.
 
 ### time
 
@@ -5523,7 +5501,7 @@ expression: 'not empty(QVAL) and time(QVAL) < time("06:00")'
 **Missing and empty** — As for [`date`](#date): a missing input yields **that missing value**; a
 value that cannot be read as a time answers false in every comparison.
 
-**List form (element-wise)** — over a list at `x` — the cells of several columns ([`values`](#values): `time(values([X, Y]))`), a per-row list such as `split_by(…)`, or a `$`-list — the function answers **a list of the same length**, each element read as a time of day; membership compares each element by the time rule, exactly as the scalar call answers it (runbook W2 E5); a missing element answers as the scalar call answers a missing value, in its position, `[]` gives `[]` and a missing list stays that missing. The list is a per-row membership set on the right of `in`, and on the left of `in` it asks whether **any** element is a member; compared with a single value (`==`, `<`, …) it fails the rule's load when the list is known statically — over an unknown-typed `$` value it is the rule's run-time ERROR. `[X, Y]` with bare names is a list of column *names*: read the values with `values([X, Y])`.
+**List form (element-wise)** — over a list at `x` — the cells of several columns ([`values`](#values): `time(values([X, Y]))`), a per-row list such as `split_by(…)`, or a `$`-list — the function answers **a list of the same length**, each element read as a time of day; membership compares each element by the time rule, exactly as the scalar call answers it; a missing element answers as the scalar call answers a missing value, in its position, `[]` gives `[]` and a missing list stays that missing. The list is a per-row membership set on the right of `in`, and on the left of `in` it asks whether **any** element is a member; compared with a single value (`==`, `<`, …) it fails the rule's load when the list is known statically — over an unknown-typed `$` value it is the rule's run-time ERROR. `[X, Y]` with bare names is a list of column *names*: read the values with `values([X, Y])`.
 
 ### value
 
@@ -5539,7 +5517,7 @@ Takes no arguments.
 expression: 'len(value()) > 200'
 ```
 
-**Missing and empty** — A `""` cell yields `""`. A missing cursor names no variable and yields **missing**. A cursor naming a column the dataset does not carry (a Define-XML variable absent from the data) answers what that column would answer read directly **at the call's position** (owner 2026-10-05, `PLAN-column-typed-function-absent-type`): the missing where `value()` — or the binding it is bound to — is read as a number, `""` everywhere else. Until 2026-10-05 it was the missing everywhere. Under the default `Data` variable universe the cursor only ever names a column the dataset carries.
+**Missing and empty** — A `""` cell yields `""`. A missing cursor names no variable and yields **missing**. A cursor naming a column the dataset does not carry (a Define-XML variable absent from the data) answers what that column would answer read directly **at the call's position**: the missing where `value()` — or the binding it is bound to — is read as a number, `""` everywhere else. Until 2026-10-05 it was the missing everywhere. Under the default `Data` variable universe the cursor only ever names a column the dataset carries.
 
 ### varname
 

@@ -660,8 +660,7 @@ by `POOLID`. Record-level links match `IDVAR` = `IDVARVAL` as text, a numeric co
 > parent record's topic variable, one guarded arm per IG general-observation domain:
 > Events `AE` `BE` `CE` `DS` `DV` `HO` `MH` (`--TERM` / `--DECOD`) and Interventions `AG` `CM` `EC`
 > `EX` `ML` `PR` `SU` (`--TRT` / `--DECOD`), each behind `<D>._matched_` (CG0601 reads the Events
-> arms only, CG0602 the Interventions arms only). Two consequences, both accepted (FU-1 of
-> `PLAN-merge-followups`, owner 2026-10-06):
+> arms only, CG0602 the Interventions arms only). Two consequences, both accepted:
 >
 > - **A sponsor-defined custom domain of the Events or Interventions class is not checked.** An FA
 >   record related to a custom `XE` record matches no arm, so the rule is silent on it — not a
@@ -669,8 +668,7 @@ by `POOLID`. Record-level links match `IDVAR` = `IDVARVAL` as text, a numeric co
 > - **A Findings parent is silent by design** (FA → `LB`): the parent's `--TERM` / `--TRT` /
 >   `--DECOD` exist only on Events and Interventions, so there is nothing to compare `FAOBJ` with.
 >
-> Selecting the parent by its observation class instead of its name is the deferred draft
-> `PLAN-fa-parent-by-observation-class`; it stays deferred until needed. Until then a new arm
+> Selecting the parent by its observation class instead of its name is not built. A new arm
 > means a new domain named in the expression.
 
 > ⛔ **`Wildcard` is retired and is a load error.** It was accepted on this entry and read by

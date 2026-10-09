@@ -31,8 +31,7 @@ about emptiness.
 
 ### The same through a binding, and through a function
 
-The position decides wherever the column is read (owner 2026-10-05,
-`PLAN-column-typed-function-absent-type`):
+The position decides wherever the column is read:
 
 - **Through a `$`-binding the binding's *uses* decide.** `$x: AESTDY` read as `$x > AEENDY` is
   `AESTDY > AEENDY` — a number, so missing. A binding answers exactly as its expression written in
@@ -86,7 +85,7 @@ Three kinds of test are **true on every row** of an absent column:
 `empty(x)` reports **every row** of an absent column as empty. (`is_missing(x)` does not: it is
 true only for a genuine missing, so over an absent column it answers the column's default — false
 where the column reads as `""`, true where its position makes it a number and so the missing;
-rulings register `D50`, owner 2026-10-05.) An absent column
+rulings register `D50`.) An absent column
 carries no data, so it is empty for every row; that is the honest answer, and it is also a trap:
 
 ```yaml
@@ -117,18 +116,17 @@ A rule that declares [`Outcome.Message_Folded`](../authoring/outcome.md#message_
 - an **absent** column is decided before a row is read — `empty(AEENDTC)` over an absent `AEENDTC`
   is true on every record, so the rule folds to one finding (the absent-column fold) — but only
   when every other live leaf of the Check is decided too; one still filled on some record keeps the
-  rule per record (owner, 2026-10-07);
+  rule per record;
 - a column that is **present but blank on every record** is a data fact the engine knows only
   after reading the rows: an `empty`-family leaf over it makes the rule's row findings **collapse**
   to one finding (none when no record fires), and the same holds for an `empty`-family leaf over an
   absent column that leaves a per-record residual — but only for a polarity-live leaf (`empty(X)`,
   never `not empty(X)`) and only when **every** live leaf of the Check is decided, its column absent
-  or blank on every record; one still filled on some record keeps the rule per record (owner,
-  2026-10-07);
+  or blank on every record; one still filled on some record keeps the rule per record;
 - [`Keep_Row_Findings`](../authoring/outcome.md#keep_row_findings) keeps the per-record findings on a
   named column; a dataset with no rows never folds or collapses.
 
-A rule **without** the key folds nothing (owner, 2026-10-05): on an absent column it is evaluated
+A rule **without** the key folds nothing: on an absent column it is evaluated
 per record, the column reading as its type default, exactly like a column blank on every record.
 Every corpus rule the fold can decide or the collapse can report carries the key
 (`MessageFoldedCoverageLintTest`); a custom rule has to declare it to get one finding per dataset.

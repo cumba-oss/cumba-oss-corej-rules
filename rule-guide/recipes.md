@@ -225,7 +225,7 @@ character POOLDEF pool IDs such as `POOL1` (or, from CSV, beside numeric-looking
 
 When the subject's own EX records or any one of its pools give an undeterminable extreme (a partial
 or unreadable date) while another part can be determined, the parts that can be determined decide
-(`PLAN-scalar-date-extremes` SDE D2) — between two pools too, since the outer aggregate skips the
+— between two pools too, since the outer aggregate skips the
 undeterminable pool as `earliest_date` skips an undeterminable part. The rule may then be silent
 where the exact union of all those EX records would have reported, never the reverse.
 

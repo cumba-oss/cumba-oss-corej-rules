@@ -56,6 +56,11 @@ that the check never touched, in the order it should appear:
 Output_Variables: ["RDOMAIN"]      # read by no condition, but it tells the reader which domain
 ```
 
+An entry may also be a [builtin operand](../reference/expression-syntax.md#builtin-operands). The 45
+metadata aliases (`dataset_name`, `variable_label`, `library_variable_label`, …) stay legal here as
+report columns, although each is a load error in an expression — a Check, a binding or a filter
+writes the accessor instead (`ds_name()`, `var_label()`, `var_label("LIBRARY")`).
+
 The entries you author come first, in the order written, and the derived columns follow in the
 order in which the check reads them — with one exception: on a per-variable rule (and on one that
 reads value-level metadata) `variable_name` is moved to the front, and a derived `variable_value`
@@ -133,9 +138,7 @@ every dataset-level finding). Without the key: 961 findings under `Message`.
 
 **Rules of the key.**
 
-- It is **opt-in, for both folds**. A rule without it never collapses, and — since
-  `PLAN-message-folded-corpus-alignment` (owner, 2026-10-05: *"I would expect the absent fold does
-  not fire anymore if no Message_Folded is available. Like the all empty fold."*) — never folds on an
+- It is **opt-in, for both folds**. A rule without it never collapses, and never folds on an
   **absent** column either: it is evaluated per record, the absent column reading as its type default
   ([absent columns](../semantics/absent-columns.md)). Nothing moves until an author writes the key.
 - With the key, an absent column the Check tests folds to **one** dataset-level finding under
@@ -146,7 +149,7 @@ every dataset-level finding). Without the key: 961 findings under `Message`.
   operator over an absent column with a per-record residual stays per record: an absent *guard*
   column (`X != "N"` in an `or`-branch, a qualifier the domain never carries) must not fold the
   findings the other conditions locate per record.
-- **Only a polarity-live leaf triggers, and only when every one is decided** (owner, 2026-10-07):
+- **Only a polarity-live leaf triggers, and only when every one is decided**:
   a leaf is live when its column being absent or blank on every record can make the Check true —
   `empty(X)` is, `not empty(X)` never is (it is false over a blank or absent `X`), and a column
   merely absent elsewhere in the Check triggers nothing; nor does a leaf in a branch a presence fact

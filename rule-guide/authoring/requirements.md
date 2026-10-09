@@ -245,8 +245,8 @@ facets are unmet keeps reporting exactly the reason it always did.
      All_Or_None, including "the rule runs when none of the variables is present") go into the SPEC
      and rule guide as confirmed semantics"), register entry CIT §2; stated from the engine's
      requirement gate as implemented, PLAN-case-insensitive-templates. -->
-These are the confirmed semantics of the requirement gate (owner, 2026-09-28; rulings register
-entry `CIT §2`), exactly as it evaluates a rule against a dataset:
+These are the confirmed semantics of the requirement gate (rulings register entry `CIT §2`),
+exactly as it evaluates a rule against a dataset:
 
 - **Order: `All`, then `Any`, then `None`, then `All_Or_None`.** The first unmet `All` entry, the
   first unmet `Any` group, the first *present* `None` entry or the first unmet `All_Or_None` group
@@ -336,7 +336,7 @@ Any of these may carry a [type suffix](#demanding-a-type-as-well-as-presence) �
 > the library's metadata for a variable the IG does not list. Write entries in the CDISC upper-case spelling regardless; never rely on
 > case to tell two columns apart. A supplemental qualifier found through the SUPP-QNAM pivot is the
 > exception: its `QNAM` is a cell value and is compared exactly (`CIT §3`). ⛔ This is a decision,
-> not a default (owner, 2026-09-28; rulings register entry `CIT §1`): if the case rule is ever
+> not a default (rulings register entry `CIT §1`): if the case rule is ever
 > revised, it is revised for every surface at once — never for one kind of entry alone.
 
 A qualified entry is how you require a column in a dataset other than the one the rule is running
@@ -519,7 +519,7 @@ merged columns too: `DM.RACEOTH` reads `SUPPDM`'s qualifier of the joined `DM` r
 
 A qualifier is **not a variable of the domain**: the variable-inventory checks (column order,
 variable count, lengths, the per-variable rules) see exactly the columns the domain file carries.
-Supplementals are the place for non-standard variables (owner, 2026-09-29), and a rule about the
+Supplementals are the place for non-standard variables, and a rule about the
 domain's variables must not report them.
 
 Write `Supp_Merge: false` only when the rule must see the raw dataset — a rule *about* the

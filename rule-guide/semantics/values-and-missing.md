@@ -112,8 +112,8 @@ The aliases are exact: `present(TSVAL)` and `non_empty(TSVAL)` are the same call
 > one place. The two are interchangeable, so this is a style rule with no behavioural catch —
 > `empty` and `not empty` are the pair to reach for.
 
-> **`is_missing` means "missing" — and only that** (rulings register `D50`, owner 2026-10-05:
-> *"is_missing() is for misisng and empty() is for missing or \"\""*). `is_missing("")` is false;
+> **`is_missing` means "missing" — and only that** (rulings register `D50`).
+> `is_missing("")` is false;
 > `empty("")` is true. Until 2026-10-05 `is_missing` was an alias of `empty`; a rule that meant
 > "missing or empty" writes `empty`.
 

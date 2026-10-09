@@ -3,7 +3,7 @@
 <!-- Grounded: Binding.java — name + expression only, the JsonAnySetter rejects every other key
      loud (id:, operator:, group:, level:, filter:, …); a binding with no expression is filed on
      the loadError channel. Since PLAN-binding-expressions (W0): the expression is ANY expression,
-     and since runbook W8 EVERY binding is a compiled binding — RulePackageLoader.materialiseBindings
+     and EVERY binding is a compiled binding — RulePackageLoader.materialiseBindings
      parses it once (CompiledBinding), and it is evaluated lazily in the reading context
      (BindingValue). -->
 
@@ -104,8 +104,7 @@ members of `is_unique_set($keys)` / `is_not_unique_set($keys)` (also as a member
 `keys=$keys` of column names (`is_unique_relationship`, `is_inconsistent_across_dataset`), and as the
 columns whose per-row values `values($keys)` lists. Their **positional** key is a column, never a
 binding: `is_unique_relationship(A, $keys)` (any `$` there) fails to load with the hint *"a binding
-of column names is spliced through keys=[$keys]"* (runbook W4 KP — before, the binding's name was
-read as a column and the key silently dropped).
+of column names is spliced through keys=[$keys]"*.
 Anywhere else — `X in $keys`, a comparison, a function's value argument, another binding,
 `Output_Variables` — it is a load error with the hint *"`$keys` holds column names: use it in a name
 slot (`group=$keys`) or read its values with `values($keys)`; to compare names as text, write a string
@@ -115,9 +114,8 @@ each ascending — the SQL default a bare column means there.
 A list of **strings** is values, never names. `$keys: ["STUDYID", "USUBJID"]` read where names are
 spliced — `group=$keys`, `is_unique_set([AETERM, $keys])`, `values($keys)`, `within=$keys`,
 `by=[asc($keys)]`, also through a binding of the binding — fails to load with the hint *"write the
-columns as names: [STUDYID, USUBJID]"*: write the bare names, `$keys: [STUDYID, USUBJID]` (runbook W4
-E3 — before, the strings were turned into names when the rule was bound, while the same strings
-written in place, `group=["STUDYID"]`, were already refused). As values the string list stays what it
+columns as names: [STUDYID, USUBJID]"*: write the bare names, `$keys: [STUDYID, USUBJID]`, as the same strings
+written in place (`group=["STUDYID"]`) are refused. As values the string list stays what it
 is (`AETERM in $keys`, `minus($keys, subtract=[…])`); a computed list of names
 (`get_dataset_variables()`, `minus([…], subtract=[…])`) still splices; and a single string binding
 (`$k: "--SEQ"`) still names its one column.

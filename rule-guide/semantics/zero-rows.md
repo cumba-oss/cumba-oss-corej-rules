@@ -36,7 +36,7 @@ rows, so the absence of rows changes nothing:
 
 ```yaml
 Check:
-  expression: 'var_label("DATA") != var_label("LIBRARY")'
+  expression: 'var_label() != var_label("LIBRARY")'
 ```
 
 **A grouped rule** sees zero rows, so it forms zero groups, so it reports nothing.

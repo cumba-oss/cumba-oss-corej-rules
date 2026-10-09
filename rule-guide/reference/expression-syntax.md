@@ -2,8 +2,10 @@
 
 <!-- The rosters in this document are the complete inventory generated from the engine's own
      registries (FunctionRegistry, CompilerDispatchedCalls, MetadataAttribute, BuiltinRegistry,
-     the sealed Expr AST) — 276 tokens. There is no operation category: runbook W8 deleted the
-     Operation surface, and every former operation is a function of the same name.
+     the sealed Expr AST) — 317 rows of generated/expression-syntax-inventory.tsv (counted as its
+     data rows, header excluded; 310 distinct tokens, 7 of them listed in two categories). There is
+     no operation category: the Operation surface is deleted, and every former operation is a
+     function of the same name.
      Grammar and precedence: CheckExpressionParser.java (or > and > not > comparison > sum >
      product > postfix `~ /pattern/replacement/` > atom). Lexer: ExpressionLexer.java (double-quoted strings, /regex/, `quoted refs`,
      bare &NAME& expansion tokens inside a name (grammar: ExpansionTokens), && and || accepted). Types: ExprType.java (6 value types + 3 parameter-only; `missing` is a
@@ -25,10 +27,10 @@
        operand-kind OPERATION_REF    -> "Operands", row "binding result"
        operand-kind BUILTIN          -> "Operands", row "builtin"
      Every other token appears verbatim: the callables — the UNION of the inventory's `function`,
-     `boolean-call` and `compiler-call` rows (106 + 28 + 21; the figures are the generated
+     `boolean-call` and `compiler-call` rows (127 + 34 + 29; the figures are the generated
      inventory's). All are presented as ONE surface: every callable carries a FunctionDescriptor
      in FunctionRegistry — a compiler-dispatched one (CompilerDispatchedCalls) with `fn == null`.
-     Plus 26 metadata-accessors, 64 builtin-operands, 14 binary-operators, 6 comparison-markers.
+     Plus 28 metadata-accessors, 65 builtin-operands, 15 binary-operators, 6 comparison-markers.
 
      ⚠ The inventory's three callable categories are a DISPATCH split, not an authoring one, and
      the split the TSV names is itself stale: `HARDCODED_BOOLEAN_CALLS` is RETIRED. Every
@@ -131,7 +133,7 @@ reserved.
 ### 4. A builtin
 
 ```yaml
-variable_label
+variable_value_length
 ```
 
 A value the engine supplies directly, without a call — see
@@ -147,7 +149,7 @@ A value the engine supplies directly, without a call — see
 | regex | `/^AE.*$/` | between slashes |
 | substitution | `/^(.*)DTC$/$1/` | a pattern and a replacement, three slashes; only ever the right side of [`~`](#substitution) |
 | sided key | `{left: ACTARMCD, right: ARMCD}` | a `group=` member of a `domain=` grouped call — this row's left column keys the other table's right column ([qualified `group=` members](functions.md#qualified-group-members)); legal nowhere else |
-| list | `["Y", "N"]` | **square** brackets; used with `in` / `not in`. ⛔ A `$` binding is never an element — `AETERM in ["A", $codes]` is a load error (it would read as the text `"$codes"`); write `$codes` alone as the operand. The one exception is a **splice** of column names into [`record_count`](functions.md#record_count)'s `group=`, [`is_unique_set`](functions.md#is_unique_set)'s members, [`values`](functions.md#values)' columns and every `within=` / `by=` slot (a `$` holding a dataset-level list of names — a name-list binding `$keys: [STUDYID, USUBJID]` or a computed list of names such as `get_dataset_variables()` — or that expression written in place; see [bindings](../authoring/bindings.md)). A binding of a written **string** list (`$keys: ["STUDYID", "USUBJID"]`) is values, not names: at a splice slot it fails to load with the hint *"write the columns as names: [STUDYID, USUBJID]"* (runbook W4 E3), as the same strings written in place do |
+| list | `["Y", "N"]` | **square** brackets; used with `in` / `not in`. ⛔ A `$` binding is never an element — `AETERM in ["A", $codes]` is a load error (it would read as the text `"$codes"`); write `$codes` alone as the operand. The one exception is a **splice** of column names into [`record_count`](functions.md#record_count)'s `group=`, [`is_unique_set`](functions.md#is_unique_set)'s members, [`values`](functions.md#values)' columns and every `within=` / `by=` slot (a `$` holding a dataset-level list of names — a name-list binding `$keys: [STUDYID, USUBJID]` or a computed list of names such as `get_dataset_variables()` — or that expression written in place; see [bindings](../authoring/bindings.md)). A binding of a written **string** list (`$keys: ["STUDYID", "USUBJID"]`) is values, not names: at a splice slot it fails to load with the hint *"write the columns as names: [STUDYID, USUBJID]"*, as the same strings written in place do |
 
 > ⚠ **Single quotes are not string delimiters.** You will see them in `Source` blocks, because
 > that is how the source sheets write SQL-ish prose — but a `Check` expression that uses them is
@@ -164,7 +166,7 @@ Seven types a **value** can have:
 | `boolean` | true / false |
 | `date` | an ISO-8601 calendar value, **partial precision retained** |
 | `time` | a time of day, partial precision retained |
-| `duration` | an ISO-8601 duration read through `duration(…)`, its months and years **ranges** (runbook W1b DO) |
+| `duration` | an ISO-8601 duration read through `duration(…)`, its months and years **ranges** |
 | `regex` | a pattern — **literal only**: never computed, never stored in a column. Written `/…/`; a computed regex fails the load. The one place a `"…"` string literal is a regex is `record_count`'s `regex=` |
 
 Plus `list<T>` and `set<T>` for the collection-valued positions: a list is ordered and may repeat,
@@ -280,8 +282,8 @@ expression: 'date_part(AESTDTC) == date_part(AEENDTC)'
 `str(A) == str(B)` is an ordinary string equality of two converted values, whatever the two
 columns' types. (Until 2026-09-30 `str` was a comparison marker that selected type-insensitive
 equality; the function answers the same on every column operand — a number written inside `str` on
-the left side, which the marker read as `"3.0"` and the function reads as `"3"`, is an open owner
-question, `PLAN-dynamic-column-functions` F3.)
+the left side, which the marker read as `"3.0"` and the function reads as `"3"`, is not yet
+settled — no shipped rule writes one.)
 
 > **Use one whenever the operands' own types do not already make the intended reading
 > unambiguous** — and prefer a conversion to a mode where both would express the requirement,
@@ -406,11 +408,10 @@ probe and the members are both folded; it is always string membership, since num
 `lower(X)` / `lowcase(X)` have no such surface (the folded value against the members as written).
 
 A **column name a rule handles as a value** — `varname()`, the list
-`get_column_order_from_dataset()` returns — is a string and compares exactly like one (owner,
-2026-09-28: *"a String that contains a column name is still a string in the engine"*; rulings
-register `CIT §3`). A rule that wants such a name to match regardless of letter case folds
-**both sides** — the owner's *"compare the upper case version of a name against the upper case
-version of a list of strings"*: `upper(varname()) in $required_variables` (the case-insensitive
+`get_column_order_from_dataset()` returns — is a string and compares exactly like one: a
+string that contains a column name is still a string in the engine. A rule that wants such a name
+to match regardless of letter case folds **both sides** — the upper-case version of a name against
+the upper-case version of a list of strings: `upper(varname()) in $required_variables` (the case-insensitive
 membership surface upper-cases the list as well as the probe), `equalsIgnoreCase(varname(),
 var_name("LIBRARY"))`, and for two lists a sibling binding per side —
 `$dataset_variables_upper: upper($dataset_variables)`, `$required_variables_upper:
@@ -418,8 +419,8 @@ upper($required_variables)` — read by `contains_all` / `is_ordered_subset_of` 
 `shares_elements_with`; [`upper`](functions.md#upper) and [`lower`](functions.md#lower) fold a list
 element by element — a `$`-list, a per-row list, and the values of several columns read with
 [`values`](functions.md#values) (`upper(values([X, Y]))`; `upper([X, Y])` with bare names fails to
-load, since `[X, Y]` is a list of column *names*). So do the other scalar value functions
-(runbook W2 E5): `len` / `length`, `trim`, `normalize_space`, `char`, `prefix`, `suffix`,
+load, since `[X, Y]` is a list of column *names*). So do the other scalar value functions:
+`len` / `length`, `trim`, `normalize_space`, `char`, `prefix`, `suffix`,
 `substring`, `lpad`, `str`, `num`, `abs`, `ceil`, `floor`, `round`, `year`, `month`, `day`, `date`,
 `time`, `earliest_possible` and `latest_possible` each answer a list of the same length over a list
 at their first argument (`len(values([X, Y]))`, `trim(split_by(X, ","))`, `date($dates)`), every
@@ -525,7 +526,8 @@ expression: 'coalesce(MIDS ~ /-/ /, MIDS) == "HYPO 3"'       # replace the first
 declared with an ordered, typed parameter list.
 
 The signature names every parameter; `[, x]` marks an optional one and `…` a keyword-argument tail
-listed under [Arguments](#arguments). **Every parameter can be given positionally or by name.**
+listed under [Arguments](#arguments). **A parameter can be given positionally or by name**, except
+the few read by keyword only or by position only that [Arguments](#arguments) lists.
 
 **Returns** is what the call yields: `boolean` — a condition you can use on its own or combine with
 `and` / `or` / `not`; `value` — a value whose type follows from its input and the
@@ -684,10 +686,10 @@ quantifier over a scalar predicate is that predicate (`any(p(X))` ≡ `p(X)`, `n
 | [`dataset_class_from_library()`](functions.md#dataset_class_from_library) | value | The CDISC Library's class name of the current dataset's domain |
 | [`dataset_names()`](functions.md#dataset_names) | value | The names of every dataset in the study, upper-cased, as a list (split members as themselves) |
 | [`domain_is_custom()`](functions.md#domain_is_custom) | value (boolean) | Whether the CDISC Library declares the current dataset's domain custom |
-| [`ds_class([x,] level)`](functions.md#ds_class) | value | The dataset's observation class; available at every level |
-| [`ds_domain("DATA")`](functions.md#ds_domain) | value | The dataset's domain as `Scope.Domains` resolves it — `SUPPLB`, not the parent, on a SUPP dataset; `DATA` only |
-| [`ds_label([x,] level)`](functions.md#ds_label) | value | The dataset's label; available at every level |
-| [`ds_name([x,] level)`](functions.md#ds_name) | value | The dataset's name; available at every level |
+| [`ds_class([[x,] level])`](functions.md#ds_class) | value | The dataset's observation class; available at every level |
+| [`ds_domain()`](functions.md#ds_domain) | value | The dataset's domain as `Scope.Domains` resolves it — `SUPPLB`, not the parent, on a SUPP dataset; `DATA` only |
+| [`ds_label([[x,] level])`](functions.md#ds_label) | value | The dataset's label; available at every level |
+| [`ds_name([[x,] level])`](functions.md#ds_name) | value | The dataset's name; available at every level |
 | [`ds_structure([x,] level)`](functions.md#ds_structure) | value | The dataset's ADaM data structure; `DEFINE` and `LIBRARY` only |
 | [`extract_metadata(name)`](functions.md#extract_metadata) | value | One dataset-metadata value of the current dataset, by its key |
 | [`referenced_dataset_variables(name[, qualifiers=])`](functions.md#referenced_dataset_variables) | value (a list) | The variable names of the dataset **named in a column value**, per row (the former `distinct(IDVAR, value_is_reference=true)`); `qualifiers=true` appends its `SUPP--` companions' `QNAM` values |
@@ -715,28 +717,28 @@ quantifier over a scalar predicate is that predicate (`any(p(X))` ≡ `p(X)`, `n
 | [`get_permitted_column_order()`](functions.md#get_permitted_column_order) | value | The model column order with the permitted additional variables of a special-purpose dataset placed by role (SDTMIG 4.1.1.4); SKIPPED when the model order is absent or empty |
 | [`natural_key_variables()`](functions.md#natural_key_variables) | value | The natural-key-forming role variables present in the dataset, as a list |
 | [`required_variables()`](functions.md#required_variables) | value | The variables the CDISC Library marks Required for this dataset, as a list |
-| [`var_ccode(x, "DEFINE")`](functions.md#var_ccode) | value | The NCI C-code of the bound codelist; `DEFINE` and `LIBRARY` only |
+| [`var_ccode([x,] level)`](functions.md#var_ccode) | value | The NCI C-code of the bound codelist; `DEFINE` and `LIBRARY` only |
 | [`var_codelist([x,] level)`](functions.md#var_codelist) | value | The name of the codelist bound to the variable; `DEFINE` and `LIBRARY` only |
-| [`var_codelist_coded_codes(x, level)`](functions.md#var_codelist_coded_codes) | value | The codes of the bound codelist's terms, as a list; `DEFINE` and `LIBRARY` only |
-| [`var_codelist_coded_values(x, level)`](functions.md#var_codelist_coded_values) | value | The submission values of the bound codelist's terms, as a list; `DEFINE` and `LIBRARY` only |
-| [`var_codelist_extended_values(x, "DEFINE")`](functions.md#var_codelist_extended_values) | value | The sponsor-added values of an extended codelist, as a list; `DEFINE` only |
-| [`var_codelist_extensible(x, "LIBRARY")`](functions.md#var_codelist_extensible) | value | Whether the bound codelist is extensible; `LIBRARY` only |
+| [`var_codelist_coded_codes([x,] level)`](functions.md#var_codelist_coded_codes) | value | The codes of the bound codelist's terms, as a list; `DEFINE` and `LIBRARY` only |
+| [`var_codelist_coded_values([x,] level)`](functions.md#var_codelist_coded_values) | value | The submission values of the bound codelist's terms, as a list; `DEFINE` and `LIBRARY` only |
+| [`var_codelist_extended_values([x,] "DEFINE")`](functions.md#var_codelist_extended_values) | value | The sponsor-added values of an extended codelist, as a list; `DEFINE` only |
+| [`var_codelist_extensible([x,] "LIBRARY")`](functions.md#var_codelist_extensible) | value | Whether the bound codelist is extensible; `LIBRARY` only |
 | [`var_core([x,] level)`](functions.md#var_core) | value | The variable's core designation — Required, Expected or Permissible; `DEFINE` and `LIBRARY` only |
-| [`var_external_dictionary(x, "DEFINE")`](functions.md#var_external_dictionary) | value | The external dictionary the variable is coded against; `DEFINE` only |
-| [`var_external_dictionary_version(x, "DEFINE")`](functions.md#var_external_dictionary_version) | value | The version of that external dictionary; `DEFINE` only |
-| [`var_format([x,] level)`](functions.md#var_format) | value | The variable's display format; `DATA` and `DEFINE` only |
-| [`var_has_codelist(x, "DEFINE")`](functions.md#var_has_codelist) | value | Whether the variable binds a codelist at all; `DEFINE` only |
-| [`var_has_comment(x, "DEFINE")`](functions.md#var_has_comment) | value | Whether Define-XML attaches a comment to the variable; `DEFINE` only |
-| [`var_has_method(x, "DEFINE")`](functions.md#var_has_method) | value | Whether Define-XML attaches a derivation method to the variable; `DEFINE` only |
-| [`var_has_value_list(x, "DEFINE")`](functions.md#var_has_value_list) | value | Whether Define-XML documents the variable per value (a `def:ValueListRef`); `DEFINE` only |
-| [`var_label([x,] level)`](functions.md#var_label) | value | The variable's label; available at every level |
-| [`var_length([x,] level)`](functions.md#var_length) | value | The variable's declared length; available at every level |
-| [`var_mandatory(x, "DEFINE")`](functions.md#var_mandatory) | value | Whether Define-XML marks the variable mandatory; `DEFINE` only |
-| [`var_name([x,] level)`](functions.md#var_name) | value | The variable's name; available at every level |
-| [`var_ordinal([x,] level)`](functions.md#var_ordinal) | value | The variable's position in the declared column order; available at every level |
-| [`var_origin_type(x, "DEFINE")`](functions.md#var_origin_type) | value | The variable's Define-XML origin type — Collected, Derived and so on; `DEFINE` only |
+| [`var_external_dictionary([x,] "DEFINE")`](functions.md#var_external_dictionary) | value | The external dictionary the variable is coded against; `DEFINE` only |
+| [`var_external_dictionary_version([x,] "DEFINE")`](functions.md#var_external_dictionary_version) | value | The version of that external dictionary; `DEFINE` only |
+| [`var_format([x,] [level])`](functions.md#var_format) | value | The variable's display format; `DATA` and `DEFINE` only |
+| [`var_has_codelist([x,] "DEFINE")`](functions.md#var_has_codelist) | value | Whether the variable binds a codelist at all; `DEFINE` only |
+| [`var_has_comment([x,] "DEFINE")`](functions.md#var_has_comment) | value | Whether Define-XML attaches a comment to the variable; `DEFINE` only |
+| [`var_has_method([x,] "DEFINE")`](functions.md#var_has_method) | value | Whether Define-XML attaches a derivation method to the variable; `DEFINE` only |
+| [`var_has_value_list([x,] "DEFINE")`](functions.md#var_has_value_list) | value | Whether Define-XML documents the variable per value (a `def:ValueListRef`); `DEFINE` only |
+| [`var_label([x,] [level])`](functions.md#var_label) | value | The variable's label; available at every level |
+| [`var_length([x,] [level])`](functions.md#var_length) | value | The variable's declared length; available at every level |
+| [`var_mandatory([x,] "DEFINE")`](functions.md#var_mandatory) | value | Whether Define-XML marks the variable mandatory; `DEFINE` only |
+| [`var_name([x,] [level])`](functions.md#var_name) | value | The variable's name; available at every level |
+| [`var_ordinal([x,] [level])`](functions.md#var_ordinal) | value | The variable's position in the declared column order; available at every level |
+| [`var_origin_type([x,] "DEFINE")`](functions.md#var_origin_type) | value | The variable's Define-XML origin type — Collected, Derived and so on; `DEFINE` only |
 | [`var_role([x,] level)`](functions.md#var_role) | value | The variable's role — identifier, topic, qualifier and so on; `DEFINE` and `LIBRARY` only |
-| [`var_type([x,] level)`](functions.md#var_type) | value | The variable's data type; available at every level |
+| [`var_type([x,] [level])`](functions.md#var_type) | value | The variable's data type; available at every level |
 | [`variable_names()`](functions.md#variable_names) | value | Every variable name the standard publishes, as a list; SKIPPED when the Library publishes none |
 
 ### Define-XML and value-level metadata
@@ -768,7 +770,7 @@ quantifier over a scalar predicate is that predicate (`any(p(X))` ≡ `p(X)`, `n
 | function | returns | what it does |
 |---|---|---|
 | [`codelist_terms(codelists=, level=, returntype=)`](functions.md#codelist_terms) | value | The terms of the named CT codelists in the selected representation, as a list; SKIPPED when they resolve none |
-| [`dictionary_available(type)`](functions.md#dictionary_available) | boolean | The external-dictionary availability gate the loader injects for an inline dictionary call (the operation form was deleted by wave 1) |
+| [`dictionary_available(type)`](functions.md#dictionary_available) | boolean | The external-dictionary availability gate the loader injects for an inline dictionary call |
 | [`dictionary_has_decode(name, external_dictionary_type=)`](functions.md#dictionary_has_decode) | boolean | Any-decode presence per record; code lookup case-sensitive by default, `case_sensitive=false` folds it |
 | [`get_codelist_attributes(name, version, ct_attribute=)`](functions.md#get_codelist_attributes) | value | One CT-package attribute (e.g. `"Term CCODE"`) over every package the rows name — a list for the dataset; SKIPPED without a usable Library answer |
 | [`library_available()`](functions.md#library_available) | boolean | `RulePackageLoader` injects this gate at load for a call that needs the CDISC Library; a not-met Precondition ⇒ SKIPPED |
@@ -832,9 +834,8 @@ name needs the level too (`ds_name("DM")` fails to load, naming `ds_name("DM", "
 
 **A computed name reads per row.** Beside a string, a `var_*` accessor's name may be any expression
 — its **value** on each row is the variable's name — and `dataset=` may be one too:
-`var_label(str(SRCVAR), "DATA", dataset=str(SRCDOM))` is the `DATA` label of the variable each
-row's `SRCVAR` names in the dataset its `SRCDOM` names (runbook W1b, `PLAN-engine-gap-value-addressed`
-V2). A missing or blank name or dataset answers missing, as does a variable the dataset does not
+`var_label(str(SRCVAR), dataset=str(SRCDOM))` is the `DATA` label of the variable each
+row's `SRCVAR` names in the dataset its `SRCDOM` names. A missing or blank name or dataset answers missing, as does a variable the dataset does not
 carry; the computed forms are per-row reads (a binding holding one is a row binding), the literal
 forms stay dataset facts. The name is always a string: `var_label(AETERM)` and
 `dataset=RDOMAIN` fail to load — write `var_label("AETERM")` for the column of that name, and
@@ -852,7 +853,7 @@ expression: 'variable_value_length > define_vlm_length'
 **44 of the 65 are a [metadata accessor](#the-metadata-accessors-take-a-level) with the level
 baked into the name** — `<level-prefix><scope>_<attribute>`, with no prefix for `DATA`, `define_`
 for Define-XML and `library_` for the CDISC Library — and `library_variable_label_template` is
-`label_template("LIBRARY")` the same way. **These 45 are retired in expressions** (runbook W4 MA6):
+`label_template("LIBRARY")` the same way. **These 45 are retired in expressions**:
 written in a Check, a binding or a `Match_Datasets` Filter, one fails the rule's load naming the
 accessor to write — *"retired operand 'dataset_name': the metadata aliases were retired in
 expressions — write ds_name() (same value); 'dataset_name' stays valid as an Output_Variables report
@@ -935,8 +936,24 @@ expressions.
 
 ## Arguments
 
-**Every parameter can be given positionally or by name.** There are no positional-only and no
-keyword-only parameters — one binder serves every function.
+**A parameter can be given positionally or by name** — one binder serves every function — with
+these exceptions, each enforced by a load error:
+
+- **By keyword only.** `within=` and `keep_missings=` on `has_multiple_values_for`
+  (`has_multiple_values_for(A, B, USUBJID)` fails to load: *"`within` on has_multiple_values_for is
+  read by keyword only — write within=USUBJID"*); `within=` on `present_on_multiple_rows_within`,
+  `has_next_corresponding_record` and `is_sorted_by`; `by=` on `is_sorted_by`,
+  `empty_within_except_last_row` and `has_next_corresponding_record` (*"… takes its sort key by
+  keyword — write by=AESEQ"*). `is_last_in_group` alone reads a positional key as `by`.
+- **One positional argument, the target.** `max`, `max_date`, `min_date`, `distinct`, `sequence`
+  and `read_value` take only their target by position; every other parameter is a keyword
+  (*"max takes one positional argument, its target; got 2 — write the others as keywords: …"*).
+  `record_count` takes no positional argument at all.
+- **By position only.** The collecting functions `union`, `tuple` and `printf` take no named
+  argument (*"'union' takes positional arguments only — …"*).
+- **A `$` key by keyword.** A positional `$`-binding of column names in `is_unique_relationship`,
+  `is_not_unique_relationship` or `is_inconsistent_across_dataset` fails to load — write
+  `keys=[$k]`.
 
 ```yaml
 expression: 'substring(AETERM, 1, 3)'                  # all positional
@@ -955,8 +972,9 @@ Four rules govern a call:
 4. **An optional parameter you leave out takes its documented default.** Omitting it is not the
    same as passing a missing value.
 
-Three shapes are errors, each with its own message: too many positional arguments, a required
-parameter left unbound, and an argument name the function does not declare.
+Four shapes are errors, each with its own message: too many positional arguments, a required
+parameter left unbound, an argument name the function does not declare, and a positional argument
+at a parameter read by keyword only (the exceptions above).
 
 > ⛔ **An unrecognised argument name is an error, deliberately.** A silently-dropped parameter is
 > the worst failure this language can have: the rule runs, computes something other than what you
@@ -967,10 +985,16 @@ Two tokens look like functions inside an argument but are not: **`asc(…)` and 
 in a sort-key list means `asc` (the SQL default, `by=[USUBJID, desc(SESTDTC)]`); the column may be a
 dataset-level `$` name or name list, spliced once per run (`asc($c)`, `by=$keys`). `by=` is the one
 sort-key parameter: `is_last_in_group`, `has_next_corresponding_record` and
-`empty_within_except_last_row` take one ascending key there; their older `ordering=` is retired —
-write `by=` (`ordering=` fails to load with the hint *"write by="*, runbook W4 OR2; the corpus
-spells `by=` since runbook W3). A descriptor's `nulls=` takes `"first"` or `"last"` only, and no
-other descriptor keyword exists (runbook W4 SB3).
+`empty_within_except_last_row` take exactly one ascending key there, written `by=` (`ordering=`
+fails to load with the hint *"ordering= is retired — write by=…"*); `is_sorted_by`,
+`empty_within_except_last_row` and `has_next_corresponding_record` take it by keyword only. A
+descriptor's `nulls=` takes the literal `"first"` or `"last"` only (lower case), and no other
+descriptor keyword exists. ⚠ The functions order differently: `sequence` and `is_sorted_by`
+classify each key over its cells — numeric when every present cell is a number, so a character
+column of numeric-looking text sorts numerically, else ISO date part by part, then text;
+`is_last_in_group` orders by the column's type (a character column as text); and
+`empty_within_except_last_row` / `has_next_corresponding_record` order by the cells' text whatever
+the column's type. Each [function's section](functions.md#sequence) gives the detail.
 
 **A boolean handed to a function needs its own parentheses** — `filter=(TSPARMCD == "SPECIES")` —
 with one exception: `joined(…)` takes a condition by declaration, so its argument is written bare,

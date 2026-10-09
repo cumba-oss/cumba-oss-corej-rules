@@ -177,7 +177,7 @@ The same hull rule, on times of day.
 ### `duration` — the hull rule on durations
 
 `duration(X)` on either side makes the comparison read both operands as ISO-8601 **durations**, and
-the same ∀ rule applies (runbook W1b DO, `PLAN-engine-gap-dur-order`). The exact designators have
+the same ∀ rule applies. The exact designators have
 one length each — a week is 7 days, a day 86 400 seconds (a duration carries no calendar, so no
 DST), hours, minutes and seconds exact, a fraction on the lowest component — so every spelling of
 the same length is the same **point**: `PT90M == PT1H30M`, `P1W == P7D`, `P0D == PT0S`, and
@@ -240,12 +240,11 @@ the weaker surface here. It is the same partiality in both.
 `upper(X) in [...]` is the case-insensitive surface, and is always textual — numbers have no
 case.
 
-> ⭐ **A column name handled as a value is a string** (owner, 2026-09-28; rulings register
-> `CIT §3`). Column names match ignoring case wherever the engine looks a column *up* (`CIT §1`),
+> ⭐ **A column name handled as a value is a string** (rulings register `CIT §3`). Column names match ignoring case wherever the engine looks a column *up* (`CIT §1`),
 > but a `varname()`, a `QNAM` cell or an element of `get_column_order_from_dataset()` is a value,
 > and a value compares as ruled here — exactly. A rule that compares or tests a NAME folds it,
-> and folds **both sides** of a comparison (the owner's *"compare the upper case version of a name
-> against the upper case version of a list of strings"*): `upper(varname()) in $x` (the membership
+> and folds **both sides** of a comparison (the upper-case version of a name against the upper-case
+> version of a list of strings): `upper(varname()) in $x` (the membership
 > surface above folds the list too), `equalsIgnoreCase(varname(), …)`, `upper($dataset_variables)`
 > against `upper($required_variables)`; and a name **test** folds the name it tests —
 > `ends_with(upper(varname()), "DTC")`, `upper(varname()) =~ /^ANL\d\dFL$/` — against a literal
@@ -265,7 +264,7 @@ case.
 > Treatment for Period 01`). Each rule keeps its own authority's exception (ruling `M2-D15`):
 > `CDISC-AD0018` excludes every index name, `var_name("LIBRARY") !~ /[a-z]/`; `CDISC-AD0709`
 > excludes the indexes `w`, `y` and `zz` only, `var_name("LIBRARY") !~ /[wyz]/`, and judges an
-> `xx` name with `matches_label_template(var_label("DATA"), label_template("LIBRARY"))`;
+> `xx` name with `matches_label_template(var_label(), label_template("LIBRARY"))`;
 > `PMDA-AD0018` states no exception and judges every index name that way. A library name is the
 > standard's spelling, not the data's, so testing it needs no fold, and the resolution itself
 > ignores letter case.
