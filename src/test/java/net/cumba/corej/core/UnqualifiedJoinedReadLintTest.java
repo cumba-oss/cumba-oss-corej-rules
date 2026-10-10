@@ -142,9 +142,16 @@ class UnqualifiedJoinedReadLintTest
     // packages (sendig 3.0 / 3.1 / 3.1.1, genetox-1-0, dart-1-2). Their bare reads are TF's own
     // (USUBJID, TFSPID, TFDETECT); the one DS read is qualified (DS.DSSTDTC). FLAGS stayed 0 and
     // CANDIDATES did not move. The sixth package, dart-1-1, selects no library dataset for TF and
-    // is named in R-EMPTY; under dart-1-2 the DS join is counted in R-UNRES (DS 1 -> 3).
+    // is named in R-EMPTY; under dart-1-2 the DS join was counted in R-UNRES (DS 1 -> 3) until
+    // the store held that product (2026-10-10, below).
+    // SEND 152 -> 162 on 2026-10-10 (PLAN-seed-sendig-dart-1-2 P3): the store now holds
+    // standards/sendig/dart-1-2 (the E14 seed supplement), so the ten joined rules of
+    // rules-cdisc-sendig-dart-1-2.json — one Match_Datasets entry each: DM (CDISC-SEND-0073,
+    // 0074, 0401, 0402, 0403), RELREC (0198, 0339), DS (0204, 0205, 0283) — are examined under
+    // that package instead of being counted in R-UNRES (exactly the three dart-1-2 rows that left
+    // it, 5 + 2 + 3 references). FLAGS stayed 0 and CANDIDATES did not move.
     private static final Map<String, Integer> EXPECTED_REACH = Map.of("ADaM", 187, "SDTM", 421,
-            "SEND", 152);
+            "SEND", 162);
 
     // SEND 6 -> 9 -> 6 on 2026-09-30 (PLAN-rprfdy-offset-tp-join). Phase 4 gave CDISC-SEND-0401/
     // 0402/0403 read_value(RPRFDY, domain="TP", group=[DM.RPATHCD, RPHASE], mode="MAX"), and the
@@ -168,22 +175,21 @@ class UnqualifiedJoinedReadLintTest
             Map.entry("sendig/ar-1-0\tRELREC (no variables)", 1),
             Map.entry("sendig/ar-1-0\tSV (no variables)", 1),
             Map.entry("sendig/ar-1-0\tTA (no variables)", 1),
-            Map.entry("sendig/ar-1-0\tTE (no variables)", 1),
-            // sendig/dart-1-2 DM 2 -> 5 and SJ 3 -> gone on 2026-09-30 (PLAN-rprfdy-offset-tp-join
-            // phase 4, D-SJ): CDISC-SEND-0401/0402/0403 replaced their SJ Match_Datasets entry by a
-            // DM entry (Keys [USUBJID]). The store has no SENDIG-DART 1.2 product, so under that
-            // package the lint cannot judge those three joins (as it could not judge the three SJ
-            // joins before) — they are examined under dart-1-1, where FLAGS stayed 0.
-            // DS 1 -> 3 on 2026-09-30 (PLAN-send-tfdetect-pathology-unpark): the un-parked
-            // CDISC-SEND-0204 / 0205 join DS, and under this package the join cannot be judged.
-            Map.entry("sendig/dart-1-2\tDM", 5), Map.entry("sendig/dart-1-2\tDS", 3),
-            Map.entry("sendig/dart-1-2\tRELREC", 2));
+            // The three sendig/dart-1-2 rows (DM 5, DS 3, RELREC 2) left on 2026-10-10
+            // (PLAN-seed-sendig-dart-1-2 P3): the store holds the SENDIG-DART 1.2 product now, so
+            // those ten joins are examined (EXPECTED_REACH SEND +10) instead of being unjudgeable.
+            Map.entry("sendig/ar-1-0\tTE (no variables)", 1));
 
     // + the two dart-1-1 rows on 2026-09-30 (PLAN-send-tfdetect-pathology-unpark): the un-parked
     // CDISC-SEND-0204 / 0205 are scoped to TF, which the SENDIG-DART 1.1 library does not define.
+    // + the two dart-1-2 rows on 2026-10-10 (PLAN-seed-sendig-dart-1-2 P3): with the SENDIG-DART
+    // 1.2 product in the store, CDISC-SEND-0204 / 0205 are examined under that package too, and
+    // their TF scope selects no library dataset there either (DART 1.2 carries no TF, as 1.1).
     private static final Set<String> EXPECTED_EMPTY = Set.of(
             "rules-cdisc-sendig-dart-1-1.json\tCDISC-SEND-0204",
             "rules-cdisc-sendig-dart-1-1.json\tCDISC-SEND-0205",
+            "rules-cdisc-sendig-dart-1-2.json\tCDISC-SEND-0204",
+            "rules-cdisc-sendig-dart-1-2.json\tCDISC-SEND-0205",
             "rules-fda-sendig-ar-1-0.json\tFDA-SD1205", "rules-fda-sendig-ar-1-0.json\tFDA-SD1206",
             "rules-fda-sendig-ar-1-0.json\tFDA-SD1207", "rules-fda-sendig-ar-1-0.json\tFDA-SD9747",
             "rules-fda-sendig-ar-1-0.json\tFDA-SE1152");

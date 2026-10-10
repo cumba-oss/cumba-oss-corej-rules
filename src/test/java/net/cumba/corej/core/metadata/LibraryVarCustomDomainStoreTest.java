@@ -108,7 +108,7 @@ class LibraryVarCustomDomainStoreTest
     private static final Set<String> AR_NON_GO_ABSENT = Set.of("CO", "SE", "TA", "TE", "TX", "TS",
             "POOLDEF", "RELREC");
 
-    /** The SEND domains SENDIG-DART 1.1 leaves out, all general-observation (Findings). */
+    /** The SEND domains SENDIG-DART 1.1 and 1.2 leave out, all general-observation (Findings). */
     private static final Set<String> DART_ABSENT = Set.of("EG", "PM", "TF", "VS", "CV", "RE");
 
     /** The Define-XML fixture, parsed once. */
@@ -481,9 +481,12 @@ class LibraryVarCustomDomainStoreTest
         {
             packages.addAll(servedPackages(rule).values());
         }
-        assertEquals(new TreeSet<>(List.of("sdtmig 3-1-2", "sdtmig 3-1-3", "sdtmig 3-2",
-                "sdtmig 3-3", "sdtmig 3-4", "sendig 3-0", "sendig 3-1", "sendig 3-1-1",
-                "sendig ar-1-0", "sendig dart-1-1", "sendig genetox-1-0")), packages);
+        assertEquals(
+                new TreeSet<>(List.of("sdtmig 3-1-2", "sdtmig 3-1-3", "sdtmig 3-2", "sdtmig 3-3",
+                        "sdtmig 3-4", "sendig 3-0", "sendig 3-1", "sendig 3-1-1", "sendig ar-1-0",
+                        "sendig dart-1-1", "sendig dart-1-2", "sendig genetox-1-0")),
+                packages, "sendig dart-1-2 since 2026-10-10: the E14 seed supplement"
+                        + " (PLAN-seed-sendig-dart-1-2)");
         int checked = 0;
         for (String pkg : packages)
         {
@@ -526,7 +529,9 @@ class LibraryVarCustomDomainStoreTest
                 checked++;
             }
         }
-        assertEquals(44, checked);
+        // 4 shapes × 12 packages; 44 -> 48 on 2026-10-10 with sendig dart-1-2 (the E14 seed
+        // supplement, PLAN-seed-sendig-dart-1-2 P3).
+        assertEquals(48, checked);
     }
 
 
@@ -577,9 +582,10 @@ class LibraryVarCustomDomainStoreTest
                 runs++;
             }
         }
-        // CG0012 3, FDA-SD0055 6, PMDA-SD0055 5, FDA-SE0055 5, SEND-0271 5 (DART 1.2 has no
-        // store product).
-        assertEquals(24, runs);
+        // CG0012 3, FDA-SD0055 6, PMDA-SD0055 5, FDA-SE0055 5, SEND-0271 6. 24 -> 25 on 2026-10-10
+        // (PLAN-seed-sendig-dart-1-2 P3): of these five only SEND-0271 ships in
+        // rules-cdisc-sendig-dart-1-2.json, which runs now that the store holds that product.
+        assertEquals(25, runs);
     }
 
 
@@ -606,8 +612,9 @@ class LibraryVarCustomDomainStoreTest
                 runs++;
             }
         }
-        // CG0010 at SDTMIG 3.2/3.3/3.4; SEND-0009.1 at SENDIG 3.0/3.1/3.1.1/DART 1.1/GENETOX 1.0.
-        assertEquals(8, runs);
+        // CG0010 at SDTMIG 3.2/3.3/3.4; SEND-0009.1 at SENDIG 3.0/3.1/3.1.1/DART 1.1/DART 1.2/
+        // GENETOX 1.0 (DART 1.2 since 2026-10-10, PLAN-seed-sendig-dart-1-2: 8 -> 9).
+        assertEquals(9, runs);
     }
 
 
@@ -626,7 +633,9 @@ class LibraryVarCustomDomainStoreTest
                     result.getViolations().get(0).getValues().get("define_variable_name"), what);
             runs++;
         }
-        assertEquals(5, runs);
+        // 5 -> 6 on 2026-10-10 (PLAN-seed-sendig-dart-1-2 P3): SEND-0005 ships in
+        // rules-cdisc-sendig-dart-1-2.json, whose product the store now holds.
+        assertEquals(6, runs);
     }
 
 
@@ -684,6 +693,12 @@ class LibraryVarCustomDomainStoreTest
         assertTrue(ar.containsAll(AR_NON_GO_ABSENT), "AR 1.0: " + ar);
         Set<String> dart = igAbsentRelativeTo311("sendig dart-1-1");
         assertTrue(dart.containsAll(DART_ABSENT), "DART 1.1: " + dart);
+        // PLAN-seed-sendig-dart-1-2 D4: the E14 supplement follows the Library's DART 1.1
+        // inclusion rule, so DART 1.2 leaves out exactly what DART 1.1 does (VS, CV, RE and EG
+        // stay IG-absent although §2.2.2 lets a juvenile study submit them).
+        Set<String> dart12 = igAbsentRelativeTo311("sendig dart-1-2");
+        assertTrue(dart12.containsAll(DART_ABSENT), "DART 1.2: " + dart12);
+        assertEquals(dart, dart12, "DART 1.2 leaves out what DART 1.1 does");
     }
 
 
