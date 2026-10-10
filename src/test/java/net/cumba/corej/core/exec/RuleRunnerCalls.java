@@ -1,10 +1,10 @@
 package net.cumba.corej.core.exec;
 
 import java.util.Set;
-import net.cumba.corej.core.metadata.RuntimeDictionaryProvider;
 import net.cumba.corej.core.metadata.VlmResolver;
 import net.cumba.corej.core.model.Rule;
 import net.cumba.datatable.IDataTable;
+import net.cumba.datatable.dictionary.house.RuntimeDictionaryProvider;
 import net.cumba.datatable.report.Severity;
 import org.jspecify.annotations.Nullable;
 
