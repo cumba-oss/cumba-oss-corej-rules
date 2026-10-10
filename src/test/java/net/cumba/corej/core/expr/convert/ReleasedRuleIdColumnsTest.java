@@ -85,17 +85,19 @@ class ReleasedRuleIdColumnsTest
     private static final int MIN_RULES_COMPARED = 3500;
 
     /**
-     * At least this many rules must have a non-empty id in <em>some</em> column. Without it the
-     * test would pass just as happily if R4 blanked every column and the assembler produced nothing
-     * either.
+     * At least this many (rule, organization) pairs must carry a non-empty id in the {@code CDISC}
+     * or {@code FDA} column. Without it the test would pass just as happily if R4 blanked both
+     * columns and the assembler produced nothing either. {@code PMDA} is deliberately not counted
+     * here: it alone exceeds this floor, so counting it would let the CDISC and FDA columns compare
+     * empty against empty everywhere and stay green. PMDA has its own floor below.
      */
     private static final int MIN_NON_EMPTY = 3000;
 
     /**
-     * At least this many rules must carry a non-empty PMDA id. The overall floor above is met by
-     * the CDISC and FDA columns alone, so without this one the PMDA column could compare empty
-     * against empty everywhere — the R4 blanking failure, for the column this floor was added with
-     * — and stay green. Floor, not an equality: the corpus grows.
+     * At least this many rules must carry a non-empty PMDA id. The floor above counts the CDISC and
+     * FDA columns only, so without this one the PMDA column could compare empty against empty
+     * everywhere — the R4 blanking failure, for the column this floor was added with — and stay
+     * green. Floor, not an equality: the corpus grows.
      */
     private static final int MIN_NON_EMPTY_PMDA = 3300;
 
@@ -105,7 +107,7 @@ class ReleasedRuleIdColumnsTest
         RuleStorageAssembler assembler = new RuleStorageAssembler();
         List<String> mismatches = new ArrayList<>();
         int compared = 0;
-        int nonEmpty = 0;
+        int nonEmptyCdiscFda = 0;
         int nonEmptyPmda = 0;
 
         for (Triple t : assembler.discoverPackages())
@@ -138,10 +140,13 @@ class ReleasedRuleIdColumnsTest
                     String fromReleased = ReportAssembler.collectRuleIds(e.getValue(), org);
                     if (!fromAuthored.isEmpty())
                     {
-                        nonEmpty++;
                         if ("PMDA".equals(org))
                         {
                             nonEmptyPmda++;
+                        }
+                        else
+                        {
+                            nonEmptyCdiscFda++;
                         }
                     }
                     if (!fromAuthored.equals(fromReleased))
@@ -156,9 +161,10 @@ class ReleasedRuleIdColumnsTest
         assertTrue(compared >= MIN_RULES_COMPARED,
                 "only " + compared + " rules compared; expected at least " + MIN_RULES_COMPARED
                         + ". A comparison over nothing is not a guard.");
-        assertTrue(nonEmpty >= MIN_NON_EMPTY,
-                "only " + nonEmpty + " (rule, organization) pairs carried any id at all; expected"
-                        + " at least " + MIN_NON_EMPTY + ". Both sides being empty is not"
+        assertTrue(nonEmptyCdiscFda >= MIN_NON_EMPTY,
+                "only " + nonEmptyCdiscFda
+                        + " (rule, CDISC/FDA) pairs carried any id at all; expected" + " at least "
+                        + MIN_NON_EMPTY + ". Both sides being empty is not"
                         + " agreement — it is the exact failure this test exists to catch.");
         assertTrue(nonEmptyPmda >= MIN_NON_EMPTY_PMDA,
                 "only " + nonEmptyPmda + " rules carried a PMDA id; expected at least "
