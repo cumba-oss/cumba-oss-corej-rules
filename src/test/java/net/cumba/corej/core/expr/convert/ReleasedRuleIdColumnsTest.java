@@ -32,7 +32,8 @@ import org.junit.jupiter.api.Test;
  * [...]}]}. That is 60.8 MiB of the 65.06 MiB it saves, and it is sound <em>only</em> because the
  * flat form still carries everything {@link ReportAssembler#collectRuleIds} reads. Those are the
  * {@code cdisc_rule_id} and {@code fda_rule_id} columns of the xlsx Rules Report, of the JSON
- * report's {@code Rules_Report}, and of {@code GET /api/checks/{id}/rules}.
+ * report's {@code Rules_Report}, and of {@code GET /api/checks/{id}/rules}, and the v2-only
+ * {@code pmda_rule_id} column of the first two.
  * </p>
  *
  * <p>
@@ -67,8 +68,12 @@ import org.junit.jupiter.api.Test;
 class ReleasedRuleIdColumnsTest
 {
 
-    /** The two organizations the report emits columns for. */
-    private static final List<String> ORGANIZATIONS = List.of("CDISC", "FDA");
+    /**
+     * The three organizations the report emits columns for: {@code cdisc_rule_id} and
+     * {@code fda_rule_id} in every report, {@code pmda_rule_id} in the v2 JSON report and the xlsx
+     * ({@code PLAN-report-v2-rule-metadata}).
+     */
+    private static final List<String> ORGANIZATIONS = List.of("CDISC", "FDA", "PMDA");
 
     private static final ObjectMapper MAPPER = new ObjectMapper()
             .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
@@ -86,6 +91,14 @@ class ReleasedRuleIdColumnsTest
      */
     private static final int MIN_NON_EMPTY = 3000;
 
+    /**
+     * At least this many rules must carry a non-empty PMDA id. The overall floor above is met by
+     * the CDISC and FDA columns alone, so without this one the PMDA column could compare empty
+     * against empty everywhere — the R4 blanking failure, for the column this floor was added with
+     * — and stay green. Floor, not an equality: the corpus grows.
+     */
+    private static final int MIN_NON_EMPTY_PMDA = 3300;
+
     @Test
     void theReleasedCorpusReportsTheSameRuleIdColumnsAsTheAuthoredSource() throws Exception
     {
@@ -93,6 +106,7 @@ class ReleasedRuleIdColumnsTest
         List<String> mismatches = new ArrayList<>();
         int compared = 0;
         int nonEmpty = 0;
+        int nonEmptyPmda = 0;
 
         for (Triple t : assembler.discoverPackages())
         {
@@ -125,6 +139,10 @@ class ReleasedRuleIdColumnsTest
                     if (!fromAuthored.isEmpty())
                     {
                         nonEmpty++;
+                        if ("PMDA".equals(org))
+                        {
+                            nonEmptyPmda++;
+                        }
                     }
                     if (!fromAuthored.equals(fromReleased))
                     {
@@ -142,10 +160,14 @@ class ReleasedRuleIdColumnsTest
                 "only " + nonEmpty + " (rule, organization) pairs carried any id at all; expected"
                         + " at least " + MIN_NON_EMPTY + ". Both sides being empty is not"
                         + " agreement — it is the exact failure this test exists to catch.");
+        assertTrue(nonEmptyPmda >= MIN_NON_EMPTY_PMDA,
+                "only " + nonEmptyPmda + " rules carried a PMDA id; expected at least "
+                        + MIN_NON_EMPTY_PMDA + ". An empty pmda_rule_id column on both sides is"
+                        + " not agreement.");
         assertEquals(List.of(), mismatches.size() > 40 ? mismatches.subList(0, 40) : mismatches,
                 mismatches.size() + " (rule, organization) report columns differ between the"
                         + " authored source and the released package. R4's whole justification is"
-                        + " that cdisc_rule_id / fda_rule_id stay bit-identical across the strip;"
-                        + " if this is red, they do not.");
+                        + " that cdisc_rule_id / fda_rule_id / pmda_rule_id stay bit-identical"
+                        + " across the strip;" + " if this is red, they do not.");
     }
 }
