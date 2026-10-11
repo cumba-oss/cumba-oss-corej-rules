@@ -51,27 +51,26 @@ Grouping:
 Each evaluated row is grouped by the `RPATHCD` of **its own bound `DM` record** and its own
 `RPHASE` — per trial path, per repro phase, although the primary dataset carries no `RPATHCD`.
 
-- **The qualifier names an entry of the same rule** that is an ordinary keyed join (not
-  `Child: true`, not `RELREC`, not `SUPP--` / `SQ`, no `--` template name, with `Keys`) and
-  **`inner`** — `Join_Type: "inner"` or none. Anything else, and a qualifier naming no entry, is a
-  **load error**. So is a `--` or `&` wildcard inside a qualified member. The flat
-  `Grouping_Variables` form takes the same members under the same rules.
+- **The qualifier names an entry of the same rule** — any declared entry: an ordinary keyed join,
+  a `left` one, a `Child: true` parent, a `RELREC` related domain or a `SUPP--` entry. The member
+  reads that entry's column on the rule's one evaluation table (an unmatched `left` row reads the
+  column's type default). A qualifier naming no entry is a **load error**, and so is a `--` or `&`
+  wildcard inside a qualified member. The flat `Grouping_Variables` form takes the same members
+  under the same rules.
 - **It is a key component like any other.** [`keep_missings`](#keep_missings--rows-whose-key-is-missing)
   applies to it: by default a group whose key carries a blank or missing value — a blank
   `DM.RPATHCD` included — is dropped; with `keep_missings: true` it stays, and `""` and each
   missing value form groups of their own.
-- **It is never dropped.** A plain grouping column the dataset lacks partitions nothing and is left
-  out of the key. A qualified one the rule cannot read — no `DM` dataset in the study, or `DM`
-  without `RPATHCD` — makes the rule **stop with an error**; declare `DM.RPATHCD` in
-  [`Requirements.Variables.All`](requirements.md) and such a study **skips** it instead.
+- **An absent one is dropped like a plain one.** A grouping column the rule cannot read — a plain
+  one the dataset lacks, or a qualified one with no `DM` dataset in the study or `DM` without
+  `RPATHCD` — partitions nothing and is left out of the key. Declare `DM.RPATHCD` in
+  [`Requirements.Variables.All`](requirements.md) if the grouping means nothing without it, and
+  such a study **skips** the rule instead.
 - **The finding carries it.** A group's reported key and its unit include the joined value, so two
   paths' groups report two keys.
 - **Copies are records.** If the join is not one-to-one per record — `DM` carrying a subject twice,
   on two paths — the join copies the record first, and each copy lands in the group of its **own**
   `DM` record. Groups are then judged over the copies.
-- ⚠ **Findings come in first-appearance order** — a group is visited at its first row. The set of
-  findings is the one a plain grouping would give; their order, and so which are kept once the
-  per-rule cap is reached, can differ.
 
 The same qualified spelling joins a key through an earlier entry in
 [`Match_Datasets`](joins.md#a-qualified-key--joining-through-an-earlier-entry) and keys a grouped

@@ -1,0 +1,100 @@
+Core:
+  Id: "CDISC-SEND-0306-A"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when the Date/Time of Last Study Treatment (RFXENDTC)\
+  \ is populated for a subject with Exposure (EX) records but equals neither the latest\
+  \ End Date/Time of Treatment (EXENDTC) nor the latest Start Date/Time of Treatment\
+  \ (EXSTDTC) for that subject, over the subject's own EX records, on a study that\
+  \ defines no pools (no POOLDEF dataset with POOLID)."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "DM"
+Requirements:
+  Variables:
+    All:
+    - "RFXENDTC"
+    - "USUBJID"
+    None:
+    - "POOLDEF.POOLID"
+Bindings:
+- name: "$ex_subjects"
+  expression: "distinct(USUBJID, domain=\"EX\")"
+- name: "$latest_exendtc"
+  expression: "max_date(EXENDTC, domain=\"EX\", missing_values=\"indeterminate\",\
+    \ group=[USUBJID])"
+- name: "$latest_exstdtc"
+  expression: "max_date(EXSTDTC, domain=\"EX\", group=[USUBJID])"
+Check:
+  expression: >-
+    not empty(RFXENDTC) and USUBJID in $ex_subjects and date(RFXENDTC) != $latest_exendtc and
+    date(RFXENDTC) != $latest_exstdtc
+Outcome:
+  Message: "RFXENDTC is populated but does not equal the latest EXENDTC or the latest\
+    \ EXSTDTC over the subject's own EX records (the study defines no pools)."
+  Output_Variables:
+  - "$ex_subjects"
+Source_Proposed:
+  Class: "SPC"
+  Domain: "DM"
+  Variable: "RFXENDTC"
+  Condition: "RFXENDTC ^= null and the study defines no pools (no POOLDEF dataset\
+    \ with POOLID)"
+  Rule: "RFXENDTC value = date/time of absolute latest value of test article exposure\
+    \ (as represented in EXENDTC or EXSTDTC for that subject)."
+Source:
+  Class: "SPC"
+  Domain: "DM"
+  Variable: "RFXENDTC"
+  Plain_Text_Explanation: "If RFXENDTC is populated it is equal to the latest (i.e.,\
+    \ absolute last) value of EXENDTC.  If EXENDTC is not populated RFXENDTC is equal\
+    \ to the latest (i.e., absolute last) value of EXSTDTC if EXENDTC was not collected\
+    \ or is missing."
+  Condition: "RFXENDTC ^= null"
+  Rule: "RFXENDTC value = date/time of absolute latest value of test article exposure\
+    \ (as represented in EXENDTC or EXSTDTC for that subject)."
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SENDIG-GENETOX"
+    Version: "1.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND306"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.2"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND306"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND306"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND306"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND306"
+        Version: "1"
+      Version: "5.0"

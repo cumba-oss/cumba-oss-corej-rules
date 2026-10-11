@@ -17,7 +17,10 @@ ExecutabilityHint:
     \ differently in DM and POOLDEF (Char against Num), makes the rule ERROR; in a\
     \ CSV or XLSX study the type is inferred from the data, and a column blank in\
     \ every row reads as Char from CSV but as Num from XLSX (e.g. an empty EX POOLID\
-    \ in an XLSX study beside character POOLDEF pool IDs such as POOL1)."
+    \ in an XLSX study beside character POOLDEF pool IDs such as POOL1). The rule\
+    \ runs on a pooled study only — POOLDEF with POOLID and EX with POOLID; a study\
+    \ that defines no pools is judged by CDISC-SEND-0305-A, and a study whose POOLDEF\
+    \ defines pools while EX has no POOLID skips both (the pool part cannot be read)."
 Scope:
   Domains:
     Include:
@@ -26,6 +29,8 @@ Requirements:
   Variables:
     All:
     - "USUBJID"
+    - "POOLDEF.POOLID"
+    - "EX.POOLID"
 Bindings:
 - name: "$ex_usubjid"
   expression: "distinct(USUBJID, domain=\"EX\")"

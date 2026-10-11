@@ -1,0 +1,22 @@
+#!RuleTest
+#test CDISC-AD0898 expect=skipped domain=ADAE
+#note "PLAN-join-key-one-side-absent-drop QK8 (owner 2026-10-09): ADAE has no USUBJID, so the template entry's ungated USUBJID key would be on the parent's side only - since REG-Q3 it would leave the key and the join would run on STUDYID + AESEQ across subjects. Requirements.Variables.All gains USUBJID, so the study SKIPS. Measured: the old rule skipped this study too, through the template expander's absent-merge-key guard (TokenExpander.firstAbsentMergeKey) - QK8 states that skip in Requirements, where the gate and its reason are visible."
+#library standard=adamig version=1-2
+#library standard-domains AE CM MH DM LB VS
+dataset ADAE
+col STUDYID type=Char
+col AESEQ   type=Char
+col AETERM  type=Char
+---
+CDISCPILOT01 | 1 | HEADACHE
+CDISCPILOT01 | 2 | NAUSEA
+---
+
+dataset AE label="Adverse Events"
+col STUDYID type=Char
+col DOMAIN  type=Char
+col USUBJID type=Char
+col AESEQ   type=Char
+---
+CDISCPILOT01 | AE | 01-701-1015 | 1
+---

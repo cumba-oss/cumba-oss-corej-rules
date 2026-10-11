@@ -1,0 +1,90 @@
+Core:
+  Id: "CDISC-SEND-0305-A"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when the Subject Reference Start Date/Time of Study Treatment\
+  \ (RFXSTDTC) is populated but does not equal the earliest EXSTDTC of the subject's\
+  \ own EX records, on a study that defines no pools (no POOLDEF dataset with POOLID)."
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "DM"
+Requirements:
+  Variables:
+    All:
+    - "USUBJID"
+    None:
+    - "POOLDEF.POOLID"
+Bindings:
+- name: "$ex_usubjid"
+  expression: "distinct(USUBJID, domain=\"EX\")"
+- name: "$min_ex_exstdtc"
+  expression: "min_date(EXSTDTC, domain=\"EX\", group=[USUBJID])"
+Check:
+  expression: >-
+    not empty(RFXSTDTC) and USUBJID in $ex_usubjid and date(RFXSTDTC) != $min_ex_exstdtc
+Outcome:
+  Message: "RFXSTDTC is populated but does not equal the earliest EXSTDTC of the subject's\
+    \ own EX records (the study defines no pools)."
+  Output_Variables:
+  - "$ex_usubjid"
+Source_Proposed:
+  Class: "SPC"
+  Domain: "DM"
+  Variable: "RFXSTDTC"
+  Condition: "RFXSTDTC ^= null and the study defines no pools (no POOLDEF dataset\
+    \ with POOLID)"
+  Rule: "RFXSTDTC value = earliest EXSTDTC value for that subject"
+Source:
+  Class: "SPC"
+  Domain: "DM"
+  Variable: "RFXSTDTC"
+  Plain_Text_Explanation: "If RFXSTDTC is populated the value should be equal to the\
+    \ earliest (i.e., absolute first) value of EXSTDTC for that subject or the EXSTDTC\
+    \ for the pool to which that subject belongs."
+  Condition: "RFXSTDTC ^= null"
+  Rule: "RFXSTDTC value = earliest EXSTDTC value for that subject"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SENDIG-GENETOX"
+    Version: "1.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND305"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.2"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND305"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND305"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND305"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND305"
+        Version: "1"
+      Version: "5.0"

@@ -1,0 +1,53 @@
+#!RuleTest
+#test CDISC-SEND-0204-A expect=violation domain=TF
+#note "PLAN-send-tfdetect-pathology-unpark: Row 1 (001, M1) is MA-linked (in MA, not in CL or PM) but its TFDETECT is blank -> NOT judged: there is no value to compare, and the rule judges a populated TFDETECT only (review L2). Row 2 (002, M2) is MA-linked (in MA, not in CL or PM) with a wrong TFDETECT (50, the right value is 100) -> REPORTED, so the silence of row 1 is not vacuous. Red-before (TF-2): with the 'not empty(TFDETECT)' term deleted, row 1 fired (2 findings, expected 1). ⚑ PLAN-join-key-one-side-absent-drop QK17 (owner 2026-10-11): split by the pool gate — a study that defines no pools is judged by CDISC-SEND-0204-A (moved from CDISC-SEND-0204, same expectation)"
+#library standard=sendig version=3-1-1
+#expectViolationCount 1
+#expectViolationAt row=2 TFSPID=M2
+dataset TF class=FINDINGS label="Tumor Findings"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col TFSEQ    type=Num  label="Sequence Number"
+col TFSPID   type=Char label="Sponsor-Defined Identifier"
+col TFTESTCD type=Char label="Tumor Findings Test Short Name"
+col TFDETECT type=Num  label="Time in Days to Detection of Tumor"
+---
+S1 | TF | 001 | 1 | M1 | TUMEXAM |
+S1 | TF | 002 | 2 | M2 | TUMEXAM | 50
+---
+dataset DS class=EVENTS label="Disposition"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col DSSEQ   type=Num  label="Sequence Number"
+col DSTERM  type=Char label="Reported Term for the Disposition Event"
+col DSDECOD type=Char label="Standardized Disposition Term"
+col DSSTDTC type=Char label="Date/Time of Disposition"
+---
+S1 | DS | 001 | 1 | TERMINAL SACRIFICE | TERMINAL SACRIFICE | 2020-04-09
+S1 | DS | 002 | 1 | TERMINAL SACRIFICE | TERMINAL SACRIFICE | 2020-04-09
+---
+dataset EX class=INTERVENTIONS label="Exposure"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col EXSEQ   type=Num  label="Sequence Number"
+col EXTRT   type=Char label="Name of Treatment"
+col EXSTDTC type=Char label="Start Date/Time of Treatment"
+---
+S1 | EX | 001 | 1 | DRUG A | 2020-01-01
+S1 | EX | 002 | 2 | DRUG A | 2020-01-01
+---
+dataset MA class=FINDINGS label="Macroscopic Findings"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col MASEQ    type=Num  label="Sequence Number"
+col MASPID   type=Char label="Sponsor-Defined Identifier"
+col MATESTCD type=Char label="Macroscopic Examination Short Name"
+col MAORRES  type=Char label="Result or Finding in Original Units"
+---
+S1 | MA | 002 | 1 | M2 | GROSPATH | MASS
+S1 | MA | 001 | 2 | M1 | GROSPATH | MASS
+---

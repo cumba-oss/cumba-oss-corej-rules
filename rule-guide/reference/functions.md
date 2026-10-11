@@ -145,27 +145,25 @@ Bindings:
 sided member `{left: X, right: Y}` is a literal of its own: each side a plain column (no `--`,
 no qualifier, no `$` — a side is never spliced), `domain=` required (without it the two names
 would be columns of one table), the key types checked side against side, an absent left column
-an ERROR (never dropped, as a qualified member), legal **only** as a `group=` member of a
+a member on one side only (it leaves the key, as below), legal **only** as a `group=` member of a
 `domain=` grouped call ([`sequence`](#sequence) included) — as a list element or an operand it
 fails to load. The qualified `DM.RPATHCD` keeps grouping on `RPATHCD`: it has no sided spelling.
 
-- **`domain=` is required.** Without it there is no other side — the evaluated dataset would be
-  grouped by a value it does not carry — and the call is a load error. To group the evaluated rows
-  by a joined value, use the rule-level
+- **Without `domain=` there is no other side**: the qualified member is a column of the
+  evaluated rows' one table (the row's `DM.RPATHCD`), exactly as in the rule-level
   [`Grouping`](../authoring/grouping.md#a-qualified-member--grouping-by-a-joined-value).
-- **The qualifier names a `Match_Datasets` entry of the rule** that is an ordinary keyed join (not
-  `Child: true`, not `RELREC`, not `SUPP--` / `SQ`, no `--` template name, with `Keys`) and
-  **`inner`** — `Join_Type: "inner"` or none. Anything else, and a qualifier naming no entry, is a
-  load error — in every `Check` level and every binding.
-- **Load errors besides:** a `--` wildcard inside a qualified member (`DM.--SEQ`), and a qualified
-  member together with `record_count`'s `regex=` (the regex normalises the grouped dataset's key
-  values; the record's value comes from another dataset). A qualified name spliced into `group=`
-  from a `$` list is not judged at load, so it **errors the rule** when it runs — write it in the
-  `group=` list itself. So does a `$` member whose binding holds neither a list of names nor a
-  single name — and when the binding's type already shows it at load (a number, or a per-row
+- **The qualifier names a `Match_Datasets` entry of the rule** — any declared entry: an ordinary
+  keyed join, a `left` one (an unmatched row reads the column's type default), a `Child: true`
+  parent, a `RELREC` related domain or a `SUPP--` entry. A qualifier naming no entry is a load
+  error — in every `Check` level and every binding.
+- **Load errors besides:** a `--` wildcard inside a qualified member (`DM.--SEQ`).
+  `record_count`'s `regex=` works with a qualified member: the record side's value is normalised
+  by the pattern its grouped column takes. A qualified name spliced into `group=` from a `$` list
+  reads like one written in the list. A `$` member whose binding holds neither a list of names nor
+  a single name **errors the rule** — and when the binding's type already shows it at load (a number, or a per-row
   binding such as `upper(AETERM)`), the rule fails to **load** instead. A compiler-dispatched group operator such as
   [`has_multiple_values_for`](#has_multiple_values_for) has no other side at all: a dotted member
-  of its `within=` is refused.
+  of its `within=` is a column of the evaluated rows' one table.
 - **The answer contract is the function's own.** Only the key is read differently. A record whose
   key has no group reads the function's no-group answer — the type default for `read_value`,
   missing for `max` / `max_date` / `min_date`, `0` for `record_count`, the empty list for
@@ -174,12 +172,21 @@ fails to load. The qualified `DM.RPATHCD` keeps grouping on `RPATHCD`: it has no
 - **Types are checked against the source.** The grouped column's type is compared with the
   **source** column's (`DM.RPATHCD`), not with the evaluated dataset's; a character key on one side
   and a numeric one on the other makes the rule ERROR.
-- **It is never dropped.** A plain group column absent from a dataset partitions nothing; a
-  qualified member the rule cannot read makes it **ERROR** — no `DM` dataset in the study, `DM`
-  without `RPATHCD`, or a grouped dataset that lacks `RPATHCD` (it needs the same variable,
-  unqualified). That holds even when the grouped dataset has no rows. Declare `DM.RPATHCD` and
-  `TP.RPATHCD` in [`Requirements.Variables.All`](../authoring/requirements.md) and such a study
-  **skips** the rule instead.
+- **A member on one side only leaves the key — bare and qualified alike.** Under `domain=` a
+  `group=` member keys two datasets, like a join key: present on both it keys; present on **one**
+  side only — no `DM` dataset in the study, `DM` without `RPATHCD`, a grouped dataset without
+  `RPATHCD`, or a bare `VISITNUM` that only one of the two carries — it is dropped from the key on
+  both sides with a WARNING in the log
+  (`[<rule>] read_value group=: TP: key column DM.RPATHCD/RPATHCD is present on one side only (TP) and is ignored`);
+  absent from both it partitions nothing, silently. ⛔ **No member left on both sides** after such a
+  drop is a rule **ERROR** (`… group= over 'TP' has no usable key`) — never an aggregate over the
+  whole `domain=` dataset — and it holds even when the grouped dataset has no rows. Declare the
+  member on both sides in [`Requirements.Variables`](../authoring/requirements.md) (`All`, or an
+  `All_Or_None` pair) and such a study **skips** the rule instead. A rule that can judge correctly
+  without the member is **split** by a gate instead of erroring: the pooled-dose SEND rules
+  (`CDISC-SEND-0204` / `-0205` / `-0305` / `-0306`) run on pooled studies (`POOLDEF.POOLID` and
+  `EX.POOLID` in `All`), their `-A` siblings on studies that define no pools (`POOLDEF.POOLID` in
+  `None`), and a POOLDEF with pools beside an EX without `POOLID` skips both.
 - **Copies are judged separately.** The `DM` join runs before any binding. If it is not one-to-one
   per record — `DM` carrying a subject twice, on two paths — each copy of the record reads the group
   of **its own** `DM` record, and the two copies may read two different values. Join on a key that
@@ -2181,7 +2188,7 @@ Check:
   expression: 'min_date(min_date(EXSTDTC, domain="EX", group=[POOLID], filter=(not empty(POOLID))), domain="POOLDEF", group=[USUBJID])'
 ```
 
-reads, per POOLDEF row, the earliest `EXSTDTC` of that row's pool, and then per subject the earliest over the subject's pools. Three answers to know: a subject in **two pools** reads the earlier pool; a pool with **no EX row** (an FW or LB pool, which POOLDEF also defines) has no answer and is skipped by the outer extreme; a study **without POOLDEF**, or an EX without `POOLID`, answers missing for every subject — which is what makes [`earliest_date`](#earliest_date)`($own, $pool)` fall back to the subject's own dose. ⚠ The inner call's `filter=(not empty(POOLID))` is **required**: with `POOLID` absent from EX, `group=[POOLID]` partitions nothing and every EX row is one block keyed blank, which a POOLDEF row with a blank `POOLID` would take as its pool's first dose (a non-blank `POOLID` matches nothing); and an own EX row with a blank `POOLID` must never match a POOLDEF row with a blank `POOLID`. The inner call's target and filter columns (`EXSTDTC`, `POOLID` in the filter) are columns of **its** `domain=`, not of the outer target table; its `group=` columns (`POOLID`) are read on **both** its `domain=` and the outer target table — they are the key its answer is broadcast on, so POOLDEF must carry `POOLID` too. An inner call without `domain=` reads the outer target table itself.
+reads, per POOLDEF row, the earliest `EXSTDTC` of that row's pool, and then per subject the earliest over the subject's pools. Three answers to know: a subject in **two pools** reads the earlier pool; a pool with **no EX row** (an FW or LB pool, which POOLDEF also defines) has no answer and is skipped by the outer extreme; a study **without POOLDEF** answers missing for every subject — which is what makes [`earliest_date`](#earliest_date)`($own, $pool)` fall back to the subject's own dose. ⛔ An EX **without `POOLID`** beside a POOLDEF that has it leaves the inner call's only `group=` member on one side — a rule ERROR ([qualified and bare `group=` members](#qualified-group-members)) — so the shipped pool readers are split by the pool gate: the base rule runs on pooled studies (`POOLDEF.POOLID` and `EX.POOLID` in `All`), its `-A` sibling on studies that define no pools. ⚠ The inner call's `filter=(not empty(POOLID))` stays **required**: an own EX row with a blank `POOLID` must never match a POOLDEF row with a blank `POOLID`. The inner call's target and filter columns (`EXSTDTC`, `POOLID` in the filter) are columns of **its** `domain=`, not of the outer target table; its `group=` columns (`POOLID`) are read on **both** its `domain=` and the outer target table — they are the key its answer is broadcast on, so POOLDEF must carry `POOLID` too. An inner call without `domain=` reads the outer target table itself.
 
 
 ### present_on_multiple_rows_within

@@ -144,6 +144,10 @@ class UnqualifiedJoinedReadLintTest
     // CANDIDATES did not move. The sixth package, dart-1-1, selects no library dataset for TF and
     // is named in R-EMPTY; under dart-1-2 the DS join was counted in R-UNRES (DS 1 -> 3) until
     // the store held that product (2026-10-10, below).
+    // SEND 162 -> 174 on 2026-10-11 (PLAN-join-key-one-side-absent-drop QK17, owner 2026-10-11):
+    // CDISC-SEND-0204-A and 0205-A,
+    // the non-pooled split siblings, join DS like their parents and ship in the same six SEND
+    // packages (2 x 6); each reads no bare joined column.
     // SEND 152 -> 162 on 2026-10-10 (PLAN-seed-sendig-dart-1-2 P3): the store now holds
     // standards/sendig/dart-1-2 (the E14 seed supplement), so the ten joined rules of
     // rules-cdisc-sendig-dart-1-2.json — one Match_Datasets entry each: DM (CDISC-SEND-0073,
@@ -151,7 +155,7 @@ class UnqualifiedJoinedReadLintTest
     // that package instead of being counted in R-UNRES (exactly the three dart-1-2 rows that left
     // it, 5 + 2 + 3 references). FLAGS stayed 0 and CANDIDATES did not move.
     private static final Map<String, Integer> EXPECTED_REACH = Map.of("ADaM", 187, "SDTM", 421,
-            "SEND", 162);
+            "SEND", 174);
 
     // SEND 6 -> 9 -> 6 on 2026-09-30 (PLAN-rprfdy-offset-tp-join). Phase 4 gave CDISC-SEND-0401/
     // 0402/0403 read_value(RPRFDY, domain="TP", group=[DM.RPATHCD, RPHASE], mode="MAX"), and the
@@ -185,11 +189,17 @@ class UnqualifiedJoinedReadLintTest
     // + the two dart-1-2 rows on 2026-10-10 (PLAN-seed-sendig-dart-1-2 P3): with the SENDIG-DART
     // 1.2 product in the store, CDISC-SEND-0204 / 0205 are examined under that package too, and
     // their TF scope selects no library dataset there either (DART 1.2 carries no TF, as 1.1).
+    // + their four -A rows on 2026-10-11 (PLAN-join-key-one-side-absent-drop QK17): the non-pooled
+    // split siblings ship in the same packages with the same TF scope.
     private static final Set<String> EXPECTED_EMPTY = Set.of(
             "rules-cdisc-sendig-dart-1-1.json\tCDISC-SEND-0204",
             "rules-cdisc-sendig-dart-1-1.json\tCDISC-SEND-0205",
             "rules-cdisc-sendig-dart-1-2.json\tCDISC-SEND-0204",
             "rules-cdisc-sendig-dart-1-2.json\tCDISC-SEND-0205",
+            "rules-cdisc-sendig-dart-1-1.json\tCDISC-SEND-0204-A",
+            "rules-cdisc-sendig-dart-1-1.json\tCDISC-SEND-0205-A",
+            "rules-cdisc-sendig-dart-1-2.json\tCDISC-SEND-0204-A",
+            "rules-cdisc-sendig-dart-1-2.json\tCDISC-SEND-0205-A",
             "rules-fda-sendig-ar-1-0.json\tFDA-SD1205", "rules-fda-sendig-ar-1-0.json\tFDA-SD1206",
             "rules-fda-sendig-ar-1-0.json\tFDA-SD1207", "rules-fda-sendig-ar-1-0.json\tFDA-SD9747",
             "rules-fda-sendig-ar-1-0.json\tFDA-SE1152");

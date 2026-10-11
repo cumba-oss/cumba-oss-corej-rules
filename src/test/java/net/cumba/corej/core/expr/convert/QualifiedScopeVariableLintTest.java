@@ -104,7 +104,13 @@ class QualifiedScopeVariableLintTest
      */
     private static final Set<String> EXPECTED_RESOLVER_ONLY = Set.of("CDISC-AD0640|AE.AETRTEM",
             "CDISC-AD0641|AE.AESTDY", "CDISC-AD0642|AE.AEENDY", "CDISC-AD0643|AE.AEDUR",
-            "CDISC-AD0644|AE.AESEV", "CDISC-AD0645|AE.AETOXGR");
+            "CDISC-AD0644|AE.AESEV", "CDISC-AD0645|AE.AETOXGR",
+            // the non-pooled split siblings (PLAN-join-key-one-side-absent-drop QK17, owner
+            // 2026-10-11) name POOLDEF only in
+            // Requirements.Variables.None — the gate "the study defines no pools" — and never read
+            // it, so the dataset is undeclared by design (R-4.30 + R-4.12)
+            "CDISC-SEND-0204-A|POOLDEF.POOLID", "CDISC-SEND-0205-A|POOLDEF.POOLID",
+            "CDISC-SEND-0305-A|POOLDEF.POOLID", "CDISC-SEND-0306-A|POOLDEF.POOLID");
 
     @Test
     void qualifiedScopeVariableEntriesAreWellFormed() throws Exception

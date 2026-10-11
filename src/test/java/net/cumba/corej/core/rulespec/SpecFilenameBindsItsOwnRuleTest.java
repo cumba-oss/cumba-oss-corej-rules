@@ -85,7 +85,7 @@ class SpecFilenameBindsItsOwnRuleTest
             Map.entry("EC46-unpositionable-value-wins.yaml", "CDISC-CG0148"),
             Map.entry("EC51-CG0147-indeterminate-extreme.yaml", "CDISC-CG0147"),
             Map.entry("EC51-SE2276-indeterminate-extreme.yaml", "FDA-SE2276"),
-            Map.entry("EC51-SEND-0306-indeterminate-extreme.yaml", "CDISC-SEND-0306"),
+            Map.entry("EC51-SEND-0306-indeterminate-extreme.yaml", "CDISC-SEND-0306-A"),
             Map.entry("EC67-dataset-domain-fork-cannot-resolve.yaml", "CDISC-CG0308"),
             Map.entry("Q16-partial-date-comparison-hull.yaml", "Q16-DATE-HULL"),
             Map.entry("rule_cross_dataset_dm_ae_usubjid.yaml", "PILOT-DM-AE-USUBJID"),

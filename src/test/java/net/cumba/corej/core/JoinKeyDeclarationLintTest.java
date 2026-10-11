@@ -27,8 +27,9 @@ import org.junit.jupiter.api.io.TempDir;
 /**
  * The join-key authoring gate, ARMED: every keyed {@code Match_Datasets} entry of the authored
  * corpus declares its key columns in {@code Requirements.Variables}, so a study missing a key
- * <b>skips</b> the rule instead of flooding (a key absent on one side) or reaching {@code JKM R7}'s
- * all-absent execution error (every key absent on both sides).
+ * <b>skips</b> the rule instead of fanning out (a key column on one side only leaves the key with a
+ * WARNING, owner ruling {@code REG-Q3}) or reaching the no-key-column execution error (every key
+ * absent on both sides, {@code JKM R7}'s all-absent half).
  *
  * <p>
  * Source: {@code PLAN-join-key-authoring-gate} (meta repo) — owner rulings §6 Q1 (all keyed
@@ -109,7 +110,11 @@ class JoinKeyDeclarationLintTest
     // conserves proves nothing on its own, so the IDENTITIES were re-derived: exactly the three
     // SJ entries of CDISC-SEND-0401/0402/0403 (Keys [USUBJID, RPHASE]) left and exactly their
     // three DM entries (Keys [USUBJID]) arrived (D-SJ / C2).
-    private static final int EXPECTED_ORDINARY = 197;
+    // 197 -> 199 on 2026-10-11 (PLAN-join-key-one-side-absent-drop QK17, owner 2026-10-11):
+    // CDISC-SEND-0204-A and 0205-A,
+    // the non-pooled split siblings, keep their parents' DS join on [STUDYID, USUBJID] with its
+    // declarations (one All_Or_None group per key, the first key bare in All).
+    private static final int EXPECTED_ORDINARY = 199;
 
     private static final int EXPECTED_CHILD = 11;
 

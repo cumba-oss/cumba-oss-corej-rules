@@ -1,0 +1,154 @@
+Core:
+  Id: "CDISC-SEND-0205-A"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when a tumor record's mass identifier (TFSPID) is populated\
+  \ and linked by --SPID to no clinical sign (CL), palpable mass (PM) or macroscopic\
+  \ finding (MA) record of the same subject, so the tumor was first detected at histopathology\
+  \ (MI), and its populated TFDETECT does not equal the number of days from the earliest\
+  \ dose date (earliest EXSTDTC of the subject's own EX records; the study defines\
+  \ no pools (no POOLDEF dataset with POOLID)) to the subject's disposition date (DS.DSSTDTC,\
+  \ a complete date), plus one (first dose day = day 1)."
+Executability: "Partially Executable"
+ExecutabilityHint:
+  Category: "partially executable"
+  Detail: "The detection method is read from the --SPID link alone (SENDIG TF Assumption\
+    \ 5, SENDIG 3.0 Assumption 4: the mass identifier in --SPID is consistent across\
+    \ CL, PM, MA, MI and TF): a TF record whose USUBJID and TFSPID are also a CL or\
+    \ PM mass was detected in life (CDISC-SEND-0202, CDISC-SEND-0203), one that is\
+    \ an MA mass and neither of those at necropsy (CDISC-SEND-0204), one that is none\
+    \ of them at histopathology (CDISC-SEND-0205). Gaps: a record with a blank TFSPID\
+    \ is not judged, because its detection method cannot be determined; a mass linked\
+    \ to CL, PM or MA only through RELREC, not by --SPID, is not seen, so it is judged\
+    \ by the wrong one of CDISC-SEND-0204 and CDISC-SEND-0205, or judged at all where\
+    \ a missed CL or PM link means it was detected in life; a study whose CL or PM\
+    \ dataset lacks its --SPID column skips the rule, because the link to that domain\
+    \ cannot be read for any record and a tumor detected in life is dated differently;\
+    \ an MA dataset without MASPID links no record, so CDISC-SEND-0204 finds no tumor\
+    \ first detected at necropsy and CDISC-SEND-0205 judges those tumors by the same\
+    \ formula, a necropsy finding then being reported under CDISC-SEND-0205's id;\
+    \ a subject without a DS record, or whose DSSTDTC is not a complete date, is not\
+    \ judged; a first dose that cannot be determined (the earliest own EXSTDTC is\
+    \ a partial or unreadable date) is a missing day count, which the populated TFDETECT\
+    \ does not equal. The study must define no pools (no POOLDEF dataset with POOLID):\
+    \ a pooled study is judged by CDISC-SEND-0205, and a study whose POOLDEF defines\
+    \ pools while EX has no POOLID skips both."
+Scope:
+  Domains:
+    Include:
+    - "TF"
+Requirements:
+  Variables:
+    All:
+    - "STUDYID"
+    - "USUBJID"
+    - "TFSPID"
+    - "TFDETECT"
+    - "DS.DSSTDTC"
+    - "EX.EXSTDTC"
+    - "EX.USUBJID"
+    None:
+    - "POOLDEF.POOLID"
+    All_Or_None:
+    - - "STUDYID"
+      - "DS.STUDYID"
+    - - "USUBJID"
+      - "DS.USUBJID"
+    - - "CL.USUBJID"
+      - "CL.CLSPID"
+    - - "PM.USUBJID"
+      - "PM.PMSPID"
+Match_Datasets:
+- Keys:
+  - "STUDYID"
+  - "USUBJID"
+  Name: "DS"
+Bindings:
+- name: "$cl_masses"
+  expression: "distinct([USUBJID, CLSPID], domain=\"CL\", filter=(not empty(CLSPID)))"
+- name: "$pm_masses"
+  expression: "distinct([USUBJID, PMSPID], domain=\"PM\", filter=(not empty(PMSPID)))"
+- name: "$ma_masses"
+  expression: "distinct([USUBJID, MASPID], domain=\"MA\", filter=(not empty(MASPID)))"
+- name: "$own_first_dose"
+  expression: "min_date(EXSTDTC, domain=\"EX\", group=[USUBJID])"
+- name: "$days_to_disposition"
+  expression: "date_diff_days(DS.DSSTDTC, $own_first_dose) + 1"
+Check:
+  expression: >-
+    not empty(TFSPID) and not empty(TFDETECT) and is_complete_date(DS.DSSTDTC) and tuple(USUBJID,
+    TFSPID) not in $cl_masses and tuple(USUBJID, TFSPID) not in $pm_masses and tuple(USUBJID,
+    TFSPID) not in $ma_masses and TFDETECT != $days_to_disposition
+Outcome:
+  Message: "TFDETECT does not equal (DSSTDTC - the earliest EXSTDTC of the subject's\
+    \ own EX records; the study defines no pools) + 1 for a tumor first detected at\
+    \ histopathology (its TFSPID matches no CL, PM or MA record of the subject)."
+Source_Proposed:
+  Class: "FND"
+  Domain: "TF"
+  Variable: "TFDETECT"
+  Condition: "Tumor was initially detected during histopathology examination (the\
+    \ MI domain) and the study defines no pools (no POOLDEF dataset with POOLID)"
+  Rule: "TFDETECT = (DSSTDTC - EXSTDTC) + 1"
+Source:
+  Class: "FND"
+  Domain: "TF"
+  Variable: "TFDETECT"
+  Plain_Text_Explanation: "If the tumor was initially detected during histopathology\
+    \ examination (the MI domain), then TFDETECT is based off the DS domain variable\
+    \ DSSTDTC (Date/Time of Disposition). This is calculated as: (DSSTDTC - EXSTDTC)\
+    \ + 1."
+  Condition: "Tumor was initially detected during histopathology examination (the\
+    \ MI domain)"
+  Rule: "TFDETECT = (DSSTDTC - EXSTDTC) + 1"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SENDIG-GENETOX"
+    Version: "1.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND205"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.2"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND205"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG-DART"
+    Version: "1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND205"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND205"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.1"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND205"
+        Version: "1"
+      Version: "5.0"
+  - Name: "SENDIG"
+    Version: "3.0"
+    References:
+    - Origin: "SEND Conformance Rules"
+      Rule_Identifier:
+        Id: "SEND205"
+        Version: "1"
+      Version: "5.0"

@@ -209,14 +209,20 @@ with `max_date` and `latest_date` (`CDISC-SEND-0306`). "Is the subject dosed at 
 `$pool_ex_rows > 0`, a **count** of the pools' EX rows — never `not empty($pool_min_exstdtc)`, so
 that a pool dosed with a blank date is still judged (and reported for its underivable reference).
 
-⚠ The pool binding's `filter=(not empty(POOLID))` is **required**, not a tidy-up: with `POOLID`
-absent from EX, `group=[POOLID]` partitions nothing, every EX row is one block keyed blank, and a
-POOLDEF row with a blank `POOLID` would take the whole study's first dose as its pool's (a non-blank
-`POOLID` matches nothing); and an own EX row with a blank `POOLID` must match no POOLDEF row.
+⚠ The pool binding's `filter=(not empty(POOLID))` is **required**, not a tidy-up: an own EX row
+with a blank `POOLID` must match no POOLDEF row, and a POOLDEF row with a blank `POOLID` reads no
+pool.
 
-A subject in no pool, a pool with no EX row and a study without POOLDEF all answer *missing* for
-the pool part, which `earliest_date` skips — so the rule reads exactly as before on a non-pooled
-study, with one exception: the pool read compares `POOLID` between EX and POOLDEF, and `USUBJID`
+⭐ **Split the rule by the pool gate.** The pool read keys EX by `POOLID` and POOLDEF by `POOLID`:
+a POOLDEF that defines pools beside an EX without `POOLID` leaves that key on one side, and a
+grouped call with no key member left on both sides is a rule **ERROR**. So the pooled read is its
+own rule, gated `Requirements.Variables.All: ["POOLDEF.POOLID", "EX.POOLID"]`, and a `-A` sibling
+without the pool bindings judges a study that defines no pools, gated
+`Requirements.Variables.None: ["POOLDEF.POOLID"]` (`CDISC-SEND-0204` / `-0205` / `-0305` / `-0306`
+and their `-A` siblings). The shape in between — pools in POOLDEF, no `POOLID` in EX — skips both.
+
+A subject in no pool and a pool with no EX row answer *missing* for the pool part, which
+`earliest_date` skips, with one exception: the pool read compares `POOLID` between EX and POOLDEF, and `USUBJID`
 between POOLDEF and the rule's dataset, and a key whose column type differs between the two (Char
 against Num) makes the rule **ERROR**, never a silent non-match. A CSV or XLSX study can meet this
 without any pooling, because there the type is inferred from the data and a column blank in every

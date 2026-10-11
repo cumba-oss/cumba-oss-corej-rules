@@ -6,8 +6,9 @@
      PLAN-merged-evaluation-table), ChildEntries.java (Child:true — RDOMAIN/IDVAR/IDVARVAL parent
      resolution into a part qualified with the parent's domain), RelrecEntries.java (forward
      RELREC — one part per related domain, the cross product per relationship), KeyGates +
-     RulePackageLoader.checkQualifiedKeys / qualifiedSourceError + UnresolvedQualifiedKeyException
-     (a qualified key, PLAN-rprfdy-offset-tp-join C1), RulePackageLoader.checkCardinality /
+     RulePackageLoader.checkQualifiedKeys / qualifiedSourceError (a qualified key,
+     PLAN-rprfdy-offset-tp-join C1; its one-side drop, REG-Q3, KeyGates + MergedEvaluation.keyedSpecs
+     + KeyDropWarning), RulePackageLoader.checkCardinality /
      checkSuppKeys (Cardinality, Supp_Keys), the datatable's net.cumba.datatable.merge specs
      (KeyedMergeSpec, ChildMergeSpec, RelrecPartSpec, SuppMergeSpec.DEFAULT_KEYS). `_matched_` usage
      measured in the corpus (8 authored checks at 2026-09-22: four whole-check
@@ -158,10 +159,10 @@ left side being the primary and the right side the joined dataset. It is a separ
 
 **A rule that joins on a key MUST declare every key column in
 [`Requirements.Variables`](requirements.md).** Undeclared, a study that lacks a key column does
-not skip the rule — it runs it: a key absent on one side contributes an empty value, no row
-matches, and every row is reported (a flood); a key set absent on both sides is an execution
-error. Neither is an answer about the data. Declared, the rule **skips**, and the skip names the
-column.
+not skip the rule — it runs it: a key column present on one side only is dropped from the key
+with a WARNING in the log, and the join matches on the rest — a record may then have several
+partners (a fan-out); a key set with no column on both sides is an execution error. Neither is an
+answer about the data. Declared, the rule **skips**, and the skip names the column.
 
 The declaration, per key column:
 
@@ -205,7 +206,8 @@ Match_Datasets:
   `TP` entry) is declared under its qualified name: the group is `[DM.RPATHCD, TP.RPATHCD]`, and
   `DM.RPATHCD` goes in `All` **as well** — whichever position the key has. The gate demands `All`
   only for a first key, but a group alone lets a study that lacks `RPATHCD` on **both** sides run,
-  and there the rule [errors](#when-a-qualified-key-cannot-be-resolved) instead of skipping.
+  and there the qualified key is [dropped](#when-a-qualified-key-cannot-be-resolved) and the join
+  runs on the remaining keys — every path's stages.
 - **Expansion-template keys** (`&DOM&`, `&DOM&SEQ`) cannot be declared — loader gate R6 bars a
   token from `Requirements` — so only a literal first key goes in `All`.
 
@@ -403,19 +405,23 @@ unqualified** — `TP.RPATHCD`. There is no `{left, right}` to write: `DM.RPATHC
 
 ### When a qualified key cannot be resolved
 
-A plain key absent on one side contributes an empty value, and absent on both sides it is dropped
-(see [Declare the key](#-declare-the-key--required-for-every-keyed-join)). **Neither applies to a
-qualified key.** Dropping it would join `TP` on `RPHASE` alone — every path's stages, the wrong
-answer with nothing to say so. So the rule **stops with an error** when:
+A qualified key behaves exactly like a plain one: present on **one side only** it leaves the key
+with a WARNING in the log, absent from **both** sides it leaves the key silently, and with no key
+column left on both sides the rule stops with an error (see
+[Declare the key](#-declare-the-key--required-for-every-keyed-join)). Its record side is the source
+entry's column, so:
 
-- the study has no dataset for the source entry (no `DM`),
-- the source dataset lacks the column (`DM` without `RPATHCD`),
-- the joined dataset lacks it (`TP` without `RPATHCD` — it needs the same variable, unqualified).
+- the study has no dataset for the source entry (no `DM`) — the record side is absent;
+- the source dataset lacks the column (`DM` without `RPATHCD`) — the record side is absent;
+- the joined dataset lacks it (`TP` without `RPATHCD`) — the joined side is absent.
 
-Declared as [above](#-declare-the-key--required-for-every-keyed-join) — `DM.RPATHCD` in `All` and
-the pair `[DM.RPATHCD, TP.RPATHCD]` — each of these **skips** the rule instead. The error is what an
-undeclared or group-only declaration gets: a group alone is satisfied by a study lacking
-`RPATHCD` on both sides, and that study reaches the join.
+Dropped, the key joins `TP` on `RPHASE` alone — every path's stages, a fan-out the WARNING names
+but nothing else reports. Declared as [above](#-declare-the-key--required-for-every-keyed-join) —
+`DM.RPATHCD` in `All` and the pair `[DM.RPATHCD, TP.RPATHCD]` — each of these **skips** the rule
+instead; a group alone is satisfied by a study lacking `RPATHCD` on both sides, which then runs with
+the key dropped. The WARNING reads
+`[<rule>] Match_Datasets TP: TP: key column DM.RPATHCD/RPATHCD is present on one side only (TP) and is ignored`
+— the SUPP merge's wording, so one log search finds every dropped key.
 
 ⚑ The same qualified spelling works in a grouped function's
 [`group=`](../reference/functions.md#qualified-group-members) and in the rule-level
@@ -594,8 +600,9 @@ Supp_Keys:                # omitted = the IG's key
 
 - The elements have the `Keys` shape: a column name shared by both sides, or `{left, right}` — the
   left side the evaluated dataset, the right side its `SUPP--` dataset.
-- A key column present on both sides is used; on one side only it is ignored (with a log warning);
-  on neither it is ignored.
+- A key column present on both sides is used; on one side only it is ignored (with a log warning,
+  in the same wording a [`Match_Datasets` key](#-declare-the-key--required-for-every-keyed-join)
+  drop uses); on neither it is ignored.
 - Load errors: `Supp_Keys` with `Supp_Merge: false` (there is no merge to key), an empty list, a
   qualified name (`DM.USUBJID` — the key reads the dataset and its `SUPP--` only), half of the
   `IDVAR` / `IDVARVAL` pair, or the pair with a differing left side.

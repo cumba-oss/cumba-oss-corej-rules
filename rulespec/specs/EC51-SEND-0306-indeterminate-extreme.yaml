@@ -30,6 +30,11 @@ description: |
   this fixture, so coreJ does not skip and both lanes execute. It is named only so a future
   reader does not mistake a Java skip for the disposition.
 
+  ⚑ Re-bound 2026-10-11 to `CDISC-SEND-0306-A` (PLAN-join-key-one-side-absent-drop QK17: the
+  rule split by the pool gate; this fixture defines no pools, so the non-pooled arm judges it and
+  the pooled `CDISC-SEND-0306` skips it). The claim — a blank EXENDTC makes the subject's extreme
+  indeterminate and the leaf fires — is the non-pooled arm's own.
+
   Subject `001` is the control: no blank `EXENDTC`, `RFXENDTC` equal to the resolved extreme,
   nothing reported on either lane.
 
@@ -41,7 +46,7 @@ description: |
   vacuous on the fork either: it observes the fork resolving the extreme the disposition was
   supposed to suppress.
 rule:
-  coreId: CDISC-SEND-0306
+  coreId: CDISC-SEND-0306-A
 datasets:
   DM:
     row_key: [STUDYID, USUBJID]
@@ -65,18 +70,13 @@ library_mocks:
     interventions: [EX]
 expected_status: EXECUTED
 expected_violations:
-  - rule_id: CDISC-SEND-0306
+  - rule_id: CDISC-SEND-0306-A
     dataset: DM
     row_key: {STUDYID: S1, USUBJID: '002'}
     status: SUCCESS
     output_variables:
       $ex_subjects: '[001, 002]'
-      $last_exendtc: '.'
-      $last_exstdtc: '2026-02-03'
       $latest_exendtc: '.'
       $latest_exstdtc: '2026-02-03'
-      $pool_ex_rows: '.'
-      $pool_latest_exendtc: '.'
-      $pool_latest_exstdtc: '.'
       RFXENDTC: '2026-02-05'
 expected_errors: []

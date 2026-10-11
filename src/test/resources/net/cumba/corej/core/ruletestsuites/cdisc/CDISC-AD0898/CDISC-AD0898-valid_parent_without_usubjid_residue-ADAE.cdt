@@ -1,0 +1,23 @@
+#!RuleTest
+#test CDISC-AD0898 expect=noViolation domain=ADAE
+#note "PLAN-join-key-one-side-absent-drop §6.2 / planted control (b): the KNOWN RESIDUE of QK8 - the gate names the ADaM side only (loader gate R6 bars the token &DOM&.USUBJID from Requirements). The parent AE has no USUBJID, so USUBJID leaves the key with a WARNING (REG-Q3) and the join runs on STUDYID + AESEQ across subjects: ADAE AESEQ 2 of 01-701-1015 meets the AESEQ 2 row of another subject and the rule stays silent (a false negative on this Draft rule). Under the retired JKM R7 default the absent USUBJID keyed \"\" and the row was reported (violation)."
+#library standard=adamig version=1-2
+#library standard-domains AE CM MH DM LB VS
+dataset ADAE
+col STUDYID type=Char
+col USUBJID type=Char
+col AESEQ   type=Char
+col AETERM  type=Char
+---
+CDISCPILOT01 | 01-701-1015 | 1 | HEADACHE
+CDISCPILOT01 | 01-701-1015 | 2 | NAUSEA
+---
+
+dataset AE label="Adverse Events"
+col STUDYID type=Char
+col DOMAIN  type=Char
+col AESEQ   type=Char
+---
+CDISCPILOT01 | AE | 1
+CDISCPILOT01 | AE | 2
+---

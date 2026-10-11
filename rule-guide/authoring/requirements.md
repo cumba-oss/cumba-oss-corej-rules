@@ -173,9 +173,10 @@ Requirements.Variables.All_Or_None group 1 [VISITDY, TV.VISITDY] is only partly 
 
 It exists for one shape: a **join key that is optional on both sides**. `VISITDY` is permissible
 in SV and in TV, so a valid study can carry it on both sides, on neither, or on one. Joined on
-both, or dropped on neither, the rule is right. Carried on one side only, no row matches and every
-planned visit is reported. Neither `All` (skips the "neither" study, which should run) nor leaving
-the column undeclared (floods the one-sided study) can say what this facet says:
+both, or dropped on neither, the rule is right. Carried on one side only, `VISITDY` leaves the key
+(a WARNING in the log) and each SV record pairs every TV row its `VISITNUM` / `VISIT` allow — a
+fan-out the rule then judges. Neither `All` (skips the "neither" study, which should run) nor
+leaving the column undeclared (fans the one-sided study out) can say what this facet says:
 
 ```yaml
 Requirements:
@@ -196,7 +197,7 @@ the bare side and the group decides the joined side.
 |---|---|---|---|
 | both sides carry it | runs | runs | runs |
 | neither side carries it | **skips** | runs | runs |
-| one side only | skips | **floods** | skips |
+| one side only | skips | **fans out** (the key column leaves the key, a WARNING) | skips |
 
 **Wildcard entries are compared resolved.** A glob, a `/regex/` or a marker template resolves to
 the set of concrete column names it matches, and an all-present group additionally needs those
