@@ -219,7 +219,9 @@ grouped call with no key member left on both sides is a rule **ERROR**. So the p
 own rule, gated `Requirements.Variables.All: ["POOLDEF.POOLID", "EX.POOLID"]`, and a `-A` sibling
 without the pool bindings judges a study that defines no pools, gated
 `Requirements.Variables.None: ["POOLDEF.POOLID"]` (`CDISC-SEND-0204` / `-0205` / `-0305` / `-0306`
-and their `-A` siblings). The shape in between — pools in POOLDEF, no `POOLID` in EX — skips both.
+and their `-A` siblings). The shape in between — pools in POOLDEF, no `POOLID` in EX — skips both. The own extreme groups EX by
+`USUBJID`, so both arms also declare `EX.USUBJID` in `All`: an EX without `USUBJID` skips the rule
+instead of making it ERROR.
 
 A subject in no pool and a pool with no EX row answer *missing* for the pool part, which
 `earliest_date` skips, with one exception: the pool read compares `POOLID` between EX and POOLDEF, and `USUBJID`

@@ -1,0 +1,28 @@
+#!RuleTest
+#test FDA-SE2270 expect=noViolation domain=DD
+#note "PLAN-join-key-one-side-absent-drop QK18 (3) (owner 2026-10-11): DS without USUBJID does NOT reach the QK16 ERROR for FDA-SE2270 - the Check's leading `USUBJID in $ds_usubjid` reads distinct(USUBJID, domain=\"DS\"), which holds no subject when DS lacks the column, so the conjunct is false on every record and the grouped DS extreme (group=[USUBJID]) is never read. Pinned as the measured answer: silent, no ERROR."
+#library standard=sendig version=3-1-1
+dataset DD label="Death Diagnosis"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col DDSEQ    type=Num  label="Sequence Number"
+col DDTESTCD type=Char label="Death Diagnosis Short Name"
+col DDORRES  type=Char label="Result or Finding in Original Units"
+col DDDTC    type=Char label="Date/Time of Collection"
+col DDDY     type=Num  label="Study Day of Collection"
+---
+S1 | DD | 001 | 1 | DTHCAUS | HEPATIC NECROSIS | 2020-01-18 | 18
+---
+
+dataset DS label="Disposition"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col DSSEQ   type=Num  label="Sequence Number"
+col DSTERM  type=Char label="Reported Term for the Disposition Event"
+col DSDECOD type=Char label="Standardized Disposition Term"
+col DSSTDTC type=Char label="Start Date/Time of Disposition Event"
+col DSSTDY  type=Num  label="Study Day of Start of Disposition Event"
+---
+S1 | DS | 1 | FOUND DEAD | DEAD | 2020-01-20 | 20
+

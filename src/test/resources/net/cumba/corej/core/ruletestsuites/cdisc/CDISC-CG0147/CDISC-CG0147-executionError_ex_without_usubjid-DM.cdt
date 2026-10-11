@@ -1,0 +1,23 @@
+#!RuleTest
+#test CDISC-CG0147 expect=executionError domain=DM
+#expect-execution-error "group= over 'EX' has no usable key"
+#note "PLAN-join-key-one-side-absent-drop QK16 (b) / QK18 (owner 2026-10-11): EX without USUBJID - the domain= call's only group= member is on the evaluated side only, so no key member is left on both sides and the rule ERRORs (never an aggregate over the whole of EX). Derived from CDISC-CG0147-blank_exendtc_indeterminate-DM.cdt with EX.USUBJID removed. A gate declaring EX.USUBJID would turn this into a SKIP."
+# Rule:Description: Raise an error when EX records are present for a subject but RFXENDTC does not equal the latest EXSTDTC or the latest EXENDTC for that subject.
+dataset DM label=Demographics
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col RFXENDTC type=Char label="Date/Time of Last Study Treatment"
+---
+CDISCPILOT01 | DM | 01-701-1015 | 2014-01-16
+---
+
+dataset EX label=Exposure
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN type=Char label="Domain Abbreviation"
+col EXSTDTC type=Char label="Start Date/Time of Treatment"
+col EXENDTC type=Char label="End Date/Time of Treatment"
+---
+CDISCPILOT01 | EX | 2014-01-02 | 2014-01-16
+CDISCPILOT01 | EX | 2014-01-17 |
+---

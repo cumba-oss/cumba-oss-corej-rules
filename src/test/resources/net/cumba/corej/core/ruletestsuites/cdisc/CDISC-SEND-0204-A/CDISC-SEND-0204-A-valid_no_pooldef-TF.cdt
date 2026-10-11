@@ -1,6 +1,6 @@
 #!RuleTest
 #test CDISC-SEND-0204-A expect=noViolation domain=TF
-#note "PLAN-scalar-date-extremes: POOLDEF ABSENT (the common study); own 2020-01-01, TFDETECT 100 right -> silent. Pin: AbsentDatasetSkip does not engage on POOLDEF (no shipped rule's whole Check is a bare presence test on it, PoolDefinitionNotReportedTest), so reading domain="POOLDEF" never SKIPs the rule. ⚑ PLAN-join-key-one-side-absent-drop QK17 (owner 2026-10-11): split by the pool gate — a study that defines no pools is judged by CDISC-SEND-0204-A (moved from CDISC-SEND-0204, same expectation)"
+#note "PLAN-scalar-date-extremes: POOLDEF ABSENT (the common study); own 2020-01-01, TFDETECT 100 right -> silent. ⚑ PLAN-join-key-one-side-absent-drop QK17 (owner 2026-10-11): split by the pool gate — a study that defines no pools is judged by CDISC-SEND-0204-A (moved from CDISC-SEND-0204, same expectation). The -A rule reads no POOLDEF binding, and its None: [POOLDEF.POOLID] gate is met by the absent dataset, so it judges the own EX rows"
 #library standard=sendig version=3-1-1
 dataset TF class=FINDINGS label="Tumor Findings"
 col STUDYID  type=Char label="Study Identifier"

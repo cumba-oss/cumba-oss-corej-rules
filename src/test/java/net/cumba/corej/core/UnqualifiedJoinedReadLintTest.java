@@ -139,15 +139,16 @@ class UnqualifiedJoinedReadLintTest
 
     // SEND 142 -> 152 on 2026-09-30 (PLAN-send-tfdetect-pathology-unpark): CDISC-SEND-0204 and
     // CDISC-SEND-0205 were un-parked and join DS on USUBJID; each is examined in five of its six
-    // packages (sendig 3.0 / 3.1 / 3.1.1, genetox-1-0, dart-1-2). Their bare reads are TF's own
+    // packages (sendig 3.0 / 3.1 / 3.1.1, genetox-1-0, dart-1-1). Their bare reads are TF's own
     // (USUBJID, TFSPID, TFDETECT); the one DS read is qualified (DS.DSSTDTC). FLAGS stayed 0 and
-    // CANDIDATES did not move. The sixth package, dart-1-1, selects no library dataset for TF and
-    // is named in R-EMPTY; under dart-1-2 the DS join was counted in R-UNRES (DS 1 -> 3) until
-    // the store held that product (2026-10-10, below).
+    // CANDIDATES did not move. Under dart-1-1 the TF scope selects no library dataset, so the pair
+    // is also named in R-EMPTY — still an examined pair, since the reach counts a pair before its
+    // scope is judged. The sixth package, dart-1-2, counted the DS join in R-UNRES (DS 1 -> 3)
+    // until the store held that product (2026-10-10, below); since then all six are examined.
     // SEND 162 -> 174 on 2026-10-11 (PLAN-join-key-one-side-absent-drop QK17, owner 2026-10-11):
-    // CDISC-SEND-0204-A and 0205-A,
-    // the non-pooled split siblings, join DS like their parents and ship in the same six SEND
-    // packages (2 x 6); each reads no bare joined column.
+    // CDISC-SEND-0204-A and 0205-A, the non-pooled split siblings, join DS like their parents and
+    // are examined in the same six SEND packages (2 x 6 — the two DART ones also in R-EMPTY, as
+    // the parents); each reads no bare joined column.
     // SEND 152 -> 162 on 2026-10-10 (PLAN-seed-sendig-dart-1-2 P3): the store now holds
     // standards/sendig/dart-1-2 (the E14 seed supplement), so the ten joined rules of
     // rules-cdisc-sendig-dart-1-2.json — one Match_Datasets entry each: DM (CDISC-SEND-0073,

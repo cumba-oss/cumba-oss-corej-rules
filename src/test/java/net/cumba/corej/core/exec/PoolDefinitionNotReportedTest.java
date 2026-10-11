@@ -17,22 +17,31 @@ import net.cumba.corej.core.model.StandardRef;
 import org.junit.jupiter.api.Test;
 
 /**
- * The precondition under which the four pool-reading SEND rules keep running on the common study
- * without POOLDEF ({@code PLAN-scalar-date-extremes} §2 / §5.3): {@code CDISC-SEND-0204} /
- * {@code -0205} / {@code -0305} / {@code -0306} read {@code domain="POOLDEF"} for a subject's
- * pooled doses, and {@link AbsentDatasetSkip} would rewrite those reads to <i>false</i> (K5b) on
- * every study without POOLDEF — silencing the four rules there — the moment a shipped package of
- * the same run carried a rule whose <b>whole</b> Check is a bare presence test on POOLDEF
- * ({@code not ds_exists("POOLDEF")}). No shipped rule tests POOLDEF that way today (the Checks
- * naming it are membership checks); this test keeps it so, for every package of every family whose
- * primary standard is SEND — not only the {@code sendig}-named ones, since the DART, AR and GENETOX
- * packages carry the rules too.
+ * The precondition under which the rules that read {@code domain="POOLDEF"} keep judging the common
+ * study without POOLDEF ({@code PLAN-scalar-date-extremes} §2 / §5.3): {@link AbsentDatasetSkip}
+ * would rewrite those reads to <i>false</i> (K5b) on every study without POOLDEF — silencing the
+ * rules there — the moment a shipped package of the same run carried a rule whose <b>whole</b>
+ * Check is a bare presence test on POOLDEF ({@code not ds_exists("POOLDEF")}). No shipped rule
+ * tests POOLDEF that way today (the Checks naming it are membership checks); this test keeps it so,
+ * for every package of every family whose primary standard is SEND — not only the
+ * {@code sendig}-named ones, since the DART, AR and GENETOX packages carry the rules too.
+ *
+ * <p>
+ * The SEND readers it protects are the membership checks {@code CDISC-SEND-0139} and
+ * {@code FDA-SE2312} (a {@code POOLID} that POOLDEF does not define). ⚠ The SDTM readers
+ * {@code CDISC-CG0157} / {@code -CG0158} / {@code -CG0367} ({@code RSUBJID} must name a pool or a
+ * DM subject) ship only in SDTMIG packages, which this test does not read. The four pool-dose rules
+ * it was written for no longer depend on it ({@code PLAN-join-key-one-side-absent-drop} QK17, owner
+ * 2026-10-11): {@code CDISC-SEND-0204} / {@code -0205} / {@code -0305} / {@code -0306} are gated
+ * {@code All: [POOLDEF.POOLID, EX.POOLID]}, so they skip a study without POOLDEF before any read,
+ * and their {@code -A} siblings, which judge that study, read no POOLDEF at all.
+ * </p>
  *
  * <p>
  * ⚠ <b>One exclusion, deliberate:</b> the DRAFT TIG package ({@code rules-draft-tig-1-0}) lists
  * {@code tig/1-0/send} among its primary standards but is <b>not</b> read — the predicate is a
  * {@code sendig*} primary standard, and TIG's is {@code tig/…}. It is safe to leave out: its seven
- * rules are DRAFT (generated and tested, never released), none of the four pool readers is among
+ * rules are DRAFT (generated and tested, never released), none of the POOLDEF readers is among
  * them, and none reads or tests POOLDEF (measured 2026-09-30 over {@code target/rules}). A TIG
  * package that ever ships SEND rules re-opens this; the population ratchet below stays 18.
  * </p>
@@ -49,9 +58,11 @@ import org.junit.jupiter.api.Test;
 class PoolDefinitionNotReportedTest
 {
 
-    /** The rules that read POOLDEF for a subject's pooled doses — named in the failure. */
-    private static final List<String> POOL_READERS = List.of("CDISC-SEND-0204", "CDISC-SEND-0205",
-            "CDISC-SEND-0305", "CDISC-SEND-0306");
+    /**
+     * The rules that read {@code domain="POOLDEF"} and still judge a study without it — named in
+     * the failure.
+     */
+    private static final List<String> POOL_READERS = List.of("CDISC-SEND-0139", "FDA-SE2312");
 
     /**
      * ⛔ Exact, not a floor: the SEND-standard packages of {@code target/rules} — CDISC 6 (sendig
@@ -97,9 +108,9 @@ class PoolDefinitionNotReportedTest
         assertEquals(List.of(), offenders, "a shipped SEND package carries a rule whose whole Check"
                 + " is a bare presence test on POOLDEF. With such a rule in the run,"
                 + " AbsentDatasetSkip (K5b) rewrites every domain=\"POOLDEF\" read to false on a"
-                + " study without POOLDEF — which SKIPs " + POOL_READERS + " there instead of"
-                + " judging the subjects' own doses. Either drop the presence rule, or re-open"
-                + " the four rules' pool reading with that suppression in mind");
+                + " study without POOLDEF — which silences " + POOL_READERS + " there instead"
+                + " of judging them. Either drop the presence rule, or re-open those rules'"
+                + " POOLDEF reading with that suppression in mind");
         assertEquals(EXPECTED_SEND_PACKAGES, read.size(),
                 "the number of SEND-standard packages read MOVED (the population ratchet):"
                         + " re-derive it in the same commit. Read: " + read);

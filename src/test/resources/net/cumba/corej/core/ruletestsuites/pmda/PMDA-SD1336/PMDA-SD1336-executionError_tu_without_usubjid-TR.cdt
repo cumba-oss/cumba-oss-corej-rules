@@ -1,0 +1,31 @@
+#!RuleTest
+#test PMDA-SD1336 expect=executionError domain=TR
+#expect-execution-error "group= over 'TU' has no usable key"
+#note "PLAN-join-key-one-side-absent-drop QK16 (b) / QK18 (owner 2026-10-11): TU without USUBJID - the domain= call's only group= member is on the evaluated side only, so no key member is left on both sides and the rule ERRORs (never an aggregate over the whole of TU). Derived from PMDA-SD1336-invalid-TR.cdt with TU.USUBJID removed. A gate declaring TU.USUBJID would turn this into a SKIP."
+#library standard=sdtmig version=3-4
+dataset TR label="Tumor Results"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col TRSEQ    type=Num  label="Sequence Number"
+col TRLNKID  type=Char label="Link ID"
+col TRTESTCD type=Char label="Tumor Assessment Short Name"
+col TRORRES  type=Char label="Result or Finding in Original Units"
+---
+CDISCPILOT01 | TR | 001 | 1 | T01 | LDIAM | 20
+CDISCPILOT01 | TR | 001 | 2 | T02 | LDIAM | 15
+CDISCPILOT01 | TR | 002 | 1 | T01 | LDIAM | 12
+CDISCPILOT01 | TR | 002 | 2 |  | SUMDIAM | 12
+---
+
+dataset TU label="Tumor Identification"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col TUSEQ    type=Num  label="Sequence Number"
+col TULNKID  type=Char label="Link ID"
+col TUTESTCD type=Char label="Tumor Identification Short Name"
+col TUORRES  type=Char label="Result or Finding in Original Units"
+---
+CDISCPILOT01 | TU | 1 | T01 | TUMIDENT | TARGET
+CDISCPILOT01 | TU | 1 | T05 | TUMIDENT | TARGET
+---

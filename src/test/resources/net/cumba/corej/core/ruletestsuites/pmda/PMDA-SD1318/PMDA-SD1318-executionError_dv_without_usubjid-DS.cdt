@@ -1,0 +1,25 @@
+#!RuleTest
+#test PMDA-SD1318 expect=executionError domain=DS
+#expect-execution-error "group= over 'DV' has no usable key"
+#note "PLAN-join-key-one-side-absent-drop QK16 (b) / QK18 (owner 2026-10-11): DV without USUBJID - the domain= call's only group= member is on the evaluated side only, so no key member is left on both sides and the rule ERRORs (never an aggregate over the whole of DV). Derived from PMDA-SD1318-invalid-DS.cdt with DV.USUBJID removed. A gate declaring DV.USUBJID would turn this into a SKIP."
+#library standard=sdtmig version=3-4
+dataset DS label="Disposition"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col DSSEQ   type=Num  label="Sequence Number"
+col DSTERM  type=Char label="Reported Term for the Disposition Event"
+col DSDECOD type=Char label="Standardized Disposition Term"
+---
+S1 | DS | 001 | 1 | Protocol violation | PROTOCOL VIOLATION
+S1 | DS | 002 | 1 | Completed          | COMPLETED
+---
+
+dataset DV label="Protocol Deviations"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col DVSEQ   type=Num  label="Sequence Number"
+col DVTERM  type=Char label="Protocol Deviation Term"
+---
+S1 | DV | 1 | Visit outside window
+---

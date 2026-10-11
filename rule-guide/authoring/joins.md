@@ -421,7 +421,8 @@ but nothing else reports. Declared as [above](#-declare-the-key--required-for-ev
 instead; a group alone is satisfied by a study lacking `RPATHCD` on both sides, which then runs with
 the key dropped. The WARNING reads
 `[<rule>] Match_Datasets TP: TP: key column DM.RPATHCD/RPATHCD is present on one side only (TP) and is ignored`
-— the SUPP merge's wording, so one log search finds every dropped key.
+— the SUPP merge's wording, so one log search finds every one-side drop of a join key, a SUPP key
+or a `domain=` group key (a column absent on both sides leaves silently).
 
 ⚑ The same qualified spelling works in a grouped function's
 [`group=`](../reference/functions.md#qualified-group-members) and in the rule-level
@@ -481,10 +482,11 @@ or not SV._matched_ and <what to conclude with no SV record>
 - **Then cover the population that declaration excludes.** The rule now skips when the dataset is
   absent. If that absence is legitimate, the study needs a sibling rule gated `not ds_exists("SV")`.
 
-⚠ **Join on the other dataset's own key.** A key component present on one side and absent on the
-other makes the row unequal *unconditionally*, so joining on a `Perm` column makes `_matched_` false
-for the whole study and routes every row to the unmatched arm — the failure looks exactly like "no
-partner ever existed". For `SV` that key is `USUBJID` + `VISITNUM`, never `VISIT`.
+⚠ **Join on the other dataset's own key.** A key component present on one side only leaves the key
+with a log WARNING, and the join runs on the rest of it — so keying on a `Perm` column joins a
+study that lacks it on fewer columns and fans every record out over all of its partners there,
+where the predicate expects one. For `SV` that key is `USUBJID` + `VISITNUM`, never `VISIT`: a
+study without `SV.VISIT` would join on `USUBJID` alone and match every visit of the subject.
 
 ⭐ The worked instance is the canonical `unplanned(visit)` predicate; the full doctrine, both
 polarities and the four-case table are house rules rather than guide material.

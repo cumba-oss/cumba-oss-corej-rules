@@ -1,0 +1,22 @@
+#!RuleTest
+#test CDISC-CG0531 expect=executionError domain=DM
+#expect-execution-error "group= over 'SUPPDM' has no usable key"
+#note "PLAN-join-key-one-side-absent-drop QK16 (b) / QK18 (owner 2026-10-11): SUPPDM without USUBJID - the domain= call's only group= member is on the evaluated side only, so no key member is left on both sides and the rule ERRORs (never an aggregate over the whole of SUPPDM). Derived from CDISC-CG0531-invalid-DM.cdt with SUPPDM.USUBJID removed. A gate declaring SUPPDM.USUBJID would turn this into a SKIP."
+# Rule:Description: Raise an error when RACE in DM equals 'MULTIPLE' but multiple race records are not present in SUPPDM for the subject.
+dataset DM label=Demographics
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col RACE type=Char label=Race format=$RACE.
+---
+CDISCPILOT01 | DM | 01-701-1015 | MULTIPLE
+CDISCPILOT01 | DM | 01-701-1023 | WHITE
+---
+
+dataset SUPPDM label="Supplemental Qualifiers for DM"
+col STUDYID type=Char label="Study Identifier"
+col QNAM type=Char label="Qualifier Variable Name"
+---
+CDISCPILOT01 | RACE1
+CDISCPILOT01 | SAFETY
+---
