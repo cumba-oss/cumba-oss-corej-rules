@@ -180,7 +180,14 @@ fails to load. The qualified `DM.RPATHCD` keeps grouping on `RPATHCD`: it has no
   (`[<rule>] read_value group=: TP: key column DM.RPATHCD/RPATHCD is present on one side only (TP) and is ignored`);
   absent from both it partitions nothing, silently. ⛔ **No member left on both sides** after such a
   drop is a rule **ERROR** (`… group= over 'TP' has no usable key`) — never an aggregate over the
-  whole `domain=` dataset — and it holds even when the grouped dataset has no rows. Declare the
+  whole `domain=` dataset — and it holds even when the grouped dataset has no rows. ⚠ The ERROR
+  is raised when the call is **read**. A rule without a rule-level `Grouping` reads the bindings of
+  its Check before it judges a record (the absent-column fold), so it errors whatever the record
+  values are, unless an earlier part of the Check is already false for the whole dataset. Under a
+  rule-level `Grouping` a binding is read only when a record reaches it — `and` stops at the first
+  part no record passes — so a study whose records all fail an earlier part is answered silently
+  instead (`FDA-SE2270`: its leading `USUBJID in $ds_usubjid` is empty when DS lacks `USUBJID`,
+  so the grouped DS extreme is never read). Declare the
   member on both sides in [`Requirements.Variables`](../authoring/requirements.md) (`All`, or an
   `All_Or_None` pair) and such a study **skips** the rule instead. A rule that can judge correctly
   without the member is **split** by a gate instead of erroring: the pooled-dose SEND rules

@@ -1,6 +1,6 @@
 #!RuleTest
 #test FDA-SE2351 expect=noViolation domain=SE
-#note "PLAN-join-key-one-side-absent-drop QK18 (3) (owner 2026-10-11): DS without USUBJID does NOT reach the QK16 ERROR for FDA-SE2351 - the Check's leading `USUBJID in $ds_usubjid` reads distinct(USUBJID, domain=\"DS\"), which holds no subject when DS lacks the column, so the conjunct is false on every record and the grouped DS extreme (group=[USUBJID]) is never read. Pinned as the measured answer: silent, no ERROR."
+#note "PLAN-join-key-one-side-absent-drop QK18 (3) (owner 2026-10-11): DS without USUBJID does NOT reach the QK16 ERROR for FDA-SE2351 - the Check's leading `USUBJID in $ds_usubjid` reads distinct(USUBJID, domain=\"DS\"), which holds no subject when DS lacks the column, so the conjunct is false on every record and the grouped DS extreme (group=[USUBJID]) is never read. Pinned as the measured answer: silent, no ERROR. Why it is data-dependent here (owner QK19, 2026-10-11): FDA-SE2351 has a rule-level Grouping, whose path has no absent-column fold reading the bindings up front, so the lazy grouped binding is read only behind the and short-circuit (E2) - the same Check without the Grouping ERRORs on this shape (measured on FDA-SE2270). A gate declaring DS.USUBJID would turn it into a SKIP."
 #library standard=sendig version=3-1-1
 dataset SE label="Subject Elements"
 col STUDYID type=Char label="Study Identifier"
