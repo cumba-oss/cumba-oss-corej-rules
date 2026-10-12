@@ -1,0 +1,16 @@
+#!RuleTest
+#test CDISC-CG0573 expect=skipped domain=VS
+#note "Rule round 2026-10-12 (owner, batch C item 4): Requirements.Variables.All [--TPT, --TPTNUM], as CDISC-CG0240 has. VSTPT is ABSENT, so the one-to-one relationship cannot be judged -> SKIPPED (no shipped rule reports --TPTNUM without --TPT in the SDTMIG 3.2 / 3.3 packages these rules ship in: CDISC-CG0661 is 3.4 only, CDISC-CG0091 is not shipped). Discriminating: before the round the --TPTNUM arm keyed on VISITNUM and --TPTREF alone (the absent --TPT drops out of the key) and fired on every record of a visit and reference with several time points - 3 findings here."
+#library standard=sdtmig version=3-3
+dataset VS class=FINDINGS label="Vital Signs"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col VSSEQ    type=Num  label="Sequence Number"
+col VISITNUM type=Num  label="Visit Number"
+col VSTPTREF type=Char label="Time Point Reference"
+col VSTPTNUM type=Num  label="Planned Time Point Number"
+---
+S1 | VS | 001 | 1 | 1 | DOSE | 1
+S1 | VS | 001 | 2 | 1 | DOSE | 2
+S1 | VS | 001 | 3 | 1 | DOSE | 3
