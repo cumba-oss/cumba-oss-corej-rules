@@ -1,0 +1,15 @@
+#!RuleTest
+#test CDISC-SEND-9445 expect=noViolation domain=BW
+#note "BWREASEX is present but empty on every record and BWEXCLFL is absent: no reason is given, so nothing needs a flag -> no finding."
+#library standard=sendig version=3-1-1
+dataset BW class=FINDINGS label="Body Weights"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col BWSEQ    type=Num  label="Sequence Number"
+col BWTESTCD type=Char label="Test Short Name"
+col BWORRES  type=Char label="Result or Findings as Collected"
+col BWREASEX type=Char label="Reason for Exclusion"
+---
+S1 | BW | 001 | 1 | BW | 250 |
+S1 | BW | 002 | 2 | BW | 260 |

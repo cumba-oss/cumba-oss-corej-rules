@@ -1,0 +1,16 @@
+#!RuleTest
+#test CDISC-SEND-0149 expect=noViolation domain=BW
+#note "Every populated BWREASEX sits on a record flagged BWEXCLFL = 'Y'; records without a reason are not judged."
+#library standard=sendig version=3-1-1
+dataset BW class=FINDINGS label="Body Weights"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col BWSEQ    type=Num  label="Sequence Number"
+col BWTESTCD type=Char label="Test Short Name"
+col BWORRES  type=Char label="Result or Findings as Collected"
+col BWEXCLFL type=Char label="Exclusion Flag"
+col BWREASEX type=Char label="Reason for Exclusion"
+---
+S1 | BW | 001 | 1 | BW | 250 | Y | Fasting not done
+S1 | BW | 002 | 2 | BW | 260 |   |

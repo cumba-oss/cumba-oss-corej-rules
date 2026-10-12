@@ -198,7 +198,13 @@ class ShippedSendSourceBlockMatchesWorkbookTest
      * <em>should</em> resolve and silently stops cannot hide among them.
      */
     private static final List<String> MINTED_WITHOUT_A_SHEET_ROW = List.of("CDISC-SEND-9423",
-            "CDISC-SEND-9424", "CDISC-SEND-9425", "CDISC-SEND-9443");
+            "CDISC-SEND-9424", "CDISC-SEND-9425", "CDISC-SEND-9438", "CDISC-SEND-9443",
+            "CDISC-SEND-9444", "CDISC-SEND-9445");
+    // ⭐ Re-derived 2026-10-12, 4 -> 7 (rule round 2026-10-12, batch C item 2), RUN with
+    // -Dcdisc.docs.dir=/data/cdisc-docs: CDISC-SEND-9445 (the --EXCLFL sister, #292) is this
+    // wave's mint. The run before the edit was already red with two owed entries: CDISC-SEND-9438,
+    // the one absent-column sister KEPT on 2026-10-07 (the 9 -> 4 re-derivation below dropped it
+    // with the five retired ones), and CDISC-SEND-9444 (#290, minted earlier in this round).
     // ⭐ Re-derived 2026-10-07, 9 -> 4 (PLAN-message-folded-corpus-alignment): the five
     // absent-column sisters CDISC-SEND-9437..9441 are retired — their parents carry
     // Outcome.Message_Folded and report the absence themselves.

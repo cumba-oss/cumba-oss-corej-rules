@@ -1,0 +1,15 @@
+#!RuleTest
+#test FDA-SE2354 expect=skipped domain=CL
+#note "Rule round 2026-10-12 (owner, batch C item 2, verdict 2-1): --EXCLFL moved from the authored `not var_exists(\"--EXCLFL\") or` disjunct to Requirements.Variables.All. The dataset gives reasons for exclusion on rows 1 and 2 but carries no CLEXCLFL column -> the rule SKIPS. Before the round this file pinned the not-present branch as a violation, one finding per populated CLREASEX record (2 here) for one dataset fact. The absence is reported once by the companion CDISC-SEND-9445 (CDISC SEND packages only)."
+#library standard=sendig version=3-1-1
+dataset CL class=FINDINGS label="Clinical Observations"
+col STUDYID  type=Char label="Study Identifier"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col CLSEQ    type=Num  label="Sequence Number"
+col CLTESTCD type=Char label="Clinical Observation Short Name"
+col CLORRES  type=Char label="Result or Finding in Original Units"
+col CLREASEX type=Char label="Reason for Exclusion"
+---
+S1 | 001 | 1 | CLSIGN | NORMAL | Animal removed from study
+S1 | 002 | 2 | CLSIGN | NORMAL | Data entry error
+S1 | 003 | 3 | CLSIGN | NORMAL |

@@ -1,0 +1,49 @@
+Core:
+  Id: "CDISC-SEND-9445"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when Reason for Exclusion (--REASEX) is populated on\
+  \ at least one record but the Exclusion Flag (--EXCLFL) variable is not present\
+  \ in the dataset; --REASEX may be used only when --EXCLFL is \"Y\", so without the\
+  \ column no populated reason is flagged."
+Sensitivity: "Dataset"
+Executability: "Fully Executable"
+Scope:
+  Classes:
+    Include:
+    - "FINDINGS"
+Requirements:
+  Variables:
+    None:
+    - "--EXCLFL"
+    All:
+    - "--REASEX"
+Check:
+  expression: >-
+    not empty(--REASEX)
+Outcome:
+  Message: "--REASEX is populated but --EXCLFL is not present in the dataset."
+Source_Proposed:
+  Sheet_Issue: "#292"
+  Class: "FND"
+  Domain: "ALL"
+  Variable: "--EXCLFL"
+  Plain_Text_Explanation: "--REASEX should only be present when --EXCLFL is \"Y\"\
+    ; a dataset that populates --REASEX on any record must therefore carry --EXCLFL"
+  Condition: "--REASEX ^= null"
+  Rule: "--EXCLFL present in dataset"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SENDIG-GENETOX"
+    Version: "1.0"
+  - Name: "SENDIG-DART"
+    Version: "1.2"
+  - Name: "SENDIG-DART"
+    Version: "1.1"
+  - Name: "SENDIG"
+    Version: "3.1.1"
+  - Name: "SENDIG"
+    Version: "3.1"
+  - Name: "SENDIG"
+    Version: "3.0"

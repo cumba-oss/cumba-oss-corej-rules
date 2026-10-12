@@ -111,6 +111,12 @@ class CrossCorpusDerivationTest
             // CDISC-SEND-0397 gates FXRESCAT on purpose (the guard-column hazard of a wide P3),
             // so the dataset-level absence is still the sister's, with its authored Sensitivity.
             "CDISC-SEND-9438",
+            // 2026-10-12 (rule round 2026-10-12, batch C item 2): CDISC-SEND-9445, the guarded
+            // sister of the --EXCLFL gate on CDISC-SEND-0149 / FDA-SE2354. The parents' leaf
+            // --EXCLFL != "Y" is no Message_Folded trigger (R-4.11b (e)), so the absent column is
+            // the sister's one dataset-level fact; its trigger not empty(--REASEX) is per record,
+            // so the derivation would read Record. Authored Dataset is correct.
+            "CDISC-SEND-9445",
             // ⛔ 2026-09-19 (PLAN-retire-core-family phase 6): the five CORE entries went with the
             // family — CORE-000212 / -000365 / -000929 / -009705 / -009707. Kept in step with
             // DerivedFieldEquivalenceTest, the authored-corpus half, where the same five went and

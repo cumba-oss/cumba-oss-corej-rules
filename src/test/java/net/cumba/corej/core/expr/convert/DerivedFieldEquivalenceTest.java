@@ -97,6 +97,12 @@ class DerivedFieldEquivalenceTest
             // CDISC-SEND-0397 gates FXRESCAT on purpose (the guard-column hazard of a wide P3),
             // so the dataset-level absence is still the sister's, with its authored Sensitivity.
             "CDISC-SEND-9438",
+            // 2026-10-12 (rule round 2026-10-12, batch C item 2): CDISC-SEND-9445, the guarded
+            // sister of the --EXCLFL gate on CDISC-SEND-0149 / FDA-SE2354. The parents' leaf
+            // --EXCLFL != "Y" is no Message_Folded trigger (R-4.11b (e)), so the absent column is
+            // the sister's one dataset-level fact; its trigger not empty(--REASEX) is per record,
+            // so the derivation would read Record. Authored Dataset is correct.
+            "CDISC-SEND-9445",
             // 8 -> 12 on 2026-08-19 (twin-alignment wave TA-6, review H2): the four minted
             // conditional TV presence rules are SCOPED to SV (that is the "visits are in use"
             // condition), so the derivation's certain `Study` verdict would trip the loader's
