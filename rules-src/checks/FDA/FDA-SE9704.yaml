@@ -1,0 +1,45 @@
+Core:
+  Id: "FDA-SE9704"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when Reason for Exclusion from Statistics (--REASEX)\
+  \ is populated on at least one record but the Exclude from Statistics (--EXCLFL)\
+  \ variable is not present in the dataset; --EXCLFL should be set to 'Y' when --REASEX\
+  \ is populated, so without the column no populated reason is flagged."
+Sensitivity: "Dataset"
+Executability: "Fully Executable"
+Scope:
+  Classes:
+    Include:
+    - "FINDINGS"
+Requirements:
+  Variables:
+    None:
+    - "--EXCLFL"
+    All:
+    - "--REASEX"
+Check:
+  expression: >-
+    not empty(--REASEX)
+Outcome:
+  Message: "--REASEX is populated but --EXCLFL is not present in the dataset."
+Source_Proposed:
+  Sheet_Issue: "#293"
+  FDA_Validator_Rule_Message: "Missing --EXCLFL variable, when --REASEX is provided"
+  FDA_Validator_Rule_Description: "Exclude from Statistics (--EXCLFL) should be present\
+    \ in the dataset when Reason for Exclusion from Statistics (--REASEX) is populated\
+    \ on any record."
+  Domains: "FINDINGS"
+Standards:
+- Organization: "FDA"
+  Standards:
+  - Name: "SENDIG"
+    Version: "3.1.1"
+  - Name: "SENDIG"
+    Version: "3.1"
+  - Name: "SENDIG"
+    Version: "3.0"
+  - Name: "SENDIG-AR"
+    Version: "1.0"
+  - Name: "SENDIG-DART"
+    Version: "1.1"

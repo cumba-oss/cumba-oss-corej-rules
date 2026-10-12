@@ -117,6 +117,10 @@ class CrossCorpusDerivationTest
             // the sister's one dataset-level fact; its trigger not empty(--REASEX) is per record,
             // so the derivation would read Record. Authored Dataset is correct.
             "CDISC-SEND-9445",
+            // 2026-10-12 (rule round 2026-10-12, batch D item 2): FDA-SE9704, the FDA arm of
+            // CDISC-SEND-9445 (the guarded sister of the --EXCLFL gate on FDA-SE2354). Same shape,
+            // same reason: authored Dataset is correct, the derivation would read Record.
+            "FDA-SE9704",
             // ⛔ 2026-09-19 (PLAN-retire-core-family phase 6): the five CORE entries went with the
             // family — CORE-000212 / -000365 / -000929 / -009705 / -009707. Kept in step with
             // DerivedFieldEquivalenceTest, the authored-corpus half, where the same five went and

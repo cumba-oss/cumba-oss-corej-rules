@@ -103,6 +103,10 @@ class DerivedFieldEquivalenceTest
             // the sister's one dataset-level fact; its trigger not empty(--REASEX) is per record,
             // so the derivation would read Record. Authored Dataset is correct.
             "CDISC-SEND-9445",
+            // 2026-10-12 (rule round 2026-10-12, batch D item 2): FDA-SE9704, the FDA arm of
+            // CDISC-SEND-9445 (the guarded sister of the --EXCLFL gate on FDA-SE2354). Same shape,
+            // same reason: authored Dataset is correct, the derivation would read Record.
+            "FDA-SE9704",
             // 8 -> 12 on 2026-08-19 (twin-alignment wave TA-6, review H2): the four minted
             // conditional TV presence rules are SCOPED to SV (that is the "visits are in use"
             // condition), so the derivation's certain `Study` verdict would trip the loader's
