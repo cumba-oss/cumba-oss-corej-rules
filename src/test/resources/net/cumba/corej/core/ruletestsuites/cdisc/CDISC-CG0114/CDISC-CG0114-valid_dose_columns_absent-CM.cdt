@@ -1,0 +1,14 @@
+#!RuleTest
+#test CDISC-CG0114 expect=noViolation domain=CM
+#note "Absent-column boundary (rule round 2026-10-12, var_exists sweep): none of CMDOSE, CMDOSTXT, CMDOSTOT is in the dataset, so no record provides a dose and the empty CMDOSU on row 2 is conformant. Without the removed var_exists guards the three `not empty(X)` disjuncts are false on the absent columns -> no violation."
+#library standard=sdtmig version=3-4
+dataset CM class=INTERVENTIONS label="Concomitant Medications"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col CMSEQ   type=Num  label="Sequence Number"
+col CMTRT   type=Char label="Reported Name of Drug, Med, or Therapy"
+col CMDOSU  type=Char label="Dose Units"
+---
+S1 | CM | 001 | 1 | ASPIRIN   | mg
+S1 | CM | 001 | 2 | VITAMIN C |

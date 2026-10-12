@@ -1,0 +1,18 @@
+#!RuleTest
+#test CDISC-SEND-0351 expect=violation domain=BW
+#note "Only BWRPDY of the six repro-phase timing variables is in the dataset (rule round 2026-10-12, var_exists sweep): the `not empty(X)` disjuncts over the absent ones are false, so they add nothing. Row 2 has BWRPDY and no RPHASE -> one violation."
+#library standard=sendig-dart version=1-2
+#expectViolationCount 1
+#expectViolationAt row=2 BWSEQ=2
+dataset BW class=FINDINGS label="Body Weights"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col BWSEQ    type=Num  label="Sequence Number"
+col BWTESTCD type=Char label="Test Short Name"
+col BWRPDY   type=Num  label="Actual Day in Repro Phase"
+col RPHASE   type=Char label="Repro Phase"
+---
+S1 | BW | 001 | 1 | BW | 5 | GESTATION
+S1 | BW | 001 | 2 | BW | 6 |
+S1 | BW | 001 | 3 | BW |   |

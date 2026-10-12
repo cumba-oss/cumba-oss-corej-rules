@@ -1,0 +1,18 @@
+#!RuleTest
+#test CDISC-CG0549 expect=violation domain=LB
+#note "LBDRVFL is not in the dataset (rule round 2026-10-12, var_exists sweep): its `== \"Y\"` disjunct is false on an absent column, so only LBORREF decides. Row 2 has an LBORREF and no LBSTREFC -> one violation."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=2 LBSEQ=2
+dataset LB class=FINDINGS label="Laboratory Test Results"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col LBSEQ    type=Num  label="Sequence Number"
+col LBTESTCD type=Char label="Lab Test or Examination Short Name"
+col LBORREF  type=Char label="Reference Result in Original Units"
+col LBSTREFC type=Char label="Reference Result in Standard Format"
+---
+S1 | LB | 001 | 1 | GLUC | NEGATIVE | NEGATIVE
+S1 | LB | 001 | 2 | ALB  | POSITIVE |
+S1 | LB | 001 | 3 | ALT  |          | NEGATIVE

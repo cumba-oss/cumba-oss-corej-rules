@@ -1,0 +1,15 @@
+#!RuleTest
+#test CDISC-CG0397 expect=noViolation domain=LB
+#note "LBDRVFL is not in the dataset (rule round 2026-10-12, var_exists sweep): every record with an LBORRES carries LBSTRESC, and the record without a result has none -> no violation. An absent LBDRVFL never reads as 'Y'."
+#library standard=sdtmig version=3-4
+dataset LB class=FINDINGS label="Laboratory Test Results"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col LBSEQ    type=Num  label="Sequence Number"
+col LBTESTCD type=Char label="Lab Test or Examination Short Name"
+col LBORRES  type=Char label="Result or Finding in Original Units"
+col LBSTRESC type=Char label="Character Result/Finding in Std Format"
+---
+S1 | LB | 001 | 1 | GLUC | 5.1 | 5.1
+S1 | LB | 001 | 2 | ALT  |     |
