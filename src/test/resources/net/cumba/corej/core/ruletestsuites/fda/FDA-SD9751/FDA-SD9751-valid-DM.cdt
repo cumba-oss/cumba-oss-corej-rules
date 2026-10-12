@@ -1,0 +1,22 @@
+#!RuleTest
+#test FDA-SD9751 expect=noViolation domain=DM
+#note "The Trial Inclusion/Exclusion Criteria (TI) dataset is present in the study inventory -> no violation."
+#library standard=sdtmig version=3-4
+dataset DM class="SPECIAL PURPOSE" label="Demographics"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col SEX     type=Char label="Sex"
+---
+S1 | DM | 001 | M
+---
+
+dataset TI class="TRIAL DESIGN" label="Trial Inclusion/Exclusion Criteria"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col IETESTCD type=Char label="Incl/Excl Criterion Short Name"
+col IETEST   type=Char label="Inclusion/Exclusion Criterion"
+col IECAT    type=Char label="Inclusion/Exclusion Category"
+---
+S1 | TI | IN01 | Age 18 or older | INCLUSION
+---
