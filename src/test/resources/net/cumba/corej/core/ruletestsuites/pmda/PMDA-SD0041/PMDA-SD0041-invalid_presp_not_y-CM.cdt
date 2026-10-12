@@ -1,6 +1,6 @@
 #!RuleTest
 #test PMDA-SD0041 expect=violation domain=CM
-#note "This rule's gate is [--OCCUR] only (no CMSTAT column here; the same shape SKIPS sister SD0042 - the discriminating pair). Row 1: OCCUR populated, PRESP empty ('' != 'Y' TRUE, B.1) -> FIRES. Row 2: OCCUR populated, PRESP='N' != 'Y' -> FIRES. Row 3: pre-specified -> clean. Row 4: OCCUR empty -> clean. The shipped or-arm guard var_exists(--PRESP) and --PRESP != \"Y\" is machine-derived (per-branch); with CMPRESP present it is transparent."
+#note "This rule's gate is [--OCCUR, --PRESP] (no CMSTAT column here; the same shape SKIPS sister SD0042 - the discriminating pair). Row 1: OCCUR populated, PRESP empty ('' != 'Y' TRUE, B.1) -> FIRES. Row 2: OCCUR populated, PRESP='N' != 'Y' -> FIRES. Row 3: pre-specified -> clean. Row 4: OCCUR empty -> clean. --PRESP joined the gate in rule round 2026-10-12; present here."
 #library standard=sdtmig version=3-4
 #expectViolationCount 2
 #expectViolationAt row=1 CMSEQ=1

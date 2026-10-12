@@ -1,0 +1,15 @@
+#!RuleTest
+#test CDISC-CG0089 expect=skipped domain=CM
+#note "Rule round 2026-10-12 (owner, verdict 2-1'): --PRESP moved from the authored `not var_exists(\"--PRESP\") or` disjunct to Requirements.Variables.All. No CMPRESP column -> the rule SKIPS; CDISC-CG0088 (Condition --PRESP not present, Rule --OCCUR not present) reports the absence once for the dataset. Discriminating: under the old rule both populated CMOCCUR rows fired, one finding per record for one dataset fact."
+#library standard=sdtmig version=3-4
+dataset CM class=INTERVENTIONS label="Concomitant Medications"
+col STUDYID  type=Char
+col DOMAIN   type=Char
+col USUBJID  type=Char
+col CMSEQ    type=Num
+col CMTRT    type=Char
+col CMOCCUR  type=Char
+---
+S1 | CM | 001 | 1 | ASPIRIN   | Y
+S1 | CM | 001 | 2 | IBUPROFEN | N
+S1 | CM | 001 | 3 | CODEINE   |

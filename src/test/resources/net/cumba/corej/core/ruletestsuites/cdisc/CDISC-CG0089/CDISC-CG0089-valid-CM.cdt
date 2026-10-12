@@ -1,0 +1,16 @@
+#!RuleTest
+#test CDISC-CG0089 expect=noViolation domain=CM
+#note "Every record with a populated CMOCCUR is pre-specified (CMPRESP = 'Y'); the spontaneous record leaves CMOCCUR empty."
+#library standard=sdtmig version=3-4
+dataset CM class=INTERVENTIONS label="Concomitant Medications"
+col STUDYID  type=Char
+col DOMAIN   type=Char
+col USUBJID  type=Char
+col CMSEQ    type=Num
+col CMTRT    type=Char
+col CMPRESP  type=Char
+col CMOCCUR  type=Char
+---
+S1 | CM | 001 | 1 | ASPIRIN   | Y | Y
+S1 | CM | 001 | 2 | IBUPROFEN | Y | N
+S1 | CM | 001 | 3 | CODEINE   |   |

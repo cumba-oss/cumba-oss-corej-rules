@@ -1,0 +1,14 @@
+#!RuleTest
+#test CDISC-CG0089 expect=skipped domain=AE
+#note "Scope boundary: AE is an EVENTS domain but in Domains.Exclude [AE, DS, DV, EX] (CG0089 Domain: NOT(AE, DS, DV, EX)). The body would fire otherwise (AEOCCUR populated, AEPRESP not 'Y')."
+#library standard=sdtmig version=3-4
+dataset AE class=EVENTS label="Adverse Events"
+col STUDYID  type=Char
+col DOMAIN   type=Char
+col USUBJID  type=Char
+col AESEQ    type=Num
+col AETERM   type=Char
+col AEPRESP  type=Char
+col AEOCCUR  type=Char
+---
+S1 | AE | 001 | 1 | HEADACHE |   | Y

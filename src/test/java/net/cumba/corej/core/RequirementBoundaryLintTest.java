@@ -62,8 +62,11 @@ class RequirementBoundaryLintTest
         // 2026-10-12 (rule round, var_exists sweep): 728 -> 726. CDISC-CG0087 and FDA-SD1392 lost
         // their `not var_exists("--X") or <negative test>` disjuncts, which the bare negative test
         // already covered on an absent column; the reader did not go blind, the leaves are gone.
-        assertTrue(absenceTests >= 726, "only " + absenceTests + " positive-firing absence"
-                + " test(s) read (726 on 2026-10-12) — the presence-test reader went blind");
+        // 2026-10-12 (rule round, batch C item 1): 726 -> 723. CDISC-CG0089, FDA-SD0041 and
+        // PMDA-SD0041 moved --PRESP from the `not var_exists("--PRESP") or` disjunct to
+        // Requirements.Variables.All (verdict 2-1'); the leaves are gone, not unread.
+        assertTrue(absenceTests >= 723, "only " + absenceTests + " positive-firing absence"
+                + " test(s) read (723 on 2026-10-12) — the presence-test reader went blind");
         assertTrue(suffixed >= 3,
                 "only " + suffixed + " suffixed requirement entries (3 on" + " 2026-10-07)");
         assertEquals(List.of(), hits, "R-4.27: a rule requires what it reports — the gate skips"

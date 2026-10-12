@@ -3,7 +3,8 @@ Core:
   Status: "Published"
   Version: "1"
 Description: "Raise an error when --OCCUR is populated for an unsolicited record,\
-  \ that is a record where --PRESP is not present or is not equal to 'Y'."
+  \ that is a record where --PRESP is not equal to 'Y'; a dataset without --PRESP\
+  \ is not judged here (FDA-SD1147 reports the absence)."
 Executability: "Fully Executable"
 Scope:
   Classes:
@@ -14,9 +15,10 @@ Requirements:
   Variables:
     All:
     - "--OCCUR"
+    - "--PRESP"
 Check:
   expression: >-
-    not empty(--OCCUR) and (not var_exists("--PRESP") or --PRESP != "Y")
+    not empty(--OCCUR) and --PRESP != "Y"
 Outcome:
   Message: "Value for --OCCUR is populated for unsolicited Intervention or Event"
 Source:

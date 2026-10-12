@@ -1,10 +1,7 @@
 #!RuleTest
-#test FDA-SD0041 expect=violation domain=CM
-#note "Branch 2 of the any-tree: the dataset carries no CMPRESP column at all, so every record with a populated CMOCCUR is unsolicited -> both populated rows fire; row 3 leaves CMOCCUR empty."
+#test FDA-SD0041 expect=skipped domain=CM
+#note "Rule round 2026-10-12 (owner, verdict 2-1'): --PRESP moved from the authored `not var_exists(\"--PRESP\") or` disjunct to Requirements.Variables.All. The dataset carries no CMPRESP column at all, so the rule SKIPS; FDA-SD1147 reports the absent --PRESP once for the dataset (--OCCUR present). Before the round the two populated CMOCCUR rows fired, one finding per record for one dataset fact - this file pinned that as a violation."
 #library standard=sdtmig version=3-4
-#expectViolationCount 2
-#expectViolationAt row=1 CMOCCUR=Y
-#expectViolationAt row=2 CMOCCUR=N
 dataset CM class=INTERVENTIONS label="Concomitant Medications"
 col STUDYID type=Char label="Study Identifier"
 col DOMAIN  type=Char label="Domain Abbreviation"
