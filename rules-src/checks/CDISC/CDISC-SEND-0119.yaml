@@ -12,6 +12,8 @@ Scope:
     Include:
     - "CO"
 Bindings:
+- name: "$coval_series"
+  expression: "find_vars(\"/^COVAL[0-9]*$/\")"
 - name: "$coval_series_incomplete"
   expression: "column_series_metadata(\"COVAL\", name_pattern=\"^COVAL\\\\d+$\", min_length=200)"
 Check:
@@ -21,7 +23,7 @@ Outcome:
   Message: "A comment longer than 200 characters is not correctly split into sequential\
     \ 200-character COVAL/COVAL1..COVALn columns."
   Output_Variables:
-  - "COVAL"
+  - "$coval_series"
 Source:
   Class: "SPC"
   Domain: "CO"
