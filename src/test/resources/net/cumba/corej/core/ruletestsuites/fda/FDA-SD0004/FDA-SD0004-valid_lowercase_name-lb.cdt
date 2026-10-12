@@ -1,0 +1,13 @@
+#!RuleTest
+#test FDA-SD0004 expect=noViolation domain=LB
+#note "Rule round 2026-10-12 (owner, queued item C4, as 46cdc793 / c5206c02): the dataset-name prefix and DOMAIN are compared as upper(prefix(ds_name(), n)) != upper(DOMAIN) - dataset names match case-insensitively (owner 2026-10-01) and the 2026-10-04 ruling compares both values upper case (study_domains() folds the DOMAIN cells the same way). Copy of FDA-SD0004-valid-LB.cdt with the dataset named lb, as a provider that passes a file name through unchanged hands it over; DOMAIN stays LB. Must not fire; red under the old raw comparison."
+#library standard=sdtmig version=3-4
+dataset lb class=FINDINGS label="Laboratory Test Results"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col LBSEQ    type=Num  label="Sequence Number"
+col LBTESTCD type=Char label="Lab Test or Examination Short Name"
+---
+S1 | LB | 001 | 1 | ALB
+S1 | LB | 001 | 2 | GLUC

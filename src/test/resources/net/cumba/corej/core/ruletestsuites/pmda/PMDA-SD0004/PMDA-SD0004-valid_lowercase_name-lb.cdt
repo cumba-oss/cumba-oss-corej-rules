@@ -1,0 +1,13 @@
+#!RuleTest
+#test PMDA-SD0004 expect=noViolation domain=LB
+#note "Rule round 2026-10-12 (owner, queued item C4, as 46cdc793 / c5206c02): the dataset-name prefix and DOMAIN are compared as upper(prefix(ds_name(), n)) != upper(DOMAIN) - dataset names match case-insensitively (owner 2026-10-01) and the 2026-10-04 ruling compares both values upper case (study_domains() folds the DOMAIN cells the same way). Copy of PMDA-SD0004-valid-LB.cdt with the dataset named lb, as a provider that passes a file name through unchanged hands it over; DOMAIN stays LB. Must not fire; red under the old raw comparison."
+#library standard=sdtmig version=3-4
+dataset lb label="Laboratory Test Results"
+col STUDYID  type=Char
+col DOMAIN   type=Char
+col USUBJID  type=Char
+col LBSEQ    type=Num
+col LBTESTCD type=Char
+---
+S1 | LB | 001 | 1 | ALB
+S1 | LB | 001 | 2 | GLUC

@@ -1,0 +1,12 @@
+#!RuleTest
+#test CDISC-CG0413-A expect=noViolation domain=APDM
+#note "Rule round 2026-10-12 (owner, queued item C4, as 46cdc793 / c5206c02): the dataset-name prefix and DOMAIN are compared as upper(prefix(ds_name(), n)) != upper(DOMAIN) - dataset names match case-insensitively (owner 2026-10-01) and the 2026-10-04 ruling compares both values upper case (study_domains() folds the DOMAIN cells the same way). Copy of CDISC-CG0413-A-valid_ap_code_matches-APDM.cdt with the dataset named apdm, as a provider that passes a file name through unchanged hands it over; DOMAIN stays APDM. Must not fire; red under the old raw comparison."
+#library standard=sdtmig version=3-4
+dataset apdm
+col STUDYID type=Char
+col DOMAIN  type=Char
+col APID    type=Char
+col RSUBJID type=Char
+col SREL    type=Char
+---
+CDISCPILOT01 | APDM | AP-001 | 01-701-1015 | MOTHER, BIOLOGICAL
