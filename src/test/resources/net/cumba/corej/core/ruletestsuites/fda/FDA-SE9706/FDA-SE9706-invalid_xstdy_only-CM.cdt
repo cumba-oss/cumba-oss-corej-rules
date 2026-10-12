@@ -1,0 +1,17 @@
+#!RuleTest
+#test FDA-SE9706 expect=violation domain=CM
+#note "Rule round 2026-10-12 (owner, batch D item 4a): only the second trigger CMXSTDY is populated (rows 1 and 3), CMCHSTDY empty, and no CMSTDTC and no CMSTDY -> one finding."
+#library standard=sendig version=ar-1-0
+#expectViolationCount 1
+dataset CM class=INTERVENTIONS label="Concomitant/Prior Medications"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col CMSEQ    type=Num  label="Sequence Number"
+col CMTRT type=Char label="Reported Name of Drug, Med, or Therapy"
+col CMCHSTDY type=Num label="Start Day of Obs Rel to Challenge Agent"
+col CMXSTDY type=Num label="Start Day of Obs Rel to Exposure"
+---
+S1 | CM | 001 | 1 | SALINE |  | 3
+S1 | CM | 002 | 2 | SALINE |  | 
+S1 | CM | 003 | 3 | SALINE |  | 4

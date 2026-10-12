@@ -1,0 +1,17 @@
+#!RuleTest
+#test FDA-SE9706 expect=violation domain=CM
+#note "Rule round 2026-10-12 (owner, batch D item 4a): CMCHSTDY is populated on rows 1 and 2 and the dataset carries no CMSTDTC and no CMSTDY -> ONE finding for the dataset, not one per record."
+#library standard=sendig version=ar-1-0
+#expectViolationCount 1
+dataset CM class=INTERVENTIONS label="Concomitant/Prior Medications"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col CMSEQ    type=Num  label="Sequence Number"
+col CMTRT type=Char label="Reported Name of Drug, Med, or Therapy"
+col CMCHSTDY type=Num label="Start Day of Obs Rel to Challenge Agent"
+col CMXSTDY type=Num label="Start Day of Obs Rel to Exposure"
+---
+S1 | CM | 001 | 1 | SALINE | 5 | 
+S1 | CM | 002 | 2 | SALINE | 6 | 
+S1 | CM | 003 | 3 | SALINE |  | 

@@ -1,0 +1,16 @@
+#!RuleTest
+#test FDA-SE9706 expect=noViolation domain=CM
+#note "CMCHSTDY, CMXSTDY present but empty on every record and no CMSTDTC and no CMSTDY: nothing is populated, so nothing needs the date -> no finding."
+#library standard=sendig version=ar-1-0
+dataset CM class=INTERVENTIONS label="Concomitant/Prior Medications"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col CMSEQ    type=Num  label="Sequence Number"
+col CMTRT type=Char label="Reported Name of Drug, Med, or Therapy"
+col CMCHSTDY type=Num label="Start Day of Obs Rel to Challenge Agent"
+col CMXSTDY type=Num label="Start Day of Obs Rel to Exposure"
+---
+S1 | CM | 001 | 1 | SALINE |  | 
+S1 | CM | 002 | 2 | SALINE |  | 
+S1 | CM | 003 | 3 | SALINE |  | 

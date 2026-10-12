@@ -1,0 +1,43 @@
+Core:
+  Id: "FDA-SE9709"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when Study Day of Start of Observation (--STDY) is populated\
+  \ on at least one record but Start Date/Time of Observation (--STDTC) is not present\
+  \ in the dataset; the study day may only be populated when --STDTC is provided,\
+  \ so without the column every populated value is unsupported."
+Sensitivity: "Dataset"
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Exclude:
+    - "DM"
+Requirements:
+  Variables:
+    None:
+    - "--STDTC"
+    All:
+    - "--STDY"
+Check:
+  expression: >-
+    not empty(--STDY)
+Outcome:
+  Message: "--STDY is populated but --STDTC is not present in the dataset."
+Source_Proposed:
+  Sheet_Issue: "#294"
+  FDA_Validator_Rule_Message: "Missing --STDTC variable, when --STDY is populated"
+  FDA_Validator_Rule_Description: "Start Date/Time of Observation (--STDTC) variable\
+    \ should be included into dataset, when Study Day of Start of Observation (--STDY)\
+    \ is populated."
+  Domains: "ALL (-DM)"
+Standards:
+- Organization: "FDA"
+  Standards:
+  - Name: "SENDIG"
+    Version: "3.1.1"
+  - Name: "SENDIG"
+    Version: "3.1"
+  - Name: "SENDIG"
+    Version: "3.0"
+  - Name: "SENDIG-DART"
+    Version: "1.1"

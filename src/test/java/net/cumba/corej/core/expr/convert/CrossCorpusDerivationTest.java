@@ -121,6 +121,12 @@ class CrossCorpusDerivationTest
             // CDISC-SEND-9445 (the guarded sister of the --EXCLFL gate on FDA-SE2354). Same shape,
             // same reason: authored Dataset is correct, the derivation would read Record.
             "FDA-SE9704",
+            // 2026-10-12 (rule round 2026-10-12, batch D item 4a): the nine study-day presence
+            // companions. The finding is that the date COLUMN is absent, one dataset-level fact;
+            // the trigger not empty(--DY) (or a --CH*DY / --X*DY) is per record, so the
+            // derivation would read Record. Authored Dataset is correct.
+            "FDA-SE9705", "FDA-SE9706", "FDA-SE9707", "FDA-SE9708", "FDA-SE9709", "FDA-SE9710",
+            "PMDA-SD9752", "PMDA-SD9753", "PMDA-SD9754",
             // ⛔ 2026-09-19 (PLAN-retire-core-family phase 6): the five CORE entries went with the
             // family — CORE-000212 / -000365 / -000929 / -009705 / -009707. Kept in step with
             // DerivedFieldEquivalenceTest, the authored-corpus half, where the same five went and

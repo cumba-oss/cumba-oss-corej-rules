@@ -1,0 +1,16 @@
+#!RuleTest
+#test PMDA-SD9753 expect=skipped domain=CM
+#note "The discriminator: CMSTDTC is PRESENT (blank on row 2) -> the companion SKIPS on None [--STDTC]; the imputation parent PMDA-SD1089 runs and reports the record whose date is incomplete."
+#library standard=sdtmig version=3-2
+dataset CM class=INTERVENTIONS label="Concomitant Medications"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col CMSEQ    type=Num  label="Sequence Number"
+col CMTRT type=Char label="Reported Name of Drug, Med, or Therapy"
+col CMSTDY type=Num label="Study Day of Start of Observation"
+col CMSTDTC type=Char label="Start Date/Time of Observation"
+---
+S1 | CM | 001 | 1 | ASPIRIN | 5 | 2020-01-05
+S1 | CM | 002 | 2 | ASPIRIN | 6 | 
+S1 | CM | 003 | 3 | ASPIRIN |  | 2020-01-07

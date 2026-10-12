@@ -1,0 +1,17 @@
+#!RuleTest
+#test FDA-SE9707 expect=skipped domain=CM
+#note "Boundary with the --ENDY presence rule: CMENDY is present (and CMENDTC absent) -> the companion SKIPS on None [--ENDY]; FDA-SD2272 reports the absent CMENDTC instead, so the dataset is reported once."
+#library standard=sendig version=ar-1-0
+dataset CM class=INTERVENTIONS label="Concomitant/Prior Medications"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col CMSEQ    type=Num  label="Sequence Number"
+col CMTRT type=Char label="Reported Name of Drug, Med, or Therapy"
+col CMCHENDY type=Num label="End Day of Obs Rel to Challenge Agent"
+col CMXENDY type=Num label="End Day of Obs Rel to Exposure"
+col CMENDY type=Num label="Study Day of End of Observation"
+---
+S1 | CM | 001 | 1 | SALINE | 5 |  | 5
+S1 | CM | 002 | 2 | SALINE | 6 |  | 6
+S1 | CM | 003 | 3 | SALINE |  |  | 

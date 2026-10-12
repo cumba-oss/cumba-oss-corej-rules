@@ -1,0 +1,48 @@
+Core:
+  Id: "PMDA-SD9752"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when Study Day of Collection (--DY) is populated on at\
+  \ least one record but Date/Time of Collection (--DTC) is not present in the dataset;\
+  \ the study day may only be populated when --DTC is provided, so without the column\
+  \ every populated value is unsupported."
+Sensitivity: "Dataset"
+Executability: "Fully Executable"
+Scope:
+  Classes:
+    Include:
+    - "SPECIAL PURPOSE"
+    - "INTERVENTIONS"
+    - "EVENTS"
+    - "FINDINGS"
+    - "FINDINGS ABOUT"
+  Domains:
+    Exclude:
+    - "DO"
+Requirements:
+  Variables:
+    None:
+    - "--DTC"
+    All:
+    - "--DY"
+Check:
+  expression: >-
+    not empty(--DY)
+Outcome:
+  Message: "--DY is populated but --DTC is not present in the dataset."
+Source_Proposed:
+  Sheet_Issue: "#295"
+  Message: "Missing --DTC variable, when --DY is populated"
+  Description: "Date/Time of Collection (--DTC) variable should be included into dataset,\
+    \ when Study Day of Collection (--DY) is populated."
+  Domains: "SPECIAL PURPOSE, INTERVENTIONS, EVENTS, FINDINGS, FINDINGS ABOUT (-DO)"
+  Severity: "Warning"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.2"
+  - Name: "SDTMIG"
+    Version: "3.1.3"
+  - Name: "SDTMIG"
+    Version: "3.1.2"

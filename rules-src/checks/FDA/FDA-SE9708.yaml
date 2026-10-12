@@ -1,0 +1,42 @@
+Core:
+  Id: "FDA-SE9708"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when Study Day of Collection (--DY) is populated on at\
+  \ least one record but Date/Time of Collection (--DTC) is not present in the dataset;\
+  \ the study day may only be populated when --DTC is provided, so without the column\
+  \ every populated value is unsupported."
+Sensitivity: "Dataset"
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "ALL"
+Requirements:
+  Variables:
+    None:
+    - "--DTC"
+    All:
+    - "--DY"
+Check:
+  expression: >-
+    not empty(--DY)
+Outcome:
+  Message: "--DY is populated but --DTC is not present in the dataset."
+Source_Proposed:
+  Sheet_Issue: "#294"
+  FDA_Validator_Rule_Message: "Missing --DTC variable, when --DY is populated"
+  FDA_Validator_Rule_Description: "Date/Time of Collection (--DTC) variable should\
+    \ be included into dataset, when Study Day of Collection (--DY) is populated."
+  Domains: "ALL"
+Standards:
+- Organization: "FDA"
+  Standards:
+  - Name: "SENDIG"
+    Version: "3.1.1"
+  - Name: "SENDIG"
+    Version: "3.1"
+  - Name: "SENDIG"
+    Version: "3.0"
+  - Name: "SENDIG-DART"
+    Version: "1.1"

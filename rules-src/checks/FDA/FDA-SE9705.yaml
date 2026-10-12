@@ -1,0 +1,47 @@
+Core:
+  Id: "FDA-SE9705"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when Day of Obs Rel to Challenge Agent (--CHDY) or Day\
+  \ of Obs Relative to Exposure (--XDY) is populated on at least one record but the\
+  \ dataset carries neither Date/Time of Collection (--DTC) nor --DY; the relative\
+  \ study day may only be populated when --DTC is provided, so without the column\
+  \ every populated value is unsupported. Where --DY is present, the absent --DTC\
+  \ is reported by the --DY presence rule."
+Sensitivity: "Dataset"
+Executability: "Fully Executable"
+Scope:
+  Classes:
+    Include:
+    - "INTERVENTIONS"
+    - "EVENTS"
+    - "FINDINGS"
+    - "FINDINGS ABOUT"
+Requirements:
+  Variables:
+    None:
+    - "--DTC"
+    - "--DY"
+    Any:
+    - - "--CHDY"
+      - "--XDY"
+Check:
+  expression: >-
+    not empty(--CHDY) or not empty(--XDY)
+Outcome:
+  Message: "--CHDY or --XDY is populated but neither --DTC nor --DY is present in\
+    \ the dataset."
+Source_Proposed:
+  Sheet_Issue: "#294"
+  FDA_Validator_Rule_Message: "Missing --DTC variable, when --CHDY or --XDY is populated\
+    \ and --DY is not present"
+  FDA_Validator_Rule_Description: "Date/Time of Collection (--DTC) variable should\
+    \ be included into dataset, when Day of Obs Rel to Challenge Agent (--CHDY) or\
+    \ Day of Obs Relative to Exposure (--XDY) is populated. Where --DY is present,\
+    \ the --DY presence row reports it."
+  Domains: "INTERVENTIONS, EVENTS, FINDINGS, FINDINGS ABOUT"
+Standards:
+- Organization: "FDA"
+  Standards:
+  - Name: "SENDIG-AR"
+    Version: "1.0"

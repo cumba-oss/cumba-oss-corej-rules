@@ -1,0 +1,16 @@
+#!RuleTest
+#test PMDA-SD9752 expect=violation domain=LB
+#note "Rule round 2026-10-12 (owner, batch D item 4a): LBDY is populated on rows 1 and 2 and the dataset carries no LBDTC -> ONE finding for the dataset, not one per record."
+#library standard=sdtmig version=3-2
+#expectViolationCount 1
+dataset LB class=FINDINGS label="Laboratory Test Results"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col LBSEQ    type=Num  label="Sequence Number"
+col LBTESTCD type=Char label="Lab Test or Examination Short Name"
+col LBDY type=Num label="Study Day of Collection"
+---
+S1 | LB | 001 | 1 | ALB | 5
+S1 | LB | 002 | 2 | ALB | 6
+S1 | LB | 003 | 3 | ALB | 

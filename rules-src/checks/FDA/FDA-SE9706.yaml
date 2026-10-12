@@ -1,0 +1,50 @@
+Core:
+  Id: "FDA-SE9706"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when Start Day of Obs Rel to Challenge Agent (--CHSTDY)\
+  \ or Start Day of Obs Rel to Exposure (--XSTDY) is populated on at least one record\
+  \ but the dataset carries neither Start Date/Time of Observation (--STDTC) nor --STDY;\
+  \ the relative study day may only be populated when --STDTC is provided, so without\
+  \ the column every populated value is unsupported. Where --STDY is present, the\
+  \ absent --STDTC is reported by the --STDY presence rule."
+Sensitivity: "Dataset"
+Executability: "Fully Executable"
+Scope:
+  Classes:
+    Include:
+    - "INTERVENTIONS"
+    - "EVENTS"
+    - "FINDINGS"
+    - "FINDINGS ABOUT"
+  Domains:
+    Exclude:
+    - "FA"
+Requirements:
+  Variables:
+    None:
+    - "--STDTC"
+    - "--STDY"
+    Any:
+    - - "--CHSTDY"
+      - "--XSTDY"
+Check:
+  expression: >-
+    not empty(--CHSTDY) or not empty(--XSTDY)
+Outcome:
+  Message: "--CHSTDY or --XSTDY is populated but neither --STDTC nor --STDY is present\
+    \ in the dataset."
+Source_Proposed:
+  Sheet_Issue: "#294"
+  FDA_Validator_Rule_Message: "Missing --STDTC variable, when --CHSTDY or --XSTDY\
+    \ is populated and --STDY is not present"
+  FDA_Validator_Rule_Description: "Start Date/Time of Observation (--STDTC) variable\
+    \ should be included into dataset, when Start Day of Obs Rel to Challenge Agent\
+    \ (--CHSTDY) or Start Day of Obs Rel to Exposure (--XSTDY) is populated. Where\
+    \ --STDY is present, the --STDY presence row reports it."
+  Domains: "INTERVENTIONS, EVENTS, FINDINGS, FINDINGS ABOUT (-FA)"
+Standards:
+- Organization: "FDA"
+  Standards:
+  - Name: "SENDIG-AR"
+    Version: "1.0"

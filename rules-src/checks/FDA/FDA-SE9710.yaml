@@ -1,0 +1,43 @@
+Core:
+  Id: "FDA-SE9710"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when Study Day of End of Observation (--ENDY) is populated\
+  \ on at least one record but End Date/Time of Observation (--ENDTC) is not present\
+  \ in the dataset; the study day may only be populated when --ENDTC is provided,\
+  \ so without the column every populated value is unsupported."
+Sensitivity: "Dataset"
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Exclude:
+    - "DM"
+Requirements:
+  Variables:
+    None:
+    - "--ENDTC"
+    All:
+    - "--ENDY"
+Check:
+  expression: >-
+    not empty(--ENDY)
+Outcome:
+  Message: "--ENDY is populated but --ENDTC is not present in the dataset."
+Source_Proposed:
+  Sheet_Issue: "#294"
+  FDA_Validator_Rule_Message: "Missing --ENDTC variable, when --ENDY is populated"
+  FDA_Validator_Rule_Description: "End Date/Time of Observation (--ENDTC) variable\
+    \ should be included into dataset, when Study Day of End of Observation (--ENDY)\
+    \ is populated."
+  Domains: "ALL (-DM)"
+Standards:
+- Organization: "FDA"
+  Standards:
+  - Name: "SENDIG"
+    Version: "3.1.1"
+  - Name: "SENDIG"
+    Version: "3.1"
+  - Name: "SENDIG"
+    Version: "3.0"
+  - Name: "SENDIG-DART"
+    Version: "1.1"

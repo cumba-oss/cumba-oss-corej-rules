@@ -1,0 +1,17 @@
+#!RuleTest
+#test FDA-SE9705 expect=violation domain=MB
+#note "Rule round 2026-10-12 (owner, batch D item 4a): MBCHDY is populated on rows 1 and 2 and the dataset carries no MBDTC and no MBDY -> ONE finding for the dataset, not one per record."
+#library standard=sendig version=ar-1-0
+#expectViolationCount 1
+dataset MB class=FINDINGS label="Microbiology Specimen"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col MBSEQ    type=Num  label="Sequence Number"
+col MBTESTCD type=Char label="Test Short Name"
+col MBCHDY type=Num label="Day of Obs Rel to Challenge Agent"
+col MBXDY type=Num label="Day of Obs Relative to Exposure"
+---
+S1 | MB | 001 | 1 | CULT | 5 | 
+S1 | MB | 002 | 2 | CULT | 6 | 
+S1 | MB | 003 | 3 | CULT |  | 

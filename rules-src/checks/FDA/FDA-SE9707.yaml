@@ -1,0 +1,50 @@
+Core:
+  Id: "FDA-SE9707"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when End Day of Obs Rel to Challenge Agent (--CHENDY)\
+  \ or End Day of Obs Rel to Exposure (--XENDY) is populated on at least one record\
+  \ but the dataset carries neither End Date/Time of Observation (--ENDTC) nor --ENDY;\
+  \ the relative study day may only be populated when --ENDTC is provided, so without\
+  \ the column every populated value is unsupported. Where --ENDY is present, the\
+  \ absent --ENDTC is reported by the --ENDY presence rule."
+Sensitivity: "Dataset"
+Executability: "Fully Executable"
+Scope:
+  Classes:
+    Include:
+    - "INTERVENTIONS"
+    - "EVENTS"
+    - "FINDINGS"
+    - "FINDINGS ABOUT"
+  Domains:
+    Exclude:
+    - "FA"
+Requirements:
+  Variables:
+    None:
+    - "--ENDTC"
+    - "--ENDY"
+    Any:
+    - - "--CHENDY"
+      - "--XENDY"
+Check:
+  expression: >-
+    not empty(--CHENDY) or not empty(--XENDY)
+Outcome:
+  Message: "--CHENDY or --XENDY is populated but neither --ENDTC nor --ENDY is present\
+    \ in the dataset."
+Source_Proposed:
+  Sheet_Issue: "#294"
+  FDA_Validator_Rule_Message: "Missing --ENDTC variable, when --CHENDY or --XENDY\
+    \ is populated and --ENDY is not present"
+  FDA_Validator_Rule_Description: "End Date/Time of Observation (--ENDTC) variable\
+    \ should be included into dataset, when End Day of Obs Rel to Challenge Agent\
+    \ (--CHENDY) or End Day of Obs Rel to Exposure (--XENDY) is populated. Where --ENDY\
+    \ is present, the --ENDY presence row reports it."
+  Domains: "INTERVENTIONS, EVENTS, FINDINGS, FINDINGS ABOUT (-FA)"
+Standards:
+- Organization: "FDA"
+  Standards:
+  - Name: "SENDIG-AR"
+    Version: "1.0"

@@ -1,0 +1,16 @@
+#!RuleTest
+#test FDA-SE9706 expect=skipped domain=FA
+#note "Scope boundary: FA is excluded (SENDIG-AR 1.0 defines FACHSTDY without FASTDTC (our metadata store), so the absence is the IG's layout, not an omission); the body would fire (FACHSTDY populated, no FASTDTC)."
+#library standard=sendig version=ar-1-0
+dataset FA class="FINDINGS ABOUT" label="Findings About"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col FASEQ    type=Num  label="Sequence Number"
+col FATESTCD type=Char label="Findings About Test Short Name"
+col FACHSTDY type=Num label="Start Day of Obs Rel to Challenge Agent"
+col FAXSTDY type=Num label="Start Day of Obs Rel to Exposure"
+---
+S1 | FA | 001 | 1 | SEV | 5 | 
+S1 | FA | 002 | 2 | SEV | 6 | 
+S1 | FA | 003 | 3 | SEV |  | 

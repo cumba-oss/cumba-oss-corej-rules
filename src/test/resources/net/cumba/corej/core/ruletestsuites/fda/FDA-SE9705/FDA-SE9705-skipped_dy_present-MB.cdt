@@ -1,0 +1,17 @@
+#!RuleTest
+#test FDA-SE9705 expect=skipped domain=MB
+#note "Boundary with the --DY presence rule: MBDY is present (and MBDTC absent) -> the companion SKIPS on None [--DY]; FDA-SD2270 reports the absent MBDTC instead, so the dataset is reported once."
+#library standard=sendig version=ar-1-0
+dataset MB class=FINDINGS label="Microbiology Specimen"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col MBSEQ    type=Num  label="Sequence Number"
+col MBTESTCD type=Char label="Test Short Name"
+col MBCHDY type=Num label="Day of Obs Rel to Challenge Agent"
+col MBXDY type=Num label="Day of Obs Relative to Exposure"
+col MBDY type=Num label="Study Day of Collection"
+---
+S1 | MB | 001 | 1 | CULT | 5 |  | 5
+S1 | MB | 002 | 2 | CULT | 6 |  | 6
+S1 | MB | 003 | 3 | CULT |  |  | 

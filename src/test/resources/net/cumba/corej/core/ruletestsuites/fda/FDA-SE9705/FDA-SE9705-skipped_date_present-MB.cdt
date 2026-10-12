@@ -1,0 +1,17 @@
+#!RuleTest
+#test FDA-SE9705 expect=skipped domain=MB
+#note "The discriminator: MBDTC is PRESENT (blank on row 2) -> the companion SKIPS on None [--DTC]; the imputation parents FDA-SD1387 / FDA-SD1390 runs and reports the record whose date is incomplete."
+#library standard=sendig version=ar-1-0
+dataset MB class=FINDINGS label="Microbiology Specimen"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col MBSEQ    type=Num  label="Sequence Number"
+col MBTESTCD type=Char label="Test Short Name"
+col MBCHDY type=Num label="Day of Obs Rel to Challenge Agent"
+col MBXDY type=Num label="Day of Obs Relative to Exposure"
+col MBDTC type=Char label="Date/Time of Collection"
+---
+S1 | MB | 001 | 1 | CULT | 5 |  | 2020-01-05
+S1 | MB | 002 | 2 | CULT | 6 |  | 
+S1 | MB | 003 | 3 | CULT |  |  | 2020-01-07

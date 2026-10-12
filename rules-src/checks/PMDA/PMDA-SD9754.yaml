@@ -1,0 +1,50 @@
+Core:
+  Id: "PMDA-SD9754"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when Study Day of End of Observation (--ENDY) is populated\
+  \ on at least one record but End Date/Time of Observation (--ENDTC) is not present\
+  \ in the dataset; the study day may only be populated when --ENDTC is provided,\
+  \ so without the column every populated value is unsupported."
+Sensitivity: "Dataset"
+Executability: "Fully Executable"
+Scope:
+  Classes:
+    Include:
+    - "SPECIAL PURPOSE"
+    - "INTERVENTIONS"
+    - "EVENTS"
+    - "FINDINGS"
+    - "FINDINGS ABOUT"
+  Domains:
+    Exclude:
+    - "CO"
+    - "DM"
+Requirements:
+  Variables:
+    None:
+    - "--ENDTC"
+    All:
+    - "--ENDY"
+Check:
+  expression: >-
+    not empty(--ENDY)
+Outcome:
+  Message: "--ENDY is populated but --ENDTC is not present in the dataset."
+Source_Proposed:
+  Sheet_Issue: "#295"
+  Message: "Missing --ENDTC variable, when --ENDY is populated"
+  Description: "End Date/Time of Observation (--ENDTC) variable should be included\
+    \ into dataset, when Study Day of End of Observation (--ENDY) is populated."
+  Domains: "SPECIAL PURPOSE, INTERVENTIONS, EVENTS, FINDINGS, FINDINGS ABOUT (-CO,\
+    \ -DM)"
+  Severity: "Warning"
+Standards:
+- Organization: "PMDA"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.2"
+  - Name: "SDTMIG"
+    Version: "3.1.3"
+  - Name: "SDTMIG"
+    Version: "3.1.2"
