@@ -342,6 +342,51 @@ class PmdaLibraryRulesTest
     }
 
 
+    /**
+     * Rule round 2026-10-12 (owner, DCE-1: "a value-level codelist satisfies"): SEX carries no
+     * CodeListRef on its own ItemDef but a {@code def:ValueListRef} whose value-level ItemDef
+     * carries one — the CT is attached at value level, as CDISC's MSG v2 example does for RACE or
+     * LBORRESU, and PMDA-DD0124 must not fire. The near-miss: the same ValueListRef with a
+     * value-level ItemDef WITHOUT a CodeListRef still fires — the guard needs a value-level
+     * codelist, not merely a value list.
+     */
+    @Test
+    void aValueLevelCodelistSatisfiesTheCodelistRequirement()
+    {
+        Map<String, RuleResult> withCodelist = evaluate(
+                valueLevelSEX("<CodeListRef CodeListOID=\"CL.VL\"/>"), "2.1",
+                new StubLibraryProvider());
+        assertEquals(ExecutionStatus.EXECUTED, withCodelist.get("PMDA-DD0124").status());
+        assertEquals(List.of(), withCodelist.get("PMDA-DD0124").findings(),
+                "a value-level CodeListRef satisfies PMDA-DD0124");
+
+        Map<String, RuleResult> withoutCodelist = evaluate(valueLevelSEX(""), "2.1",
+                new StubLibraryProvider());
+        assertEquals(1, withoutCodelist.get("PMDA-DD0124").findings().size(),
+                "a value list without a value-level codelist still fires");
+        assertTrue(
+                withoutCodelist.get("PMDA-DD0124").findings().get(0).getMessage().contains("[SEX]"),
+                "PMDA-DD0124 names SEX");
+    }
+
+
+    /**
+     * The violating 2.1 document with SEX's ItemDef given a def:ValueListRef to one value-level
+     * ItemDef whose body is {@code aValueLevelBody} (a CodeListRef, or nothing).
+     */
+    private static String valueLevelSEX(String aValueLevelBody)
+    {
+        String header = "<ItemDef OID=\"IT.SEX\" Name=\"SEX\" DataType=\"text\" Length=\"1\">";
+        return VIOLATIONS_21.replace(header, header + "<def:ValueListRef ValueListOID=\"VL.SEX\"/>")
+                .replace("</MetaDataVersion>", "<def:ValueListDef OID=\"VL.SEX\">"
+                        + "<ItemRef ItemOID=\"IT.SEX.VL\" Mandatory=\"No\"/></def:ValueListDef>"
+                        + "<ItemDef OID=\"IT.SEX.VL\" Name=\"SEX\" DataType=\"text\" Length=\"16\">"
+                        + aValueLevelBody + "</ItemDef>"
+                        + "<CodeList OID=\"CL.VL\" Name=\"Value level\" DataType=\"text\">"
+                        + "<EnumeratedItem CodedValue=\"X\"/></CodeList></MetaDataVersion>");
+    }
+
+
     @Test
     void sheetSeveritiesAndVersionsArePinned()
     {

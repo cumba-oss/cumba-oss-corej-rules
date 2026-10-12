@@ -12,5 +12,15 @@ Plain_Text_Rule: "A variable defined in a standard with a Controlled Terminology
 # the finding is the dereferenced ItemDef carrying no CodeListRef child.
 # 2.1-only per the sheet (the per-dataset def:StandardOID linkage).
 Message: "ItemDef [${value}] requires Controlled Terminology and is missing the CodeListRef child element."
+# Rule round 2026-10-12 (owner, DCE-1: "I would define a value-level codelist
+# satisfies. This is likely a sheet issue."): a variable whose CT is attached at
+# value level - its ItemDef's def:ValueListRef names a ValueListDef with at least
+# one value-level ItemDef carrying a CodeListRef - is out of reach. CDISC's own MSG
+# v2 example does this for RACE, DSDECOD, LBORRESU, LBSTRESC, LBSTRESU, RSSTRESC,
+# VSORRESU, VSSTRESU. A ValueListRef whose value-level ItemDefs carry no
+# CodeListRef still fires.
 Check:
   kind: "library_codelist_ref_required"
+  when:
+    path: "@ItemOID->ItemDef@OID/ValueListRef/@ValueListOID->ValueListDef@OID/ItemRef/@ItemOID->ItemDef@OID/CodeListRef/@CodeListOID"
+    exists: false

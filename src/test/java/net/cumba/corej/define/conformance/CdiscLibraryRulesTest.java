@@ -304,6 +304,51 @@ class CdiscLibraryRulesTest
     }
 
 
+    /**
+     * Rule round 2026-10-12 (owner, DCE-1: "a value-level codelist satisfies"): AEACN carries no
+     * CodeListRef on its own ItemDef but a {@code def:ValueListRef} whose value-level ItemDef
+     * carries one — the CT is attached at value level, as CDISC's MSG v2 example does for RACE or
+     * LBORRESU, and DEFINE-XML-0149 must not fire. The near-miss: the same ValueListRef with a
+     * value-level ItemDef WITHOUT a CodeListRef still fires — the guard needs a value-level
+     * codelist, not merely a value list.
+     */
+    @Test
+    void aValueLevelCodelistSatisfiesTheCodelistRequirement()
+    {
+        Map<String, RuleResult> withCodelist = evaluate(
+                valueLevelAEACN("<CodeListRef CodeListOID=\"CL.VL\"/>"), "2.1",
+                new StubLibraryProvider());
+        assertEquals(ExecutionStatus.EXECUTED, withCodelist.get("DEFINE-XML-0149").status());
+        assertEquals(List.of(), withCodelist.get("DEFINE-XML-0149").findings(),
+                "a value-level CodeListRef satisfies DEFINE-XML-0149");
+
+        Map<String, RuleResult> withoutCodelist = evaluate(valueLevelAEACN(""), "2.1",
+                new StubLibraryProvider());
+        assertEquals(1, withoutCodelist.get("DEFINE-XML-0149").findings().size(),
+                "a value list without a value-level codelist still fires");
+        assertTrue(withoutCodelist.get("DEFINE-XML-0149").findings().get(0).getMessage()
+                .contains("[AEACN]"), "DEFINE-XML-0149 names AEACN");
+    }
+
+
+    /**
+     * The violating 2.1 document with AEACN's ItemDef given a def:ValueListRef to one value-level
+     * ItemDef whose body is {@code aValueLevelBody} (a CodeListRef, or nothing).
+     */
+    private static String valueLevelAEACN(String aValueLevelBody)
+    {
+        String header = "<ItemDef OID=\"IT.AEACN\" Name=\"AEACN\" DataType=\"text\" Length=\"16\">";
+        return VIOLATIONS_21
+                .replace(header, header + "<def:ValueListRef ValueListOID=\"VL.AEACN\"/>")
+                .replace("</MetaDataVersion>", "<def:ValueListDef OID=\"VL.AEACN\">"
+                        + "<ItemRef ItemOID=\"IT.AEACN.VL\" Mandatory=\"No\"/></def:ValueListDef>"
+                        + "<ItemDef OID=\"IT.AEACN.VL\" Name=\"AEACN\" DataType=\"text\" Length=\"16\">"
+                        + aValueLevelBody + "</ItemDef>"
+                        + "<CodeList OID=\"CL.VL\" Name=\"Value level\" DataType=\"text\">"
+                        + "<EnumeratedItem CodedValue=\"X\"/></CodeList></MetaDataVersion>");
+    }
+
+
     @Test
     void allTwinsSkipWithoutALibraryProvider()
     {

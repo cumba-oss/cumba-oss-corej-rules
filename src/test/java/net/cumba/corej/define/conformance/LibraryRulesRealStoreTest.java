@@ -66,14 +66,18 @@ import org.junit.jupiter.api.io.TempDir;
  * findings are the example's real departures from the published IG:
  * </p>
  * <ul>
- * <li>0149 / DD0124 ×8: RACE, DSDECOD, LBORRESU, LBSTRESC, LBSTRESU, RSSTRESC, VSORRESU, VSSTRESU
- * have an IG codelist but no {@code CodeListRef} — the example attaches their CT at value level
- * ({@code def:ValueListRef}); the rules ask for the element, so they fire by their letter;</li>
  * <li>0265 / DD0136: CM's label "Concomitant Medications" is "Concomitant/Prior Medications" in
  * SDTMIG 3.3, TS's "Trial Summary" is "Trial Summary Information";</li>
  * <li>DD0118 ×2: RSTESTCD / RSTEST reference the HAMD-17 codelists {@code C100138} /
  * {@code C100137}, while the Library assigns RS only {@code C96782} / {@code C96781}.</li>
  * </ul>
+ * <p>
+ * 0149 / DD0124 raise nothing since rule round 2026-10-12 (owner, DCE-1: "a value-level codelist
+ * satisfies"): RACE, DSDECOD, LBORRESU, LBSTRESC, LBSTRESU, RSSTRESC, VSORRESU and VSSTRESU have an
+ * IG codelist but no {@code CodeListRef} of their own — the example attaches their CT at value
+ * level ({@code def:ValueListRef} to value-level ItemDefs carrying one), which the rules now
+ * accept; they fired 8 times each before.
+ * </p>
  * <p>
  * 0067, 0097, 0098, 0099, 0263, 0266, DD0116 and DD0137 raise nothing here (the Req variables are
  * all {@code Mandatory="Yes"}; every CT-required codelist and item carries its alias or is a marked
@@ -104,28 +108,12 @@ class LibraryRulesRealStoreTest
 
     /** (ii) Adjudicated: the MSG example with its IG name corrected, against SDTMIG 3.3. */
     private static final List<String> CORRECTED_EXPECTED = List.of(//
-            "DEFINE-XML-0149 /ItemGroupDef[@OID='IG.DM']/ItemRef[18] = RACE",
-            "DEFINE-XML-0149 /ItemGroupDef[@OID='IG.DS']/ItemRef[7] = DSDECOD",
-            "DEFINE-XML-0149 /ItemGroupDef[@OID='IG.LB']/ItemRef[12] = LBSTRESC",
-            "DEFINE-XML-0149 /ItemGroupDef[@OID='IG.LB']/ItemRef[14] = LBSTRESU",
-            "DEFINE-XML-0149 /ItemGroupDef[@OID='IG.LB']/ItemRef[9] = LBORRESU",
-            "DEFINE-XML-0149 /ItemGroupDef[@OID='IG.RS']/ItemRef[9] = RSSTRESC",
-            "DEFINE-XML-0149 /ItemGroupDef[@OID='IG.VS']/ItemRef[12] = VSSTRESU",
-            "DEFINE-XML-0149 /ItemGroupDef[@OID='IG.VS']/ItemRef[9] = VSORRESU",
             "DEFINE-XML-0265 /ItemGroupDef[@OID='IG.CM']"
                     + " = Concomitant Medications vs Concomitant/Prior Medications",
             "DEFINE-XML-0265 /ItemGroupDef[@OID='IG.TS']"
                     + " = Trial Summary vs Trial Summary Information",
             "PMDA-DD0118 /ItemGroupDef[@OID='IG.RS']/ItemRef[5] = RSTESTCD: C100138 vs C96782",
             "PMDA-DD0118 /ItemGroupDef[@OID='IG.RS']/ItemRef[6] = RSTEST: C100137 vs C96781",
-            "PMDA-DD0124 /ItemGroupDef[@OID='IG.DM']/ItemRef[18] = RACE",
-            "PMDA-DD0124 /ItemGroupDef[@OID='IG.DS']/ItemRef[7] = DSDECOD",
-            "PMDA-DD0124 /ItemGroupDef[@OID='IG.LB']/ItemRef[12] = LBSTRESC",
-            "PMDA-DD0124 /ItemGroupDef[@OID='IG.LB']/ItemRef[14] = LBSTRESU",
-            "PMDA-DD0124 /ItemGroupDef[@OID='IG.LB']/ItemRef[9] = LBORRESU",
-            "PMDA-DD0124 /ItemGroupDef[@OID='IG.RS']/ItemRef[9] = RSSTRESC",
-            "PMDA-DD0124 /ItemGroupDef[@OID='IG.VS']/ItemRef[12] = VSSTRESU",
-            "PMDA-DD0124 /ItemGroupDef[@OID='IG.VS']/ItemRef[9] = VSORRESU",
             "PMDA-DD0136 /ItemGroupDef[@OID='IG.CM']"
                     + " = Concomitant Medications vs Concomitant/Prior Medications",
             "PMDA-DD0136 /ItemGroupDef[@OID='IG.TS']"
