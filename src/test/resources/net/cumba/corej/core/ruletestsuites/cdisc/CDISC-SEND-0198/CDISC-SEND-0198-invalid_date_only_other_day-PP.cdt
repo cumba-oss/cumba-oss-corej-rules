@@ -1,0 +1,39 @@
+#!RuleTest
+#test CDISC-SEND-0198 expect=violation domain=PP
+#note "Rule round 2026-10-12: the near-miss of valid_date_only_reference. PPRFTDTC is the date only (2014-01-16), PCRFTDTC a datetime on the day before (2014-01-15T08:30): compared as dates they still disagree, so the rule fires."
+#library standard=sendig version=3-1
+#expectViolationCount 1
+#expectViolationAt row=1 PPSEQ=1 USUBJID=01-701-1015
+dataset PP label="Pharmacokinetics Parameters"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col PPSEQ type=Num label="Sequence Number"
+col PPTESTCD type=Char label="Parameter Short Name"
+col PPRFTDTC type=Char label="Date/Time of Reference Point"
+---
+CDISCPILOT01 | PP | 01-701-1015 | 1 | CMAX | 2014-01-16
+---
+
+dataset PC label="Pharmacokinetics Concentrations"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col PCSEQ type=Num label="Sequence Number"
+col PCTEST type=Char label="Pharmacokinetic Test Name"
+col PCRFTDTC type=Char label="Date/Time of Reference Point"
+---
+CDISCPILOT01 | PC | 01-701-1015 | 1 | DRUG_X | 2014-01-15T08:30
+---
+
+dataset RELREC label="Related Records"
+col STUDYID type=Char label="Study Identifier"
+col RDOMAIN type=Char label="Related Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col IDVAR type=Char label="Identifying Variable"
+col IDVARVAL type=Char label="Identifying Variable Value"
+col RELID type=Char label="Relationship Identifier"
+---
+CDISCPILOT01 | PC | 01-701-1015 | PCSEQ | 1 | R1
+CDISCPILOT01 | PP | 01-701-1015 | PPSEQ | 1 | R1
+---

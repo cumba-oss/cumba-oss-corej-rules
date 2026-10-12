@@ -1,0 +1,37 @@
+#!RuleTest
+#test CDISC-SEND-0339 expect=noViolation domain=PP
+#note "Rule round 2026-10-12 (owner 2026-10-12; PLAN-engine-gap-temporal-membership 3.1): PPRFTDTC is the date only (2014-01-15), PCRFTDTC of the related PC record the full datetime (2014-01-15T08:30) on the same day. SENDIG 3.1.1 p. 128 l. 55 and p. 129 ll. 4-7 permit a date-only PPRFTDTC for a pool; compared as dates the two denote the same day, so no finding. Compared as text (before date() on both sides) they differed and the rule fired."
+#library standard=sendig version=3-1-1
+dataset PP label="Pharmacokinetics Parameters"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col PPSEQ type=Num label="Sequence Number"
+col PPTESTCD type=Char label="Parameter Short Name"
+col PPRFTDTC type=Char label="Date/Time of Reference Point"
+---
+CDISCPILOT01 | PP | 01-701-1015 | 1 | CMAX | 2014-01-15
+---
+
+dataset PC label="Pharmacokinetics Concentrations"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col PCSEQ type=Num label="Sequence Number"
+col PCTEST type=Char label="Pharmacokinetic Test Name"
+col PCRFTDTC type=Char label="Date/Time of Reference Point"
+---
+CDISCPILOT01 | PC | 01-701-1015 | 1 | DRUG_X | 2014-01-15T08:30
+---
+
+dataset RELREC label="Related Records"
+col STUDYID type=Char label="Study Identifier"
+col RDOMAIN type=Char label="Related Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col IDVAR type=Char label="Identifying Variable"
+col IDVARVAL type=Char label="Identifying Variable Value"
+col RELID type=Char label="Relationship Identifier"
+---
+CDISCPILOT01 | PC | 01-701-1015 | PCSEQ | 1 | R1
+CDISCPILOT01 | PP | 01-701-1015 | PPSEQ | 1 | R1
+---
