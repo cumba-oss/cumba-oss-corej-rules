@@ -147,8 +147,18 @@ class NativeCorpusFullCoverageTest
     // (SESEQ, read only in a binding), FDA-SD1089 / -1093 (--STDY / --ENDY, read under var_exists)
     // and PMDA-SD1319 (--STDTC, a placeholder the DM table does not resolve): intended skips, the
     // sweep's point. Gained: CDISC-AD0053 / AD0256 (their declared key half is now decidable) and
-    // CDISC-AD0720 (dispatches). The floor stays at its policy value: 6000 clears 6126 by 126.
-    private static final int RECORD_DATA_RECORDED_FLOOR = 6000;
+    // CDISC-AD0720 (dispatches). The floor stayed at its policy value: 6000 cleared 6126 by 126.
+    // ⭐ Re-measured 2026-10-12 (rule round 2026-10-12, its close), CORE-free = all: 6001 verdicts
+    // at the round's base a5386130, 5984 at its close. The per-entry diff, every move attributed:
+    // -22 package entries slid from a verdict to a SKIP — 21 are the round's absent-column gates
+    // (absent ⇒ SKIP, owner-ruled; this DM table carries neither column): CDISC-CG0571 / 0572 /
+    // 0573 × sdtmig 3.2 / 3.3 (c5475bd7, All: [--TPT, --TPTNUM]), FDA-SD0005 × 10 and
+    // PMDA-SD0005 × 5 (64e6f11d, All: [--SEQ]); 1 is CDISC-SEND-0247 × sendig 3.0 (3f2ad26c, the
+    // CG0287 recipe moves its only TSPARMCD read into the $missing binding, and this table is
+    // built from the Check's columns — the same class as CG0287 itself and SEND-0127 / -0283
+    // above). +5: the new FDA-SD9751 × sdtmig 3.1.2–3.4 (f078f47b). No entry left the
+    // population; nothing errored or threw. Lowered once per the policy note below: 5984 − 2.0 %.
+    private static final int RECORD_DATA_RECORDED_FLOOR = 5864;
 
     /**
      * Floor on the number of metadata-family rules ({@code {VAR}} ∪ {@code {VAR,ROW}}) that run to
