@@ -1,0 +1,28 @@
+#!RuleTest
+#test FDA-SD0077 expect=skipped domain=SQAPAE
+#note "Rule round 2026-10-12 (owner, JKAG-B): the SDTMIG-AP v1.0 sqapae.xpt example (p. 16). SDTMIG-AP 2.1: AP domains have the structure of subject domains except for the variables only applicable to study subjects (USUBJID, SPDEVID); AP records are keyed by APID, and the example leaves USUBJID empty (its sqapmh.xpt has no USUBJID column at all). An SQAP-- supplemental therefore has no subject key for this rule's [STUDYID, USUBJID, IDVAR, IDVARVAL] join, and the rule does not run on it - by Scope: SQ-- stands for SQ plus a two-character domain, and AP domain codes have four (AP--), so SQAPAE is outside Scope.Domains.Include. The skip is intended."
+#library standard=sdtmig version=3-4
+dataset SQAPAE class=RELATIONSHIP label="Supplemental Qualifiers for APAE"
+col STUDYID  type=Char label="Study Identifier"
+col RDOMAIN  type=Char label="Related Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col APID     type=Char label="Associated Persons Identifier"
+col IDVAR    type=Char label="Identifying Variable"
+col IDVARVAL type=Char label="Identifying Variable Value"
+col QNAM     type=Char label="Qualifier Variable Name"
+col QLABEL   type=Char label="Qualifier Variable Label"
+col QVAL     type=Char label="Data Value"
+---
+IM_05_2008 | APAE |  | DEV_2011_OP04 | AESEQ | 1 | RELPROC | Related Procedure | CT Scan
+---
+
+dataset APAE label="Associated Persons Adverse Events"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col APID    type=Char label="Associated Persons Identifier"
+col AESEQ   type=Num  label="Sequence Number"
+col RSUBJID type=Char label="Related Subject or Pool Identifier"
+col AETERM  type=Char label="Reported Term for the Adverse Event"
+---
+IM_05_2008 | APAE | DEV_2011_OP04 | 1 |  | Operator exposed to radioactive contrast agent
+---
