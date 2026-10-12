@@ -1,0 +1,15 @@
+#!RuleTest
+#test CDISC-CG0087 expect=noViolation domain=MH
+#note "MHSTAT is not in the dataset (rule round 2026-10-12, var_exists sweep): its `== \"NOT DONE\"` disjunct is false on an absent column. Every record with MHOCCUR is pre-specified (MHPRESP = Y), the spontaneous record carries no MHOCCUR -> no violation."
+#library standard=sdtmig version=3-4
+dataset MH class=EVENTS label="Medical History"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col MHSEQ   type=Num  label="Sequence Number"
+col MHTERM  type=Char label="Reported Term for the Medical History"
+col MHPRESP type=Char label="Medical History Event Pre-Specified"
+col MHOCCUR type=Char label="Medical History Occurrence"
+---
+S1 | MH | 001 | 1 | ASTHMA | Y | Y
+S1 | MH | 001 | 2 | GOUT   |   |

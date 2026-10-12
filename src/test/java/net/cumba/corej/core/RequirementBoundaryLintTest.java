@@ -59,8 +59,11 @@ class RequirementBoundaryLintTest
         // ⛔ Non-vacuity: measured 2026-10-07 over 3 396 shipped rules — 728 positive-firing absence
         // tests, 3 suffixed entries. A drop means the presence-test reader stopped matching a
         // spelling (the MintedParentageLintTest lesson: a detector matching one of two spellings).
-        assertTrue(absenceTests >= 728, "only " + absenceTests + " positive-firing absence"
-                + " test(s) read (728 on 2026-10-07) — the presence-test reader went blind");
+        // 2026-10-12 (rule round, var_exists sweep): 728 -> 726. CDISC-CG0087 and FDA-SD1392 lost
+        // their `not var_exists("--X") or <negative test>` disjuncts, which the bare negative test
+        // already covered on an absent column; the reader did not go blind, the leaves are gone.
+        assertTrue(absenceTests >= 726, "only " + absenceTests + " positive-firing absence"
+                + " test(s) read (726 on 2026-10-12) — the presence-test reader went blind");
         assertTrue(suffixed >= 3,
                 "only " + suffixed + " suffixed requirement entries (3 on" + " 2026-10-07)");
         assertEquals(List.of(), hits, "R-4.27: a rule requires what it reports — the gate skips"
