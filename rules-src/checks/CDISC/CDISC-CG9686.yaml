@@ -1,0 +1,41 @@
+Core:
+  Id: "CDISC-CG9686"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when Collection Study Day (--DY) is populated on at least\
+  \ one record but Collection Study Date/Time (--DTC) is not present in the dataset;\
+  \ --DY is to be null unless the date portion of --DTC is complete, so without the\
+  \ column every populated value is unsupported."
+Sensitivity: "Dataset"
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "ALL"
+Requirements:
+  Variables:
+    None:
+    - "--DTC"
+    All:
+    - "--DY"
+Check:
+  expression: >-
+    not empty(--DY)
+Outcome:
+  Message: "--DY is populated but --DTC is not present in the dataset."
+Source_Proposed:
+  Sheet_Issue: "#296"
+  Class: "ALL"
+  Domain: "ALL"
+  Variable: "--DTC"
+  Condition: "--DY ^= null"
+  Rule: "--DTC present in dataset"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+  - Name: "SDTMIG"
+    Version: "3.3"
+  - Name: "SDTMIG"
+    Version: "3.2"

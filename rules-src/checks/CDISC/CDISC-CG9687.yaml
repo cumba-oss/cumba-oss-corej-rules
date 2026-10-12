@@ -1,0 +1,41 @@
+Core:
+  Id: "CDISC-CG9687"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when Study Day of Start of Observation (--STDY) is populated\
+  \ on at least one record but Start Date/Time of Observation (--STDTC) is not present\
+  \ in the dataset; --STDY is to be null unless the date portion of --STDTC is complete,\
+  \ so without the column every populated value is unsupported."
+Sensitivity: "Dataset"
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "ALL"
+Requirements:
+  Variables:
+    None:
+    - "--STDTC"
+    All:
+    - "--STDY"
+Check:
+  expression: >-
+    not empty(--STDY)
+Outcome:
+  Message: "--STDY is populated but --STDTC is not present in the dataset."
+Source_Proposed:
+  Sheet_Issue: "#296"
+  Class: "ALL"
+  Domain: "ALL"
+  Variable: "--STDTC"
+  Condition: "--STDY ^= null"
+  Rule: "--STDTC present in dataset"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+  - Name: "SDTMIG"
+    Version: "3.3"
+  - Name: "SDTMIG"
+    Version: "3.2"

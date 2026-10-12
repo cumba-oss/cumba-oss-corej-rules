@@ -1,0 +1,16 @@
+#!RuleTest
+#test CDISC-CG9686 expect=skipped domain=LB
+#note "The discriminator: LBDTC is PRESENT (blank on row 2) -> the companion SKIPS on None [--DTC]; the imputation parent CDISC-CG0007 runs and judges the record whose date is incomplete."
+#library standard=sdtmig version=3-4
+dataset LB class=FINDINGS label="Laboratory Test Results"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col LBSEQ    type=Num  label="Sequence Number"
+col LBTESTCD type=Char label="Lab Test or Examination Short Name"
+col LBDY type=Num label="Study Day of Collection"
+col LBDTC type=Char label="Date/Time of Collection"
+---
+S1 | LB | 001 | 1 | GLUC | 5 | 2020-01-05
+S1 | LB | 002 | 2 | GLUC | 6 | 
+S1 | LB | 003 | 3 | GLUC |  | 2020-01-07

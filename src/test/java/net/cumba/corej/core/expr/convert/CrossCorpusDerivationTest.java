@@ -127,6 +127,10 @@ class CrossCorpusDerivationTest
             // derivation would read Record. Authored Dataset is correct.
             "FDA-SE9705", "FDA-SE9706", "FDA-SE9707", "FDA-SE9708", "FDA-SE9709", "FDA-SE9710",
             "PMDA-SD9752", "PMDA-SD9753", "PMDA-SD9754",
+            // 2026-10-12 (rule round 2026-10-12, batch E item 1): the CDISC arm of the same
+            // companions, CDISC-CG9686 / CG9687 / CG9688 (SDTMIG 3.2-3.4). Same shape, same
+            // reason: authored Dataset is correct, the derivation would read Record.
+            "CDISC-CG9686", "CDISC-CG9687", "CDISC-CG9688",
             // ⛔ 2026-09-19 (PLAN-retire-core-family phase 6): the five CORE entries went with the
             // family — CORE-000212 / -000365 / -000929 / -009705 / -009707. Kept in step with
             // DerivedFieldEquivalenceTest, the authored-corpus half, where the same five went and

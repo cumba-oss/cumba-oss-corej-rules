@@ -1,0 +1,41 @@
+Core:
+  Id: "CDISC-CG9688"
+  Status: "Published"
+  Version: "1"
+Description: "Raise an error when Study Day of End of Observation (--ENDY) is populated\
+  \ on at least one record but End Date/Time of Observation (--ENDTC) is not present\
+  \ in the dataset; --ENDY is to be null unless the date portion of --ENDTC is complete,\
+  \ so without the column every populated value is unsupported."
+Sensitivity: "Dataset"
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "ALL"
+Requirements:
+  Variables:
+    None:
+    - "--ENDTC"
+    All:
+    - "--ENDY"
+Check:
+  expression: >-
+    not empty(--ENDY)
+Outcome:
+  Message: "--ENDY is populated but --ENDTC is not present in the dataset."
+Source_Proposed:
+  Sheet_Issue: "#296"
+  Class: "ALL"
+  Domain: "ALL"
+  Variable: "--ENDTC"
+  Condition: "--ENDY ^= null"
+  Rule: "--ENDTC present in dataset"
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SDTMIG"
+    Version: "3.4"
+  - Name: "SDTMIG"
+    Version: "3.3"
+  - Name: "SDTMIG"
+    Version: "3.2"
