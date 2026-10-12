@@ -111,8 +111,31 @@ class SplitUnionTwinScenarioTest
         assertNotNull(primary, aFile + " declares domain=" + s.getDomain()
                 + " but no such dataset is present in the file");
 
-        RuleExecutionResult twinRes = execute(resolveTwin(aTwinId), primary, s);
-        RuleExecutionResult baseRes = execute(resolveTwin(aBaseId), primary, s);
+        Rule twinRule = resolveTwin(aTwinId);
+        Rule baseRule = resolveTwin(aBaseId);
+
+        // The scope pre-gate, as the family factory and production apply it. RuleRunnerCalls
+        // executes BELOW the scope layer — production judges Scope.Domains / Datasets / Classes
+        // upstream of RuleRunner (DatasetRuleResolver -> ScopeMatcher), so an out-of-scope primary
+        // means the rule never runs. ⚠ Until rule round 2026-10-12 this replay skipped the gate:
+        // the first out-of-scope scenario in a twin directory (CDISC-CG0371-skipped_sqap-SQAPAE,
+        // `SQ--` is SQ + a two-character domain) EXECUTED here, 0 violations, and reddened its
+        // expect=skipped for all three twins although every production path refuses it.
+        String twinScope = AbstractRuleTestSuitesFactory.describeScopeMismatch(twinRule, primary);
+        String baseScope = AbstractRuleTestSuitesFactory.describeScopeMismatch(baseRule, primary);
+        assertEquals(baseScope == null, twinScope == null,
+                aTwinId + " and " + aBaseId + " must agree on the scope verdict for " + aFile
+                        + " (base: " + baseScope + ", twin: " + twinScope + ")");
+        if (twinScope != null)
+        {
+            assertEquals(RuleTestScenario.Verdict.SKIPPED, s.getExpect(),
+                    aTwinId + " is out of scope on " + aFile.getFileName() + " (" + twinScope
+                            + ") but the scenario expects " + s.getExpect());
+            return;
+        }
+
+        RuleExecutionResult twinRes = execute(twinRule, primary, s);
+        RuleExecutionResult baseRes = execute(baseRule, primary, s);
 
         // The identity contract: identical Checks + identical Match_Datasets ⇒ identical results,
         // per scenario, whatever the family packaging.
@@ -149,7 +172,10 @@ class SplitUnionTwinScenarioTest
                     + aFile.getFileName() + " but got " + twinRes.getViolationCount());
         }
         case SKIPPED -> assertTrue(twinRes.isSkipped(),
-                aTwinId + " expected a skip on " + aFile.getFileName());
+                aTwinId + " expected a skip on " + aFile.getFileName() + " but the rule executed: "
+                        + twinRes.getStatus() + ", " + twinRes.getViolationCount()
+                        + " violation(s), rows " + rows(twinRes) + ": "
+                        + twinRes.getStatusMessage());
         // The twin must ERROR for the same reason the base does — a split/union replay that
         // quietly succeeded where the base errored would hide exactly the divergence this test
         // exists to catch.
