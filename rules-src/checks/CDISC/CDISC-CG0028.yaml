@@ -17,9 +17,8 @@ Requirements:
     - "--SEQ"
 Check:
   expression: >-
-    var_exists("--SEQ") and not empty(USUBJID) and not is_unique_set([--SEQ, DOMAIN, USUBJID]) or
-    var_exists("--SEQ") and var_exists("POOLID") and not empty(POOLID) and not is_unique_set([--SEQ,
-    DOMAIN, POOLID])
+    not empty(USUBJID) and not is_unique_set([--SEQ, DOMAIN, USUBJID]) or var_exists("POOLID") and
+    not empty(POOLID) and not is_unique_set([--SEQ, DOMAIN, POOLID])
 Outcome:
   Message: "--SEQ is not a unique number per USUBJID per domain, nor a unique number\
     \ per POOLID per domain, including when the domain is split into multiple files."

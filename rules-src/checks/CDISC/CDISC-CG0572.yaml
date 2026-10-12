@@ -12,9 +12,8 @@ Scope:
     - "ALL"
 Check:
   expression: >-
-    not var_exists("VISITNUM") and var_exists("--TPTREF") and (var_exists("--TPT") and
-    is_inconsistent_across_dataset(--TPT, keys=[--TPTNUM, --TPTREF]) or var_exists("--TPTNUM") and
-    is_inconsistent_across_dataset(--TPTNUM, keys=[--TPT, --TPTREF]))
+    not var_exists("VISITNUM") and var_exists("--TPTREF") and (is_inconsistent_across_dataset(--TPT,
+    keys=[--TPTNUM, --TPTREF]) or is_inconsistent_across_dataset(--TPTNUM, keys=[--TPT, --TPTREF]))
 Outcome:
   Message: "--TPT and --TPTNUM do not have a one-to-one relationship per unique value\
     \ of --TPTREF."

@@ -15,11 +15,14 @@ Scope:
     - "DT"
     - "DU"
     - "DX"
+Requirements:
+  Variables:
+    All:
+    - "--SEQ"
 Check:
   expression: >-
-    var_exists("--SEQ") and not empty(USUBJID) and not is_unique_set([--SEQ, DOMAIN, USUBJID]) or
-    var_exists("--SEQ") and var_exists("POOLID") and not empty(POOLID) and not is_unique_set([--SEQ,
-    DOMAIN, POOLID])
+    not empty(USUBJID) and not is_unique_set([--SEQ, DOMAIN, USUBJID]) or var_exists("POOLID") and
+    not empty(POOLID) and not is_unique_set([--SEQ, DOMAIN, POOLID])
 Outcome:
   Message: "Duplicate value for --SEQ variable"
 Source:

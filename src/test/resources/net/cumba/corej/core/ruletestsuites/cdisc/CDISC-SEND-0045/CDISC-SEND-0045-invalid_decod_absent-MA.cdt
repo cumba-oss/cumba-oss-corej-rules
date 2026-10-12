@@ -1,0 +1,17 @@
+#!RuleTest
+#test CDISC-SEND-0045 expect=violation domain=MA
+#note "MADECOD is not in the dataset (rule round 2026-10-12, var_exists sweep); the MABODSYS arm still decides: row 2's MASCAT equals MABODSYS -> one violation."
+#library standard=sendig version=3-1-1
+#expectViolationCount 1
+#expectViolationAt row=2 MASEQ=2
+dataset MA class=FINDINGS label="Macroscopic Findings"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col MASEQ    type=Num  label="Sequence Number"
+col MATESTCD type=Char label="Macroscopic Examination Short Name"
+col MASCAT   type=Char label="Subcategory for Macroscopic Finding"
+col MABODSYS type=Char label="Body System or Organ Class"
+---
+S1 | MA | 001 | 1 | GROSPATH | GROSS | HEPATOBILIARY
+S1 | MA | 001 | 2 | GROSPATH | RENAL | RENAL
