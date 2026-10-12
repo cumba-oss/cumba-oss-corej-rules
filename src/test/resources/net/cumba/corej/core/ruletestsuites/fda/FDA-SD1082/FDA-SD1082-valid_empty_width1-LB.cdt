@@ -1,0 +1,14 @@
+#!RuleTest
+#test FDA-SD1082 expect=noViolation domain=LB
+#note "Round 2026-10-12 (owner 2026-10-07): an all-empty character column has width 1, the smallest an XPT column can be, against a longest value of 0. LBSTRESC is declared length=1 and empty in every row, so it cannot be sized any smaller and must not fire; the rule fired on it before the var_length() > 1 guard. Every other character variable is sized exactly."
+#library standard=sdtmig version=3-4
+dataset LB class=FINDINGS label="Laboratory Test Results"
+col STUDYID  type=Char length=12 label="Study Identifier"
+col DOMAIN   type=Char length=2  label="Domain Abbreviation"
+col USUBJID  type=Char length=11 label="Unique Subject Identifier"
+col LBSEQ    type=Num  length=8  label="Sequence Number"
+col LBTESTCD type=Char length=4  label="Lab Test or Examination Short Name"
+col LBSTRESC type=Char length=1  label="Character Result/Finding in Std Format"
+---
+CDISCPILOT01 | LB | 01-701-1015 | 1 | GLUC |
+CDISCPILOT01 | LB | 01-701-1023 | 2 | ALB  |

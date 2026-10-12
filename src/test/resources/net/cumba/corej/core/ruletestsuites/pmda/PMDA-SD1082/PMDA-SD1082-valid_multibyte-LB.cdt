@@ -1,0 +1,14 @@
+#!RuleTest
+#test PMDA-SD1082 expect=noViolation domain=LB
+#note "Round 2026-10-12 (byte-length): an XPT width is a byte count. LBSTRESC holds 'µmol' - 4 characters but 5 bytes in the dataset's encoding (UTF-8, the scenario default; 'µ' takes 2 bytes) - and is declared length=5, exactly its stored size, so it must not fire. Counting characters (the rule before unit=\"bytes\") compared 5 != 4 and fired on correctly sized data."
+#library standard=sdtmig version=3-4
+dataset LB class=FINDINGS label="Laboratory Test Results"
+col STUDYID  type=Char length=12 label="Study Identifier"
+col DOMAIN   type=Char length=2  label="Domain Abbreviation"
+col USUBJID  type=Char length=11 label="Unique Subject Identifier"
+col LBSEQ    type=Num  length=8  label="Sequence Number"
+col LBTESTCD type=Char length=4  label="Lab Test or Examination Short Name"
+col LBSTRESC type=Char length=5  label="Character Result/Finding in Std Format"
+---
+CDISCPILOT01 | LB | 01-701-1015 | 1 | GLUC | µmol
+CDISCPILOT01 | LB | 01-701-1023 | 2 | ALB  | g/L

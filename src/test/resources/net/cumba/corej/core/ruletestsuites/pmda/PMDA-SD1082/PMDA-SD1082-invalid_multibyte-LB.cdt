@@ -1,0 +1,16 @@
+#!RuleTest
+#test PMDA-SD1082 expect=violation domain=LB
+#note "Round 2026-10-12 (byte-length): LBSTRESC holds 'µmol', 4 characters but 5 bytes in UTF-8 (the scenario default), and is declared length=4 - one byte short of its stored size - so it fires (4 != 5 bytes). Counting characters (the rule before unit=\"bytes\") compared 4 == 4 and missed it."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt variable_name=LBSTRESC variable_size=4
+dataset LB class=FINDINGS label="Laboratory Test Results"
+col STUDYID  type=Char length=12 label="Study Identifier"
+col DOMAIN   type=Char length=2  label="Domain Abbreviation"
+col USUBJID  type=Char length=11 label="Unique Subject Identifier"
+col LBSEQ    type=Num  length=8  label="Sequence Number"
+col LBTESTCD type=Char length=4  label="Lab Test or Examination Short Name"
+col LBSTRESC type=Char length=4  label="Character Result/Finding in Std Format"
+---
+CDISCPILOT01 | LB | 01-701-1015 | 1 | GLUC | µmol
+CDISCPILOT01 | LB | 01-701-1023 | 2 | ALB  | g/L
