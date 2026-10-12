@@ -1,8 +1,9 @@
 #!RuleTest
 #test CDISC-SEND-0247 expect=violation domain=TS
-#note "Positive control added by PLAN-absent-guard-test-hardening P3: this rule previously had ONLY an expect=skipped fixture, which asserts non-execution and so proved nothing about the rule ever running at this standard/version. TS carries only TITLE, so the required parameter set is not fully present and not_contains_all fires."
+#note "Positive control added by PLAN-absent-guard-test-hardening P3: this rule previously had ONLY an expect=skipped fixture, which asserts non-execution and so proved nothing about the rule ever running at this standard/version. TS carries only TITLE, so the required parameter set is not fully present and the rule fires. Rule round 2026-10-12: the single dataset finding names all 26 should-include codes in $missing and no longer lists TSPARMCD (\"!TSPARMCD\")."
 #library standard=sendig version=3-0
 #expectViolationCount 1
+#expectViolationAt "$missing"="[AGEU, SDESIGN, DOSDUR, EXPENDTC, EXPSTDTC, GLPTYP, ROUTE, SNDIGVER, SNDCTVER, SPECIES, SPLRNAM, SPREFID, SSPONSOR, STCAT, STDIR, STRAIN, STSTDTC, STITLE, SSTYP, TRT, TFCNTRY, TSTFLOC, TSTFNAM, TRMSAC, TRTCAS, TRTV]"
 dataset TS label="Trial Summary"
 col STUDYID  type=Char label="Study Identifier"
 col DOMAIN   type=Char label="Domain Abbreviation"

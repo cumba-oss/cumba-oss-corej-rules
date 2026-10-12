@@ -1,0 +1,37 @@
+#!RuleTest
+#test CDISC-SEND-0247 expect=violation domain=TS
+#note "Rule round 2026-10-12 (owner 2026-10-04, the CDISC-CG0287 recipe): TS holds 24 of the 26 should-include codes, with AGEU on the first row; SNDIGVER and TRTV are absent. The single dataset finding must name exactly those two in $missing and must not list TSPARMCD, which the Check read through distinct() and which read as if the first row's code were the missing one. The old rule listed TSPARMCD by name beside $missing, so this exact-set pin fails under it."
+#library standard=sendig version=3-0
+#expectViolationCount 1
+#expectViolationAt "$missing"="[SNDIGVER, TRTV]"
+dataset TS label="Trial Summary"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col TSSEQ    type=Num  label="Sequence Number"
+col TSPARMCD type=Char label="Trial Summary Parameter Short Name"
+col TSVAL    type=Char label="Parameter Value"
+---
+CDISCPILOT01 | TS | 1 | AGEU | X
+CDISCPILOT01 | TS | 2 | SDESIGN | X
+CDISCPILOT01 | TS | 3 | DOSDUR | X
+CDISCPILOT01 | TS | 4 | EXPENDTC | X
+CDISCPILOT01 | TS | 5 | EXPSTDTC | X
+CDISCPILOT01 | TS | 6 | GLPTYP | X
+CDISCPILOT01 | TS | 7 | ROUTE | X
+CDISCPILOT01 | TS | 8 | SNDCTVER | X
+CDISCPILOT01 | TS | 9 | SPECIES | X
+CDISCPILOT01 | TS | 10 | SPLRNAM | X
+CDISCPILOT01 | TS | 11 | SPREFID | X
+CDISCPILOT01 | TS | 12 | SSPONSOR | X
+CDISCPILOT01 | TS | 13 | STCAT | X
+CDISCPILOT01 | TS | 14 | STDIR | X
+CDISCPILOT01 | TS | 15 | STRAIN | X
+CDISCPILOT01 | TS | 16 | STSTDTC | X
+CDISCPILOT01 | TS | 17 | STITLE | X
+CDISCPILOT01 | TS | 18 | SSTYP | X
+CDISCPILOT01 | TS | 19 | TRT | X
+CDISCPILOT01 | TS | 20 | TFCNTRY | X
+CDISCPILOT01 | TS | 21 | TSTFLOC | X
+CDISCPILOT01 | TS | 22 | TSTFNAM | X
+CDISCPILOT01 | TS | 23 | TRMSAC | X
+CDISCPILOT01 | TS | 24 | TRTCAS | X

@@ -25,12 +25,12 @@ Bindings:
     , \"TSTFNAM\", \"TRMSAC\", \"TRTCAS\", \"TRTV\"])"
 Check:
   expression: >-
-    var_exists("TSPARMCD") and not contains_all(TSPARMCD, keys=[AGEU, SDESIGN, DOSDUR, EXPENDTC,
-    EXPSTDTC, GLPTYP, ROUTE, SNDIGVER, SNDCTVER, SPECIES, SPLRNAM, SPREFID, SSPONSOR, STCAT, STDIR,
-    STRAIN, STSTDTC, STITLE, SSTYP, TRT, TFCNTRY, TSTFLOC, TSTFNAM, TRMSAC, TRTCAS, TRTV])
+    var_exists("TSPARMCD") and not empty($missing)
 Outcome:
   Message: "The Trial Summary (TS) dataset is missing a record for one or more TSPARMCD\
     \ values that should be included."
+  Output_Variables:
+  - "!TSPARMCD"
 Source:
   Class: "TDM"
   Domain: "TS"

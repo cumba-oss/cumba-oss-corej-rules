@@ -8,6 +8,9 @@ description: |
   Here TS carries 24 of the 26; DOSDUR and GLPTYP are absent, so the rule fires once and reports
   $missing = [DOSDUR, GLPTYP]. Both engines share the distinct+minus surface (minus value= literal
   minuend), so the lanes agree.
+  Rule round 2026-10-12 (owner 2026-10-04, the CDISC-CG0287 recipe): the Check reads
+  not empty($missing) and Output_Variables excludes "!TSPARMCD", so the finding no longer lists
+  TSPARMCD (read through distinct()) beside the missing codes; the exact output map pins that.
 rule:
   coreId: CDISC-SEND-0247
 datasets:
@@ -48,5 +51,4 @@ expected_violations:
   status: SUCCESS
   output_variables:
     $missing: '[DOSDUR, GLPTYP]'
-  name_only: [TSPARMCD]
 expected_errors: []
