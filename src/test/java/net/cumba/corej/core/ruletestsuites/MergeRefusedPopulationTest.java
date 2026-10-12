@@ -42,8 +42,12 @@ import org.junit.jupiter.api.Test;
 class MergeRefusedPopulationTest
 {
 
-    /** The measured size of the population (5 OD-10 DM copies, AD0256, CG0006, CG0174). */
-    static final int EXPECTED_COUNT = 8;
+    /**
+     * The measured size of the population (5 OD-10 DM copies, AD0256, CG0006, CG0174; rule round
+     * 2026-10-12: +6 from {@code Cardinality: "n:1"} on the SENDIG DS joins — SEND-0127 / SEND-0283
+     * on SE -> DS, SEND-0204 / SEND-0205 (+ -A) on TF -> DS, a second DS record per subject).
+     */
+    static final int EXPECTED_COUNT = 14;
 
     /** The population by file name, sorted. */
     static final List<String> EXPECTED = List.of(
@@ -51,6 +55,12 @@ class MergeRefusedPopulationTest
             "CDISC-CG0006-error_cardinality_dm_duplicate_other_subject-AE.cdt",
             "CDISC-CG0006-invalid_duplicate_dm_usubjid-AE.cdt",
             "CDISC-CG0174-error_reltype_one_side_repeats-FA.cdt",
+            "CDISC-SEND-0127-invalid_ds_one_to_many_tie-SE.cdt",
+            "CDISC-SEND-0204-A-error_ds_two_dispositions-TF.cdt",
+            "CDISC-SEND-0204-error_ds_two_dispositions-TF.cdt",
+            "CDISC-SEND-0205-A-error_ds_two_dispositions-TF.cdt",
+            "CDISC-SEND-0205-error_ds_two_dispositions-TF.cdt",
+            "CDISC-SEND-0283-error_ds_two_dispositions-SE.cdt",
             "CDISC-SEND-0401-invalid_dm_duplicate_usubjid_copies-BW.cdt",
             "CDISC-SEND-0402-invalid_dm_duplicate_usubjid_copies-EX.cdt",
             "CDISC-SEND-0403-invalid_dm_duplicate_usubjid_copies-FW.cdt",
