@@ -1,0 +1,20 @@
+#!RuleTest
+#test CDISC-SEND-9444 expect=noViolation domain=BW
+#note "(library variable-metadata: the SENDIG 3.1.1 labels as our metadata store holds them) Rule round 2026-10-12 (owner C2a): SENDIG 3.1.1 section 4.2.3 - "The term subject should be used consistently in all labels and comments"; a label equal to the SENDIG library label is the standard's own wording and exempt. Every label is the SENDIG's own, including BWDTC 'Date/Time Animal Weighed' -> no finding. Also no false hit on a word that only contains the letters (none here) or on 'Subject'."
+#library standard=sendig version=3-1-1
+#library variable-metadata BW STUDYID  name=STUDYID  label="Study Identifier"
+#library variable-metadata BW DOMAIN   name=DOMAIN   label="Domain Abbreviation"
+#library variable-metadata BW USUBJID  name=USUBJID  label="Unique Subject Identifier"
+#library variable-metadata BW BWSEQ    name=BWSEQ    label="Sequence Number"
+#library variable-metadata BW BWTESTCD name=BWTESTCD label="Test Short Name"
+#library variable-metadata BW BWORRES  name=BWORRES  label="Result or Findings as Collected"
+#library variable-metadata BW BWDTC    name=BWDTC    label="Date/Time Animal Weighed"
+dataset BW class=FINDINGS label="Body Weights"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col BWSEQ    type=Num  label="Sequence Number"
+col BWTESTCD type=Char label="Test Short Name"
+col BWDTC    type=Char label="Date/Time Animal Weighed"
+---
+S1 | BW | S1-001 | 1 | BW | 2020-01-01

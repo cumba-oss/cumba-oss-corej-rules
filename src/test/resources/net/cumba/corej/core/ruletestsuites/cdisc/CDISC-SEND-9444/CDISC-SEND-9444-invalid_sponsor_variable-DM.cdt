@@ -1,0 +1,16 @@
+#!RuleTest
+#test CDISC-SEND-9444 expect=violation domain=DM
+#note "(library variable-metadata: the SENDIG 3.1.1 labels as our metadata store holds them) Rule round 2026-10-12 (owner C2a): SENDIG 3.1.1 section 4.2.3 - "The term subject should be used consistently in all labels and comments"; a label equal to the SENDIG library label is the standard's own wording and exempt. A sponsor variable the SENDIG does not define (DMANIMID, no library label) is labelled 'Sponsor Animals ID' -> one finding: with no library label there is nothing to exempt it."
+#library standard=sendig version=3-1-1
+#library variable-metadata DM STUDYID name=STUDYID label="Study Identifier"
+#library variable-metadata DM DOMAIN  name=DOMAIN  label="Domain Abbreviation"
+#library variable-metadata DM USUBJID name=USUBJID label="Unique Subject Identifier"
+#expectViolationCount 1
+#expectViolationAt variable_name=DMANIMID
+dataset DM class="SPECIAL PURPOSE" label="Demographics"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col DMANIMID type=Char label="Sponsor Animals ID"
+---
+S1 | DM | S1-001 | A1

@@ -1,0 +1,46 @@
+Core:
+  Id: "CDISC-SEND-9444"
+  Status: "Published"
+  Version: "1"
+Description: "Raise a warning when a variable label in the dataset uses the word \"\
+  animal\" where the SENDIG asks for \"subject\", unless the label is the SENDIG's\
+  \ own label for that variable."
+Severity: "Warning"
+Executability: "Fully Executable"
+Scope:
+  Domains:
+    Include:
+    - "ALL"
+Check:
+  expression: >-
+    var_label() =~ /(?i)\\banimals?\\b/ and var_label() != var_label("LIBRARY")
+Outcome:
+  Message: "The variable label uses \"animal\"; the SENDIG asks for \"subject\" in\
+    \ all labels."
+Source_Proposed:
+  Sheet_Issue: "#290"
+  Class: "ALL"
+  Domain: "ALL"
+  Variable: "ALL"
+  Plain_Text_Explanation: "\"Subject\" should be used where applicable to generically\
+    \ refer to \"animal.\" The term \"subject\" should be used consistently in all\
+    \ labels and comments (SENDIG 3.1.1 section 4.2.3; SENDIG 3.0 and 3.1 alike).\
+    \ A label the SENDIG itself publishes (e.g. BWDTC \"Date/Time Animal Weighed\"\
+    ) is the standard's wording and is exempt."
+  Condition: "Variable label is not the SENDIG label of the variable"
+  Rule: "Variable label does not use the word \"animal\" or \"animals\""
+Standards:
+- Organization: "CDISC"
+  Standards:
+  - Name: "SENDIG-GENETOX"
+    Version: "1.0"
+  - Name: "SENDIG-DART"
+    Version: "1.2"
+  - Name: "SENDIG-DART"
+    Version: "1.1"
+  - Name: "SENDIG"
+    Version: "3.1.1"
+  - Name: "SENDIG"
+    Version: "3.1"
+  - Name: "SENDIG"
+    Version: "3.0"
