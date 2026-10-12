@@ -1,0 +1,26 @@
+#!RuleTest
+#test CDISC-SEND-0192 expect=violation domain=PC
+#note "Two genuine duplicates (rule round 2026-10-12): rows 1/2 share test, subject, specimen and PCDTC; rows 4/5 have no PCDTC and share PCTPTREF and PCELTM. Row 3 differs from 1/2 by PCDTC only; row 6 differs from 4/5 by PCTPTREF only -> 4 findings."
+#library standard=sendig version=3-1-1
+#expectViolationCount 4
+#expectViolationAt row=1 PCSEQ=1
+#expectViolationAt row=2 PCSEQ=2
+#expectViolationAt row=4 PCSEQ=4
+#expectViolationAt row=5 PCSEQ=5
+dataset PC class=FINDINGS label="Pharmacokinetics Concentrations"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col PCSEQ    type=Num  label="Sequence Number"
+col PCTESTCD type=Char label="Test Short Name"
+col PCSPEC   type=Char label="Specimen Material Type"
+col PCDTC    type=Char label="Date/Time of Specimen Collection"
+col PCELTM   type=Char label="Planned Elapsed Time from Time Point Ref"
+col PCTPTREF type=Char label="Time Point Reference"
+---
+5311016 | PC | 5311016-101 | 1 | A9876543 | PLASMA | 2018-01-01T09:00 | PT1H | Day 1 dose
+5311016 | PC | 5311016-101 | 2 | A9876543 | PLASMA | 2018-01-01T09:00 | PT1H | Day 1 dose
+5311016 | PC | 5311016-101 | 3 | A9876543 | PLASMA | 2018-01-01T10:00 | PT2H | Day 1 dose
+5311016 | PC | 5311016-101 | 4 | A9871234 | PLASMA |  | PT1H | Day 1 dose
+5311016 | PC | 5311016-101 | 5 | A9871234 | PLASMA |  | PT1H | Day 1 dose
+5311016 | PC | 5311016-101 | 6 | A9871234 | PLASMA |  | PT1H | Day 14 dose

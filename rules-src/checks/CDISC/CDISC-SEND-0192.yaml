@@ -4,9 +4,9 @@ Core:
   Version: "1"
 Description: "Raise an error when more than one Pharmacokinetic Concentrations (PC)\
   \ record exists for the same combination of Test Short Name (PCTESTCD), subject\
-  \ or pool (USUBJID/POOLID), specimen (PCSPEC), and observation time (PCDTC); the\
-  \ domain should hold one record per test per specimen per observation time per subject\
-  \ or pool."
+  \ or pool (USUBJID/POOLID), specimen (PCSPEC), and observation time (PCDTC, or the\
+  \ planned time PCTPTREF / PCELTM where PCDTC is null); the domain should hold one\
+  \ record per test per specimen per observation time per subject or pool."
 Executability: "Partially Executable - Possible Underreporting"
 Scope:
   Domains:
@@ -14,10 +14,12 @@ Scope:
     - "PC"
 Check:
   expression: >-
-    not is_unique_set([PCTESTCD, USUBJID, POOLID, PCSPEC, PCDTC])
+    not is_unique_set([PCTESTCD, USUBJID, POOLID, PCSPEC, coalesce(PCDTC, concat(PCTPTREF, "/",
+    PCELTM))])
 Outcome:
   Message: "More than one PC record exists for the same test (PCTESTCD), subject or\
-    \ pool (USUBJID/POOLID), specimen (PCSPEC), and observation time (PCDTC)."
+    \ pool (USUBJID/POOLID), specimen (PCSPEC), and observation time (PCDTC, or PCTPTREF\
+    \ / PCELTM where PCDTC is null)."
 Source:
   Class: "FND"
   Domain: "PC"

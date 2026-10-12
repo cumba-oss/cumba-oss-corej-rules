@@ -1,0 +1,41 @@
+#!RuleTest
+#test CDISC-SEND-0192 expect=noViolation domain=PC
+#note "SENDIG 3.1.1 section 6.3.13.2 (PC PP Cross-domain Example 2), the identifying columns of all 26 rows: PCDTC is null throughout and the Day 1 and Day 14 profiles repeat the same PCELTM values. Rule round 2026-10-12 (owner: key coalesce(PCDTC, concat(PCTPTREF, \"/\", PCELTM))): the observation time falls back to the planned reference + elapsed time, so the conforming example reports nothing. Red under the old PCDTC-only key (every record of a test shares the null PCDTC) and under coalesce(PCDTC, PCELTM) (Day 1 / Day 14 collide)."
+#library standard=sendig version=3-1-1
+dataset PC class=FINDINGS label="Pharmacokinetics Concentrations"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col PCSEQ    type=Num  label="Sequence Number"
+col PCTESTCD type=Char label="Test Short Name"
+col PCSPEC   type=Char label="Specimen Material Type"
+col PCDTC    type=Char label="Date/Time of Specimen Collection"
+col PCELTM   type=Char label="Planned Elapsed Time from Time Point Ref"
+col PCTPTREF type=Char label="Time Point Reference"
+---
+5311016 | PC | 5311016-101 | 1 | A9876543 | PLASMA |  | PT30M | Day 1 dose
+5311016 | PC | 5311016-101 | 3 | A9876543 | PLASMA |  | PT1H | Day 1 dose
+5311016 | PC | 5311016-101 | 5 | A9876543 | PLASMA |  | PT2H | Day 1 dose
+5311016 | PC | 5311016-101 | 7 | A9876543 | PLASMA |  | PT4H | Day 1 dose
+5311016 | PC | 5311016-101 | 9 | A9876543 | PLASMA |  | PT8H | Day 1 dose
+5311016 | PC | 5311016-101 | 11 | A9876543 | PLASMA |  | PT24H | Day 1 dose
+5311016 | PC | 5311016-101 | 2 | A9871234 | PLASMA |  | PT30M | Day 1 dose
+5311016 | PC | 5311016-101 | 4 | A9871234 | PLASMA |  | PT1H | Day 1 dose
+5311016 | PC | 5311016-101 | 6 | A9871234 | PLASMA |  | PT2H | Day 1 dose
+5311016 | PC | 5311016-101 | 8 | A9871234 | PLASMA |  | PT4H | Day 1 dose
+5311016 | PC | 5311016-101 | 10 | A9871234 | PLASMA |  | PT8H | Day 1 dose
+5311016 | PC | 5311016-101 | 12 | A9871234 | PLASMA |  | PT24H | Day 1 dose
+5311016 | PC | 5311016-101 | 13 | A9876543 | PLASMA |  | PT0H | Day 14 dose
+5311016 | PC | 5311016-101 | 15 | A9876543 | PLASMA |  | PT30M | Day 14 dose
+5311016 | PC | 5311016-101 | 17 | A9876543 | PLASMA |  | PT1H | Day 14 dose
+5311016 | PC | 5311016-101 | 19 | A9876543 | PLASMA |  | PT2H | Day 14 dose
+5311016 | PC | 5311016-101 | 21 | A9876543 | PLASMA |  | PT4H | Day 14 dose
+5311016 | PC | 5311016-101 | 23 | A9876543 | PLASMA |  | PT8H | Day 14 dose
+5311016 | PC | 5311016-101 | 25 | A9876543 | PLASMA |  | PT24H | Day 14 dose
+5311016 | PC | 5311016-101 | 14 | A9871234 | PLASMA |  | PT0H | Day 14 dose
+5311016 | PC | 5311016-101 | 16 | A9871234 | PLASMA |  | PT30M | Day 14 dose
+5311016 | PC | 5311016-101 | 18 | A9871234 | PLASMA |  | PT1H | Day 14 dose
+5311016 | PC | 5311016-101 | 20 | A9871234 | PLASMA |  | PT2H | Day 14 dose
+5311016 | PC | 5311016-101 | 22 | A9871234 | PLASMA |  | PT4H | Day 14 dose
+5311016 | PC | 5311016-101 | 24 | A9871234 | PLASMA |  | PT8H | Day 14 dose
+5311016 | PC | 5311016-101 | 26 | A9871234 | PLASMA |  | PT24H | Day 14 dose
