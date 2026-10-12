@@ -1,0 +1,12 @@
+#!RuleTest
+#test FDA-SD1063 expect=noViolation domain=DM
+#note "Rule round 2026-10-12 (owner 2026-10-04: \"Agree to case insensitive compare using upper if needed.\"): the dataset arrives named in lower case (dm), as a provider that passes a file name through unchanged would hand it over; the Define-XML declares DM. define_dataset_names() is upper-cased by the engine, so the rule upper-cases ds_name() too and must not fire. Before upper(ds_name()) the raw 'dm' was not in [DM] and fired."
+#library standard=sdtmig version=3-4
+#define-xml FDA-SD1063-define.xml
+dataset dm label="Demographics"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+---
+CDISCPILOT01 | DM | 01-701-1015
+CDISCPILOT01 | DM | 01-701-1023
