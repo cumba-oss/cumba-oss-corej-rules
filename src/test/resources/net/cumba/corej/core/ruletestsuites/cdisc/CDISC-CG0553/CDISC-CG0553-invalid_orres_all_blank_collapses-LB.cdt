@@ -1,0 +1,18 @@
+#!RuleTest
+#test CDISC-CG0553 expect=violation domain=LB
+#note "The all-blank collapse is unchanged by the empty(--DRVFL) leaf: LBORRES is empty on EVERY record, so the rule collapses to ONE Message_Folded finding although LBDRVFL is filled on some records - --DRVFL is in Keep_Row_Findings, so its leaf neither triggers nor blocks the collapse (outcome.md). Without the key the filled LBDRVFL would keep the rule per record (2 findings: rows 1 and 3)."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+dataset LB class=FINDINGS label="Laboratory Test Results"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col LBSEQ    type=Num  label="Sequence Number"
+col LBTESTCD type=Char label="Lab Test or Examination Short Name"
+col LBORRES  type=Char label="Result or Finding in Original Units"
+col LBLOBXFL type=Char label="Last Observation Before Exposure Flag"
+col LBDRVFL  type=Char label="Derived Flag"
+---
+S1 | LB | 001 | 1 | ALT | | Y |
+S1 | LB | 001 | 2 | AST | | Y | Y
+S1 | LB | 001 | 3 | BILI | | Y |

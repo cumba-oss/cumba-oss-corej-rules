@@ -1,7 +1,7 @@
 name: CDISC-CG0553
 kind: rule
 description: |
-  Wave 10 port - --ORRES empty when --LOBXFL=Y and --DRVFL is missing or != Y. Exercises the broader Fix #17
+  Wave 10 port - --ORRES empty when --LOBXFL=Y and --DRVFL is null (rule round 2026-10-12: was != Y, so 'N' fired). Exercises the broader Fix #17
   bucket: Check leaves with column-as-reference values, exists/not_exists
   column-presence safeguards, or Domains.Exclude scope shapes not covered
   by Waves 8-9.
@@ -13,7 +13,8 @@ datasets:
     row_key: [STUDYID, USUBJID, LBSEQ]
     rows:
       - {STUDYID: S1, DOMAIN: LB, USUBJID: '001', LBSEQ: 1, LBORRES: '', LBLOBXFL: Y, LBDRVFL: Y}
-      - {STUDYID: S1, DOMAIN: LB, USUBJID: '002', LBSEQ: 1, LBORRES: '', LBLOBXFL: Y, LBDRVFL: N}
+      - {STUDYID: S1, DOMAIN: LB, USUBJID: '002', LBSEQ: 1, LBORRES: '', LBLOBXFL: Y, LBDRVFL: ''}
+      - {STUDYID: S1, DOMAIN: LB, USUBJID: '003', LBSEQ: 1, LBORRES: '', LBLOBXFL: Y, LBDRVFL: N}
 config:
   standard: sdtmig
   standard_version: '3.4'

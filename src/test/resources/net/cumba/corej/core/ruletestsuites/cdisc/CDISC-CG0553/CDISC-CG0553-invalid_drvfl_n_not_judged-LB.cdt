@@ -1,0 +1,21 @@
+#!RuleTest
+#test CDISC-CG0553 expect=violation domain=LB
+#note "CG0553: Condition --LOBXFL = 'Y' and --DRVFL = null, Rule --ORRES ^= null. Row 1: baseline, LBDRVFL null, LBORRES empty -> fires. Row 2: derived baseline (LBDRVFL 'Y') -> exempt. Row 3: LBDRVFL 'N' -> NOT null, so not judged (rule round 2026-10-12, owner: the Check follows the Condition, empty(--DRVFL); the old `--DRVFL != \"Y\"` fired here). Row 4: LBORRES populated -> clean. Row 5: not the baseline -> clean. LBORRES is populated on row 4, so nothing collapses."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=1 LBSEQ=1
+dataset LB class=FINDINGS label="Laboratory Test Results"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col LBSEQ    type=Num  label="Sequence Number"
+col LBTESTCD type=Char label="Lab Test or Examination Short Name"
+col LBORRES  type=Char label="Result or Finding in Original Units"
+col LBLOBXFL type=Char label="Last Observation Before Exposure Flag"
+col LBDRVFL  type=Char label="Derived Flag"
+---
+S1 | LB | 001 | 1 | ALT | | Y |
+S1 | LB | 001 | 2 | AST | | Y | Y
+S1 | LB | 001 | 3 | BILI | | Y | N
+S1 | LB | 001 | 4 | ALB | 42 | Y |
+S1 | LB | 001 | 5 | ALT | | |

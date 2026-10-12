@@ -1,0 +1,20 @@
+#!RuleTest
+#test CDISC-CG0553 expect=violation domain=LB
+#note "LBDRVFL is ABSENT: it reads null, so no record is derived and every baseline record with an empty LBORRES fires, located per record (verdict 1, EXEMPTION; the absent --DRVFL is listed in Keep_Row_Findings and folds nothing). Rows 1 and 3 fire; row 2 has a result; row 4 is not the baseline."
+#library standard=sdtmig version=3-4
+#expectViolationCount 2
+#expectViolationAt row=1 LBSEQ=1
+#expectViolationAt row=3 LBSEQ=3
+dataset LB class=FINDINGS label="Laboratory Test Results"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col LBSEQ    type=Num  label="Sequence Number"
+col LBTESTCD type=Char label="Lab Test or Examination Short Name"
+col LBORRES  type=Char label="Result or Finding in Original Units"
+col LBLOBXFL type=Char label="Last Observation Before Exposure Flag"
+---
+S1 | LB | 001 | 1 | ALT | | Y
+S1 | LB | 001 | 2 | AST | 30 | Y
+S1 | LB | 001 | 3 | BILI | | Y
+S1 | LB | 001 | 4 | ALT | |

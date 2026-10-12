@@ -66,9 +66,10 @@ class RequirementBoundaryLintTest
         // PMDA-SD0041 moved --PRESP from the `not var_exists("--PRESP") or` disjunct to
         // Requirements.Variables.All (verdict 2-1'); the leaves are gone, not unread.
         // 723 -> 721 (batch C item 2): CDISC-SEND-0149 and FDA-SE2354 moved --EXCLFL the same way
-        // (verdict 2-1, guarded sister CDISC-SEND-9445).
-        assertTrue(absenceTests >= 721, "only " + absenceTests + " positive-firing absence"
-                + " test(s) read (721 on 2026-10-12) — the presence-test reader went blind");
+        // (verdict 2-1, guarded sister CDISC-SEND-9445). 721 -> 720 (batch C item 5): CDISC-CG0553
+        // reads empty(--DRVFL), the sheet's Condition, in place of `not var_exists or != "Y"`.
+        assertTrue(absenceTests >= 720, "only " + absenceTests + " positive-firing absence"
+                + " test(s) read (720 on 2026-10-12) — the presence-test reader went blind");
         assertTrue(suffixed >= 3,
                 "only " + suffixed + " suffixed requirement entries (3 on" + " 2026-10-07)");
         assertEquals(List.of(), hits, "R-4.27: a rule requires what it reports — the gate skips"
