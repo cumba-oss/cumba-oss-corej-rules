@@ -16,13 +16,12 @@ Requirements:
     - "--ORRES"
 Check:
   expression: >-
-    empty(--ORRES) and (not var_exists("--STAT") or --STAT != "NOT DONE")
+    empty(--ORRES) and --STAT != "NOT DONE"
 Outcome:
   Message: "--ORRES is empty and the record is not marked \"NOT DONE\" in --STAT;\
     \ a result is expected."
-  Message_Folded: "--ORRES not populated in any record of the dataset, and at least\
-    \ one record meets the rest of the condition: --ORRES is empty and the record\
-    \ is not marked \"NOT DONE\" in --STAT; a result is expected."
+  Keep_Row_Findings:
+  - "--ORRES"
   Output_Variables:
   - "!--ORRES"
 Source:

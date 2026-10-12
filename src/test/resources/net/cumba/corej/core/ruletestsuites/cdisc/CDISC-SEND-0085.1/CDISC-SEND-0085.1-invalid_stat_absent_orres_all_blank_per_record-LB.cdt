@@ -1,0 +1,16 @@
+#!RuleTest
+#test CDISC-SEND-0085.1 expect=violation domain=LB
+#note "Round 2026-10-12 (item 8b): no LBSTAT column and LBORRES blank on every record. An absent --STAT reads blank, != 'NOT DONE', so every record is reported per record. Before, the all-blank column collapsed the three findings to one."
+#library standard=sendig version=3-1-1
+#expectViolationCount 3
+dataset LB class=FINDINGS label="Laboratory Test Results"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col LBSEQ    type=Num  label="Sequence Number"
+col LBTESTCD type=Char label="Lab Test or Examination Short Name"
+col LBORRES  type=Char label="Result or Finding in Original Units"
+---
+S1 | LB | 001 | 1 | ALT | 
+S1 | LB | 001 | 2 | AST | 
+S1 | LB | 001 | 3 | ALB | 

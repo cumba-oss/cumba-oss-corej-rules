@@ -1,0 +1,18 @@
+#!RuleTest
+#test PMDA-SD0047 expect=violation domain=LB
+#note "ADAPTED-FROM fda/FDA-SD0047/FDA-SD0047-invalid_orres_all_blank_per_record-LB.cdt (verbatim). Round 2026-10-12 (item 8b): LBORRES blank on every record; rows 1 and 3 reported per record, row 2 NOT DONE. Before, the collapse reported one."
+#library standard=sdtmig version=3-4
+#expectViolationCount 2
+dataset LB class=FINDINGS label="Laboratory Test Results"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col LBSEQ    type=Num  label="Sequence Number"
+col LBTESTCD type=Char label="Lab Test or Examination Short Name"
+col LBSTAT   type=Char label="Completion Status"
+col LBDRVFL  type=Char label="Derived Flag"
+col LBORRES  type=Char label="Result or Finding in Original Units"
+---
+S1 | LB | 001 | 1 | ALT |  |  | 
+S1 | LB | 001 | 2 | AST | NOT DONE |  | 
+S1 | LB | 001 | 3 | ALB |  | N | 

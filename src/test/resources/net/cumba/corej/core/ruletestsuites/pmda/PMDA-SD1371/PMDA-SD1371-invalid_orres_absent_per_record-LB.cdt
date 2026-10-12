@@ -1,0 +1,17 @@
+#!RuleTest
+#test PMDA-SD1371 expect=violation domain=LB
+#note "ADAPTED-FROM fda/FDA-SD1371/FDA-SD1371-invalid_orres_absent_per_record-LB.cdt (verbatim). Round 2026-10-12 (item 8b, D1-override): no LBORRES column; rows 1 and 2 reported per record, row 3 derived. Before, the absent column folded to one."
+#library standard=sdtmig version=3-4
+#expectViolationCount 2
+dataset LB class=FINDINGS label="Laboratory Test Results"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col LBSEQ    type=Num  label="Sequence Number"
+col LBTESTCD type=Char label="Lab Test or Examination Short Name"
+col LBLOBXFL type=Char label="Last Observation Before Exposure Flag"
+col LBDRVFL  type=Char label="Derived Flag"
+---
+S1 | LB | 001 | 1 | ALT | Y | 
+S1 | LB | 001 | 2 | AST | Y | N
+S1 | LB | 001 | 3 | ALB | Y | Y

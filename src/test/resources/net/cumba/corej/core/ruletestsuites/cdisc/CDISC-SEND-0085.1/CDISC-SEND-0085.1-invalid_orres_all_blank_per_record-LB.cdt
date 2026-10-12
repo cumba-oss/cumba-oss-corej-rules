@@ -1,0 +1,17 @@
+#!RuleTest
+#test CDISC-SEND-0085.1 expect=violation domain=LB
+#note "Round 2026-10-12 (item 8b): LBORRES is blank on every record. Rows 1 and 3 are not marked NOT DONE and are reported per record; row 2 is exempt. The rule never folds (Keep_Row_Findings [--ORRES], no Message_Folded) - before, the all-blank column collapsed the two findings to one dataset-level line."
+#library standard=sendig version=3-1-1
+#expectViolationCount 2
+dataset LB class=FINDINGS label="Laboratory Test Results"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col LBSEQ    type=Num  label="Sequence Number"
+col LBTESTCD type=Char label="Lab Test or Examination Short Name"
+col LBSTAT   type=Char label="Completion Status"
+col LBORRES  type=Char label="Result or Finding in Original Units"
+---
+S1 | LB | 001 | 1 | ALT |  | 
+S1 | LB | 001 | 2 | AST | NOT DONE | 
+S1 | LB | 001 | 3 | ALB |  | 

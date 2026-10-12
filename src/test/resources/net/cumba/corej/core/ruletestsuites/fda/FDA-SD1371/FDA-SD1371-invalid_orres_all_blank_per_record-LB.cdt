@@ -1,0 +1,18 @@
+#!RuleTest
+#test FDA-SD1371 expect=violation domain=LB
+#note "Round 2026-10-12 (item 8b): every record is a baseline record (LBLOBXFL = Y) and LBORRES is blank on every record. Row 3 is derived (exempt); rows 1 and 2 are reported per record. The rule never folds (Keep_Row_Findings [--ORRES]) - before, the all-blank column collapsed them to one dataset-level finding."
+#library standard=sdtmig version=3-4
+#expectViolationCount 2
+dataset LB class=FINDINGS label="Laboratory Test Results"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col LBSEQ    type=Num  label="Sequence Number"
+col LBTESTCD type=Char label="Lab Test or Examination Short Name"
+col LBLOBXFL type=Char label="Last Observation Before Exposure Flag"
+col LBDRVFL  type=Char label="Derived Flag"
+col LBORRES  type=Char label="Result or Finding in Original Units"
+---
+S1 | LB | 001 | 1 | ALT | Y |  | 
+S1 | LB | 001 | 2 | AST | Y | N | 
+S1 | LB | 001 | 3 | ALB | Y | Y | 
