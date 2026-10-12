@@ -1,0 +1,12 @@
+#!RuleTest
+#test PMDA-SD1440 expect=skipped domain=AE
+#note "No AETERM column, AEDECOD present. Rule round 2026-10-12 (var_exists sweep, owner 2026-10-07): the grouping key --TERM moved from a Check-level var_exists guard into Requirements.Variables.All, so an absent key now SKIPS the rule (auditable) instead of passing silently. Was expect=noViolation (valid_no_term) under the guard; this scenario pinned that silent pass and changes verdict on purpose."
+#library standard=sdtmig version=3-4
+dataset AE class=EVENTS label="Adverse Events"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col AESEQ   type=Num  label="Sequence Number"
+col AEDECOD type=Char label="Dictionary-Derived Term"
+---
+S1 | AE | 001 | 1 | Headache

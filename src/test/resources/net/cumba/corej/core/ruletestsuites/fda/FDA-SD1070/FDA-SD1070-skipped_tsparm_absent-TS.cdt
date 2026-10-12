@@ -1,0 +1,12 @@
+#!RuleTest
+#test FDA-SD1070 expect=skipped domain=TS
+#note "TSPARM is not in the dataset (rule round 2026-10-12, var_exists sweep, owner 2026-10-07): the grouping key --PARM moved from a Check-level var_exists guard into Requirements.Variables.All, so the rule is SKIPPED instead of passing silently. Red under the old rule (it ran: no violation). Without either gate the absent key drops out of the grouping, and the two different values below would be judged inconsistent across the whole dataset."
+#library standard=sdtmig version=3-4
+dataset TS label="Trial Summary"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col TSSEQ type=Num label="Sequence Number"
+col TSPARMCD type=Char label="Trial Summary Parameter Short Name"
+---
+S1 | TS | 1 | TITLE
+S1 | TS | 2 | TPHASE

@@ -1,0 +1,13 @@
+#!RuleTest
+#test PMDA-SD1043 expect=skipped domain=LB
+#note "LB WITH LBTESTCD but WITHOUT the LBTEST column. Rule round 2026-10-12 (var_exists sweep, owner 2026-10-07): the grouping key --TEST moved from a Check-level var_exists guard into Requirements.Variables.All, so an absent key now SKIPS the rule (auditable) instead of passing silently. Was expect=noViolation (valid_no_lbtest) under the guard; this scenario pinned that silent pass and changes verdict on purpose. Without either gate the absent key would drop out of the grouping and LBTESTCD would be judged across the whole dataset."
+#library standard=sdtmig version=3-4
+dataset LB class=FINDINGS label="Laboratory Test Results"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col LBSEQ    type=Num  label="Sequence Number"
+col LBTESTCD type=Char label="Lab Test or Examination Short Name"
+---
+S1 | LB | 001 | 1 | GLUC
+S1 | LB | 002 | 1 | GLUCOSE

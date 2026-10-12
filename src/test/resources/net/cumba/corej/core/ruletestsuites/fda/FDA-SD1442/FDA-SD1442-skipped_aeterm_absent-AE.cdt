@@ -1,0 +1,13 @@
+#!RuleTest
+#test FDA-SD1442 expect=skipped domain=AE
+#note "AETERM is not in the dataset (rule round 2026-10-12, var_exists sweep, owner 2026-10-07): the grouping key --TERM moved from a Check-level var_exists guard into Requirements.Variables.All, so the rule is SKIPPED instead of passing silently. Red under the old rule (it ran: no violation). Without either gate the absent key drops out of the grouping, and the two different values below would be judged inconsistent across the whole dataset."
+#library standard=sdtmig version=3-4
+dataset AE class=EVENTS label="Adverse Events"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col AESEQ type=Num label="Sequence Number"
+col AEHLGT type=Char label="High Level Group Term"
+---
+S1 | AE | 001 | 1 | Headaches
+S1 | AE | 001 | 2 | Gastrointestinal signs and symptoms
