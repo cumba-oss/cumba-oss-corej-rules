@@ -1,0 +1,26 @@
+#!RuleTest
+#test CDISC-SEND-0116 expect=noViolation domain=CO
+#note "Rule round 2026-10-12 (owner 2026-10-04: \"compare both values upper case\"; case-insensitive dataset names, 2026-10-01): the BW dataset writes its DOMAIN cell in lower case (bw). Row 1, RDOMAIN=BW: study_domains() upper-cases the DOMAIN cells itself (engine runbook W2 SD), so it matches. Row 2, RDOMAIN=bw: the rule upper-cases RDOMAIN too, so it matches as well. Before upper(RDOMAIN) row 2 fired (bw not in [BW, ...]) - the interim movement the W2 review named."
+#library standard=sendig version=3-1-1
+dataset CO class="SPECIAL PURPOSE" label="Comments"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col RDOMAIN type=Char label="Related Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col COSEQ   type=Num  label="Sequence Number"
+col COVAL   type=Char label="Comment"
+---
+S1 | CO | BW | 001 | 1 | Comment on body weight
+S1 | CO | bw | 001 | 2 | Second comment on body weight
+---
+
+dataset BW label="Body Weight"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col BWSEQ    type=Num  label="Sequence Number"
+col BWTESTCD type=Char label="Body Weight Test Short Name"
+col BWORRES  type=Char label="Result or Finding in Original Units"
+---
+S1 | bw | 001 | 1 | BW | 250
+---

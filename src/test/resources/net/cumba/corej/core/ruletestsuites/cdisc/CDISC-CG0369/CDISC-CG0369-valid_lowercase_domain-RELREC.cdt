@@ -1,0 +1,35 @@
+#!RuleTest
+#test CDISC-CG0369 expect=noViolation domain=RELREC
+#note "Rule round 2026-10-12 (owner 2026-10-04: \"compare both values upper case\"; case-insensitive dataset names, 2026-10-01): the AE dataset writes its DOMAIN cell in lower case (ae). Row 1, RDOMAIN=AE: study_domains() upper-cases the DOMAIN cells itself (engine runbook W2 SD), so it matches. Row 2, RDOMAIN=ae: the rule upper-cases RDOMAIN too, so it matches as well. Before upper(RDOMAIN) row 2 fired (ae not in [AE, ...]) - the interim movement the W2 review named."
+#library standard=sdtmig version=3-4
+dataset RELREC label="Related Records"
+col STUDYID  type=Char label="Study Identifier"
+col RDOMAIN  type=Char label="Related Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col IDVAR    type=Char label="Identifying Variable"
+col IDVARVAL type=Char label="Identifying Variable Value"
+col RELTYPE  type=Char label="Relationship Type"
+col RELID    type=Char label="Relationship Identifier"
+---
+S1 | AE | 001 | AESEQ | 1 | ONE | R1
+S1 | ae | 001 | AESEQ | 1 | ONE | R2
+---
+
+dataset AE label="Adverse Events"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col AESEQ   type=Num  label="Sequence Number"
+col AETERM  type=Char label="Reported Term for the Adverse Event"
+---
+S1 | ae | 001 | 1 | HEADACHE
+---
+
+dataset DM label="Demographics"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col ARM     type=Char label="Description of Planned Arm"
+---
+S1 | DM | 001 | PLACEBO
+---
