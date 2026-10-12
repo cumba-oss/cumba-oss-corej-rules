@@ -1,6 +1,6 @@
 #!RuleTest
 #test FDA-SD1392 expect=violation domain=CM
-#note "Regression pin for the T6 fix: Requirements.Variables gates the checked --CHENDY (not --ENDTC), and the absent-CMENDTC case fires via the not_exists branch with empty DM.RFCSTDTC."
+#note "Regression pin for the T6 fix: Requirements.Variables gates the checked --CHENDY (not --ENDTC). CMENDTC is absent and DM.RFCSTDTC is empty -> fires via the RFCSTDTC branch. (Since rule round 2026-10-12 the --ENDTC branch is guarded by var_exists, as in CG0007 / CG0221 / CG0223 / SD1085 / SD1089 / SD1093, so the absent CMENDTC alone no longer fires: valid_endtc_absent.)"
 #library standard=sendig version=ar-1-0
 #expectViolationCount 1
 #expectViolationAt row=1 USUBJID=002

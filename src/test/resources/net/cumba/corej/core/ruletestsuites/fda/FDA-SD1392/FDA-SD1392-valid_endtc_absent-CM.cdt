@@ -1,0 +1,24 @@
+#!RuleTest
+#test FDA-SD1392 expect=noViolation domain=CM
+#note "Rule round 2026-10-12 (owner, batch C item 3): FDA-SD1392 aligned with the nine imputation rules (CG0007 / CG0221 / CG0223, FDA/PMDA-SD1085 / SD1089 / SD1093), whose --DTC / --STDTC / --ENDTC branch is guarded by var_exists. CMENDTC is ABSENT and DM.RFCSTDTC is complete -> no finding; FDA-SD2272 reports an absent --ENDTC once where --ENDY is present (not here: it keys on --ENDY, not --CHENDY). Under the rule before the round both CMCHENDY records fired, one finding per record for one dataset fact."
+#library standard=sendig version=ar-1-0
+dataset CM class=INTERVENTIONS label="Concomitant/Prior Medications"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col CMSEQ    type=Num  label="Sequence Number"
+col CMTRT    type=Char label="Reported Name of Drug, Med, or Therapy"
+col CMCHENDY type=Num  label="End Day of Obs Rel to Challenge Agent"
+---
+S1 | CM | 002 | 1 | SALINE | 5
+S1 | CM | 002 | 2 | SALINE | 6
+---
+
+dataset DM class="SPECIAL PURPOSE" label="Demographics"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col RFCSTDTC type=Char label="Date/Time of First Challenge Agent Admin"
+---
+S1 | DM | 002 | 2020-01-01
+---
