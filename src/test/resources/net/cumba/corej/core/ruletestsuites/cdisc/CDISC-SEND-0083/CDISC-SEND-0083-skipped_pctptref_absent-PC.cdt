@@ -1,0 +1,16 @@
+#!RuleTest
+#test CDISC-SEND-0083 expect=skipped domain=PC
+#note "PCTPTREF is not in the dataset (rule round 2026-10-12, var_exists sweep, owner 2026-10-07): the grouping keys --TPTREF and --TPTNUM moved from Check-level var_exists guards into Requirements.Variables.All, so the rule is SKIPPED instead of passing silently. Red under the old rule (it ran: no violation). Without either gate the absent key drops out of [DOMAIN, VISITDY, --TPTREF, --TPTNUM] and the two animals' different PCELTM at the same VISITDY / PCTPTNUM would fire."
+#library standard=sendig version=3-0
+dataset PC class=FINDINGS label="Pharmacokinetics Concentrations"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col PCSEQ    type=Num  label="Sequence Number"
+col PCTESTCD type=Char label="Test Short Name"
+col VISITDY  type=Num  label="Planned Study Day of Collection"
+col PCTPTNUM type=Num  label="Planned Time Point Number"
+col PCELTM   type=Char label="Planned Elapsed Time from Time Point Ref"
+---
+S1 | PC | 001 | 1 | DRUGX | 1 | 1 | PT1H
+S1 | PC | 002 | 1 | DRUGX | 1 | 1 | PT2H

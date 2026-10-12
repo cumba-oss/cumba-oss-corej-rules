@@ -1,0 +1,15 @@
+#!RuleTest
+#test PMDA-SD2238 expect=skipped domain=CM
+#note "No CMSTDTC column. Rule round 2026-10-12 (var_exists sweep, owner 2026-10-07): the grouping key --STDTC moved from a Check-level var_exists guard into Requirements.Variables.All, so the rule is now SKIPPED (auditable) although STTPT values disagree. Was expect=noViolation (valid_no_stdtc_column): this scenario pinned the authored guard's silent pass, the face of the silence trichotomy the sweep retires; the verdict changes on purpose. Without either gate the absent key drops out of [USUBJID, --STDTC] and the disagreeing STTPT values would fire."
+#library standard=sdtmig version=3-4
+dataset CM class=INTERVENTIONS label="Concomitant Medications"
+col STUDYID  type=Char
+col DOMAIN   type=Char
+col USUBJID  type=Char
+col CMSEQ    type=Num
+col CMTRT    type=Char
+col CMSTTPT  type=Char
+---
+S1 | CM | 001 | 1 | ASPIRIN   | SCREENING
+S1 | CM | 001 | 2 | IBUPROFEN | RANDOMIZATION
+---

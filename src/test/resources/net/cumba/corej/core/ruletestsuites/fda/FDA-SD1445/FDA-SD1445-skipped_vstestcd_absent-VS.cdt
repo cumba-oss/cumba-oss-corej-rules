@@ -1,0 +1,14 @@
+#!RuleTest
+#test FDA-SD1445 expect=skipped domain=VS
+#note "VSTESTCD is not in the dataset (rule round 2026-10-12, var_exists sweep, owner 2026-10-07): the assessment key --TESTCD moved from a Check-level var_exists guard into Requirements.Variables.All, so the rule is SKIPPED instead of passing silently. Red under the old rule (it ran: no violation). Without either gate the absent key drops out of the unique set, and the subject's two flagged records (different tests, told apart only by the absent VSTESTCD) would read as duplicates."
+#library standard=sdtmig version=3-4
+dataset VS class=FINDINGS label="Vital Signs"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col VSSEQ    type=Num  label="Sequence Number"
+col VSTEST   type=Char label="Vital Signs Test Name"
+col VSLOBXFL type=Char label="Last Observation Before Exposure Flag"
+---
+S1 | VS | 001 | 1 | Temperature           | Y
+S1 | VS | 001 | 2 | Systolic Blood Pressure | Y
