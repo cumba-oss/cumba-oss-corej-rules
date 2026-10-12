@@ -1,0 +1,15 @@
+#!RuleTest
+#test CDISC-CG0203 expect=noViolation domain=SUPPDM
+#note "SUPPDM with RDOMAIN = dm (lower case) and no IDVAR: DM records are keyed by USUBJID alone. Rule round 2026-10-12 (owner, queued item C3, as c5206c02): RDOMAIN names a domain, and dataset names match case-insensitively (owner 2026-10-01), so the literal comparison reads upper(RDOMAIN). Red under the old exact comparison."
+#library standard=sdtmig version=3-4
+dataset SUPPDM label="Supplemental Qualifiers"
+col STUDYID  type=Char label="Study Identifier"
+col RDOMAIN  type=Char label="Related Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col IDVAR    type=Char label="Identifying Variable"
+col IDVARVAL type=Char label="Identifying Variable Value"
+col QNAM     type=Char label="Qualifier Variable Name"
+col QLABEL   type=Char label="Qualifier Variable Label"
+col QVAL     type=Char label="Data Value"
+---
+S1 | dm | 001 |  |  | RACEOTH | Race, Other | ASIAN-INDIAN

@@ -1,0 +1,18 @@
+#!RuleTest
+#test CDISC-CG0203 expect=violation domain=SUPPAE
+#note "Row 2 relates to AE but has no IDVAR -> violation; row 1 is complete. Rule round 2026-10-12 (owner, queued item C3, as c5206c02): RDOMAIN names a domain, and dataset names match case-insensitively (owner 2026-10-01), so the literal comparison reads upper(RDOMAIN)."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=2 QVAL=N
+dataset SUPPAE label="Supplemental Qualifiers"
+col STUDYID  type=Char label="Study Identifier"
+col RDOMAIN  type=Char label="Related Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col IDVAR    type=Char label="Identifying Variable"
+col IDVARVAL type=Char label="Identifying Variable Value"
+col QNAM     type=Char label="Qualifier Variable Name"
+col QLABEL   type=Char label="Qualifier Variable Label"
+col QVAL     type=Char label="Data Value"
+---
+S1 | AE | 001 | AESEQ | 1 | AETRTEM | Treatment Emergent Flag | Y
+S1 | AE | 001 |       |   | AETRTEM | Treatment Emergent Flag | N

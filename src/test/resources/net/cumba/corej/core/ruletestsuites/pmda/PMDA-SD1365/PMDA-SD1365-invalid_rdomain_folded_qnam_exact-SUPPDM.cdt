@@ -1,0 +1,18 @@
+#!RuleTest
+#test PMDA-SD1365 expect=violation domain=SUPPDM
+#note "Was valid_case_mismatch_not_matched. Rule round 2026-10-12 (owner, queued item C3): RDOMAIN names a domain and is compared as upper(RDOMAIN) == \"DM\" - dataset names match case-insensitively (owner 2026-10-01; c5206c02). This scenario cited ruling M2-D25 (Fix #338) for an exact RDOMAIN compare; the register (value-semantics-archive, M2-D25) scopes that ruling to QNAM / IDVAR CELLS and lists RDOMAIN as out of its scope, so the RDOMAIN half of the pin moves and the QNAM half stays. Row 1: RDOMAIN dm + SAFFL now fires. Row 2: RDOMAIN exact but QNAM lower-case saffl -> still does NOT fire (the QNAM cell is exact, M2-D25)."
+#expectViolationCount 1
+#expectViolationAt row=1 QNAM=SAFFL
+#library standard=sdtmig version=3-4
+dataset SUPPDM label="Supplemental Qualifiers for DM"
+col STUDYID  type=Char label="Study Identifier"
+col RDOMAIN  type=Char label="Related Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col IDVAR    type=Char label="Identifying Variable"
+col IDVARVAL type=Char label="Identifying Variable Value"
+col QNAM     type=Char label="Qualifier Variable Name"
+col QLABEL   type=Char label="Qualifier Variable Label"
+col QVAL     type=Char label="Data Value"
+---
+CDISCPILOT01 | dm | 01-701-1015 |  |  | SAFFL | Safety Population Flag | Y
+CDISCPILOT01 | DM | 01-701-1023 |  |  | saffl | Safety Population Flag | Y

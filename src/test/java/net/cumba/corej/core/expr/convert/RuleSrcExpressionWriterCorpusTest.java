@@ -239,7 +239,9 @@ class RuleSrcExpressionWriterCorpusTest
                 // The flip-day re-base of SpecialCaseLeafSignatureTest: the leaf-signature
                 // rewrite's product (chars 5-6 of $dataset_name) is pinned as authored text —
                 // the raw-leaf signature itself retired with the authored leaf corpus.
-                assertEquals("RDOMAIN != substring($dataset_name, 5, 2)", expression,
+                // 2026-10-12 (rule round, owner item C3): both sides folded with upper(), as
+                // RDOMAIN and a dataset name match case-insensitively (owner 2026-10-01).
+                assertEquals("upper(RDOMAIN) != upper(substring($dataset_name, 5, 2))", expression,
                         id + ": the leaf-signature carrier's authored text moved");
             }
             checked++;

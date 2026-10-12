@@ -1,0 +1,17 @@
+#!RuleTest
+#test PMDA-SD1051 expect=violation domain=SUPPDM
+#note "Rule round 2026-10-12 (owner, queued item C3, as c5206c02): RDOMAIN names a domain, and dataset names match case-insensitively (owner 2026-10-01), so the literal comparison reads upper(RDOMAIN). Copy of PMDA-SD1051-invalid_idvar-SUPPDM.cdt with the RDOMAIN cells lower-cased; the expected outcome is the original one. Red under the old exact comparison."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=2 IDVAR=USUBJID
+dataset SUPPDM label="Supplemental Qualifiers for DM"
+col STUDYID  type=Char label="Study Identifier"
+col RDOMAIN  type=Char label="Related Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col IDVAR    type=Char label="Identifying Variable"
+col IDVARVAL type=Char label="Identifying Variable Value"
+col QNAM     type=Char label="Qualifier Variable Name"
+col QVAL     type=Char label="Data Value"
+---
+CDISCPILOT01 | dm | 01-701-1015 |          |  | RACEOTH | ASIAN-INDIAN
+CDISCPILOT01 | dm | 01-701-1023 | USUBJID  |  | RACEOTH | ASIAN-INDIAN
