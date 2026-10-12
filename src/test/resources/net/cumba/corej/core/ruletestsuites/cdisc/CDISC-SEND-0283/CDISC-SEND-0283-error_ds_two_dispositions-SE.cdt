@@ -1,0 +1,29 @@
+#!RuleTest
+#test CDISC-SEND-0283 expect=executionError domain=SE
+#note "Rule round 2026-10-12 (owner; C8 phase 0.2 / Pack 3 review): the DS join declares Cardinality n:1 on [STUDYID, USUBJID] - SENDIG DS holds one record per subject, so a DS carrying subject 001 twice is refused: the rule ERRORs naming DS, the key and the two rows, instead of judging the last Element against each disposition. A second DS record is reported by CDISC-SEND-0140. Same fixture as CDISC-SEND-0127 invalid_ds_one_to_many_tie."
+#library standard=sendig version=3-1-1
+#expect-execution-error "Cardinality n:1: DS has duplicate key (STUDYID=S1, USUBJID=001) at rows 1 and 2"
+dataset SE label="Subject Elements"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col SESEQ   type=Num  label="Sequence Number"
+col ETCD    type=Char label="Element Code"
+col SESTDTC type=Char label="Start Date/Time of Element"
+col SEENDTC type=Char label="End Date/Time of Element"
+---
+S1 | SE | 001 | 1 | SCRN | 2020-01-01 | 2020-01-10
+S1 | SE | 001 | 2 | TRT | 2020-01-10 | 2020-01-20
+---
+
+dataset DS label="Disposition"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col DSSEQ   type=Num  label="Sequence Number"
+col DSDECOD type=Char label="Standardized Disposition Term"
+col DSSTDTC type=Char label="Start Date/Time of Disposition Event"
+---
+S1 | DS | 001 | 1 | REMOVED FROM STUDY | 2020-01-15
+S1 | DS | 001 | 2 | TERMINAL SACRIFICE | 2020-01-18
+---
