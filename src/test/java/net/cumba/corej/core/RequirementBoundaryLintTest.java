@@ -68,8 +68,10 @@ class RequirementBoundaryLintTest
         // 723 -> 721 (batch C item 2): CDISC-SEND-0149 and FDA-SE2354 moved --EXCLFL the same way
         // (verdict 2-1, guarded sister CDISC-SEND-9445). 721 -> 720 (batch C item 5): CDISC-CG0553
         // reads empty(--DRVFL), the sheet's Condition, in place of `not var_exists or != "Y"`.
-        assertTrue(absenceTests >= 720, "only " + absenceTests + " positive-firing absence"
-                + " test(s) read (720 on 2026-10-12) — the presence-test reader went blind");
+        // 720 -> 716 (item 8a): CDISC-CG0348's four arms became one; its four `not var_exists`
+        // leaves (two --STAT, two --DRVFL) were each contained in the remaining arm.
+        assertTrue(absenceTests >= 716, "only " + absenceTests + " positive-firing absence"
+                + " test(s) read (716 on 2026-10-12) — the presence-test reader went blind");
         assertTrue(suffixed >= 3,
                 "only " + suffixed + " suffixed requirement entries (3 on" + " 2026-10-07)");
         assertEquals(List.of(), hits, "R-4.27: a rule requires what it reports — the gate skips"

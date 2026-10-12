@@ -1,0 +1,18 @@
+#!RuleTest
+#test CDISC-CG0348 expect=violation domain=LB
+#note "Neither LBSTAT nor LBDRVFL present: no record is excused, every empty LBORRES fires (rows 1 and 3); row 2 has a result. Verdict identity with the old not var_exists(\"--STAT\") and not var_exists(\"--DRVFL\") arm."
+#library standard=sdtmig version=3-4
+#expectViolationCount 2
+#expectViolationAt row=1 LBSEQ=1
+#expectViolationAt row=3 LBSEQ=3
+dataset LB class=FINDINGS label="Laboratory Test Results"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col LBSEQ    type=Num  label="Sequence Number"
+col LBTESTCD type=Char label="Lab Test or Examination Short Name"
+col LBORRES  type=Char label="Result or Finding in Original Units"
+---
+S1 | LB | 001 | 1 | ALT | 
+S1 | LB | 001 | 2 | AST | 30
+S1 | LB | 001 | 3 | ALB | 

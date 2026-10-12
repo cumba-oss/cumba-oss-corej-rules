@@ -1,0 +1,22 @@
+#!RuleTest
+#test CDISC-CG0348 expect=violation domain=LB
+#note "Both exemption columns present. Row 1: LBSTAT null, LBDRVFL null, LBORRES empty -> fires. Row 2: not done (LBSTAT) -> exempt. Row 3: derived (LBDRVFL 'Y') -> exempt. Row 4: LBDRVFL 'N' is not 'Y' -> fires. Row 5: result present -> clean. Verdict-identical under the four-arm Check before rule round 2026-10-12 and the one arm since."
+#library standard=sdtmig version=3-4
+#expectViolationCount 2
+#expectViolationAt row=1 LBSEQ=1
+#expectViolationAt row=4 LBSEQ=4
+dataset LB class=FINDINGS label="Laboratory Test Results"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col LBSEQ    type=Num  label="Sequence Number"
+col LBTESTCD type=Char label="Lab Test or Examination Short Name"
+col LBSTAT   type=Char label="Completion Status"
+col LBDRVFL  type=Char label="Derived Flag"
+col LBORRES  type=Char label="Result or Finding in Original Units"
+---
+S1 | LB | 001 | 1 | ALT |  |  | 
+S1 | LB | 001 | 2 | AST | NOT DONE |  | 
+S1 | LB | 001 | 3 | ALB |  | Y | 
+S1 | LB | 001 | 4 | BILI |  | N | 
+S1 | LB | 001 | 5 | CA |  |  | 9.1

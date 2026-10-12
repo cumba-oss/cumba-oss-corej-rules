@@ -1,0 +1,19 @@
+#!RuleTest
+#test CDISC-CG0348 expect=violation domain=LB
+#note "Owner 2026-10-12 (rule round 2026-10-12, item 8a): CG0348 never folds - it reports per record also when --ORRES is blank on every record or --STAT is absent (Keep_Row_Findings [--ORRES, --STAT]). Here LBSTAT is absent and LBORRES is blank on every record: rows 1 and 3 fire, row 2 is derived. Before the round the rule collapsed this to ONE Message_Folded finding."
+#library standard=sdtmig version=3-4
+#expectViolationCount 2
+#expectViolationAt row=1 LBSEQ=1
+#expectViolationAt row=3 LBSEQ=3
+dataset LB class=FINDINGS label="Laboratory Test Results"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col LBSEQ    type=Num  label="Sequence Number"
+col LBTESTCD type=Char label="Lab Test or Examination Short Name"
+col LBDRVFL  type=Char label="Derived Flag"
+col LBORRES  type=Char label="Result or Finding in Original Units"
+---
+S1 | LB | 001 | 1 | ALT |  | 
+S1 | LB | 001 | 2 | AST | Y | 
+S1 | LB | 001 | 3 | ALB |  | 

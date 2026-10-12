@@ -1,0 +1,20 @@
+#!RuleTest
+#test CDISC-CG0348 expect=violation domain=LB
+#note "LBDRVFL ABSENT (reads \"\", which is != 'Y': nothing is derived). Row 1: LBSTAT null, LBORRES empty -> fires. Row 2: not done -> exempt. Row 3: fires. Row 4: result present -> clean. Verdict identity with the old empty(--STAT) and not var_exists(\"--DRVFL\") arm."
+#library standard=sdtmig version=3-4
+#expectViolationCount 2
+#expectViolationAt row=1 LBSEQ=1
+#expectViolationAt row=3 LBSEQ=3
+dataset LB class=FINDINGS label="Laboratory Test Results"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col LBSEQ    type=Num  label="Sequence Number"
+col LBTESTCD type=Char label="Lab Test or Examination Short Name"
+col LBSTAT   type=Char label="Completion Status"
+col LBORRES  type=Char label="Result or Finding in Original Units"
+---
+S1 | LB | 001 | 1 | ALT |  | 
+S1 | LB | 001 | 2 | AST | NOT DONE | 
+S1 | LB | 001 | 3 | ALB |  | 
+S1 | LB | 001 | 4 | CA |  | 9.1

@@ -1,0 +1,18 @@
+#!RuleTest
+#test CDISC-CG0348 expect=violation domain=LB
+#note "Owner 2026-10-12 (item 8a): no fold. LBSTAT is PRESENT but blank on every record and LBORRES is blank on every record (no LBDRVFL): both rows fire, one finding each. Before the round both empty-family leaves were decided and the rule collapsed to ONE finding."
+#library standard=sdtmig version=3-4
+#expectViolationCount 2
+#expectViolationAt row=1 LBSEQ=1
+#expectViolationAt row=2 LBSEQ=2
+dataset LB class=FINDINGS label="Laboratory Test Results"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col LBSEQ    type=Num  label="Sequence Number"
+col LBTESTCD type=Char label="Lab Test or Examination Short Name"
+col LBSTAT   type=Char label="Completion Status"
+col LBORRES  type=Char label="Result or Finding in Original Units"
+---
+S1 | LB | 001 | 1 | ALT |  | 
+S1 | LB | 001 | 2 | AST |  | 

@@ -15,16 +15,13 @@ Requirements:
     - "--ORRES"
 Check:
   expression: >-
-    empty(--STAT) and --DRVFL != "Y" and empty(--ORRES) or empty(--STAT) and not
-    var_exists("--DRVFL") and empty(--ORRES) or not var_exists("--STAT") and --DRVFL != "Y" and
-    empty(--ORRES) or not var_exists("--STAT") and not var_exists("--DRVFL") and empty(--ORRES)
+    empty(--STAT) and --DRVFL != "Y" and empty(--ORRES)
 Outcome:
   Message: "--STAT is not populated and --DRVFL is not equal to 'Y', but --ORRES is\
     \ not populated."
-  Message_Folded: "--STAT absent or not populated in any record of the dataset, and\
-    \ --ORRES not populated in any record of the dataset, and at least one record\
-    \ meets the rest of the condition: --STAT is not populated and --DRVFL is not\
-    \ equal to 'Y', but --ORRES is not populated."
+  Keep_Row_Findings:
+  - "--ORRES"
+  - "--STAT"
   Output_Variables:
   - "!--ORRES"
   - "!--STAT"
