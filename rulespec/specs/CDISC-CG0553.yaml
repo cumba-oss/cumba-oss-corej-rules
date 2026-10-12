@@ -21,15 +21,14 @@ config:
 library_mocks:
   classes:
     findings: [LB]
-# PLAN-message-folded-corpus-alignment (2026-10-07): the trigger column is blank or absent on every
-# fixture row, so the rule now reports ONE dataset-level finding (Outcome.Message_Folded, D5) where
-# it reported per row; the per-row rows were replaced by the collapsed one (anchored at the first
-# firing row, columns listed by name).
+# Rule round 2026-10-12 (review M1, owner): the rule never folds (Keep_Row_Findings [--ORRES,
+# --DRVFL], no Message_Folded), so the all-blank LBORRES no longer collapses to one dataset-level
+# finding (2026-10-07, PLAN-message-folded-corpus-alignment): the one firing record (002, LBDRVFL
+# null) is reported per record, with its values. 001 is derived (Y), 003 has LBDRVFL = N (not null).
 expected_violations:
 - rule_id: CDISC-CG0553
   dataset: LB
   row_key: {LBSEQ: 1, STUDYID: S1, USUBJID: '002'}
   status: SUCCESS
-  output_variables: {}
-  name_only: [LBDRVFL, LBLOBXFL]
+  output_variables: {LBDRVFL: null, LBLOBXFL: Y}
 expected_errors: []

@@ -1,0 +1,23 @@
+#!RuleTest
+#test CDISC-CG0553 expect=violation domain=LB
+#note "Round 2026-10-12 (review M1, owner: CG0553 joins the never-fold set, as CDISC-CG0348 and FDA/PMDA-SD1371): LBORRES is blank on every record. Rows 1, 2 and 4 are non-derived baseline records (LBLOBXFL = Y, LBDRVFL null) and are reported per record; row 3 is derived (LBDRVFL = Y, exempt) and row 5 is not a baseline record. The rule never folds (Keep_Row_Findings [--ORRES, --DRVFL], no Message_Folded) - before, the all-blank LBORRES collapsed the three to one dataset-level finding."
+#library standard=sdtmig version=3-4
+#expectViolationCount 3
+#expectViolationAt row=1 LBSEQ=1
+#expectViolationAt row=2 LBSEQ=2
+#expectViolationAt row=4 LBSEQ=4
+dataset LB class=FINDINGS label="Laboratory Test Results"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col LBSEQ    type=Num  label="Sequence Number"
+col LBTESTCD type=Char label="Lab Test or Examination Short Name"
+col LBORRES  type=Char label="Result or Finding in Original Units"
+col LBLOBXFL type=Char label="Last Observation Before Exposure Flag"
+col LBDRVFL  type=Char label="Derived Flag"
+---
+S1 | LB | 001 | 1 | ALT  | | Y |
+S1 | LB | 001 | 2 | AST  | | Y |
+S1 | LB | 001 | 3 | BILI | | Y | Y
+S1 | LB | 001 | 4 | ALB  | | Y |
+S1 | LB | 001 | 5 | GLUC | |   |
