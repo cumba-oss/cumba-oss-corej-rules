@@ -112,9 +112,8 @@ class BindingSubstitutabilityCorpusCensusTest
         {
             Map<String, Rule> loaded = RulePackageLoader.load(pkg).getRules();
             JsonNode rules = MAPPER.readTree(pkg.toFile()).get("rules");
-            for (Iterator<Map.Entry<String, JsonNode>> it = rules.fields(); it.hasNext();)
+            for (Map.Entry<String, JsonNode> e : rules.properties())
             {
-                Map.Entry<String, JsonNode> e = it.next();
                 JsonNode bindings = e.getValue().get("Bindings");
                 if (bindings == null || !bindings.isArray() || bindings.isEmpty())
                 {

@@ -11,7 +11,6 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -182,9 +181,8 @@ class WrittenDataLevelLintTest
         }
         else if (node.isObject())
         {
-            for (Iterator<Map.Entry<String, JsonNode>> it = node.fields(); it.hasNext();)
+            for (Map.Entry<String, JsonNode> e : node.properties())
             {
-                Map.Entry<String, JsonNode> e = it.next();
                 if (EXPRESSION_KEYS.contains(e.getKey()) && e.getValue().isTextual())
                 {
                     scan(id, where, e.getValue().asText(), census);

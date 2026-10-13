@@ -588,7 +588,7 @@ class NullKeyProvenanceDifferentialTest
                 {
                     for (Path file : scenarioFiles(ruleDir))
                     {
-                        Outcome o = scenario(factory, file, packages, aborted);
+                        Outcome o = scenario(file, packages, aborted);
                         if (o != null)
                         {
                             out.add(o);
@@ -627,8 +627,8 @@ class NullKeyProvenanceDifferentialTest
     }
 
 
-    private static @Nullable Outcome scenario(AbstractRuleTestSuitesFactory factory, Path file,
-            Map<String, Map<String, Rule>> packages, List<String> aborted)
+    private static @Nullable Outcome scenario(Path file, Map<String, Map<String, Rule>> packages,
+            List<String> aborted)
         throws IOException
     {
         String rel = RESOURCE_BASE.relativize(file).toString().replace('\\', '/');
@@ -644,7 +644,7 @@ class NullKeyProvenanceDifferentialTest
         ScenarioRunner.EvalOutcome o;
         try
         {
-            o = factory.evaluateScenario(file, s, rule, primary);
+            o = AbstractRuleTestSuitesFactory.evaluateScenario(file, s, rule, primary);
         }
         catch (TestAbortedException e)
         {

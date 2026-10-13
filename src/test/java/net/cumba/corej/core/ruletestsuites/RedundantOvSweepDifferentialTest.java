@@ -320,7 +320,7 @@ class RedundantOvSweepDifferentialTest
                 ledger.rulesSeen.add(coreId);
                 for (Path file : scenarioFiles(ruleDir))
                 {
-                    compareScenario(factory, file, coreId, basePackages, currentPackages, ledger);
+                    compareScenario(file, coreId, basePackages, currentPackages, ledger);
                 }
             }
         }
@@ -349,8 +349,8 @@ class RedundantOvSweepDifferentialTest
     }
 
 
-    private static void compareScenario(AbstractRuleTestSuitesFactory factory, Path file,
-            String coreId, Map<String, Map<String, Rule>> basePackages,
+    private static void compareScenario(Path file, String coreId,
+            Map<String, Map<String, Rule>> basePackages,
             Map<String, Map<String, Rule>> currentPackages, Ledger ledger)
         throws IOException
     {
@@ -368,8 +368,8 @@ class RedundantOvSweepDifferentialTest
         ScenarioRunner.EvalOutcome c;
         try
         {
-            b = factory.evaluateScenario(file, s, base, primary);
-            c = factory.evaluateScenario(file, s, current, primary);
+            b = AbstractRuleTestSuitesFactory.evaluateScenario(file, s, base, primary);
+            c = AbstractRuleTestSuitesFactory.evaluateScenario(file, s, current, primary);
         }
         catch (TestAbortedException e)
         {
