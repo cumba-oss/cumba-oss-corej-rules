@@ -146,11 +146,11 @@ class AdamTemplateDeclaredStructureProbeTest extends AbstractAdamTemplateTest
             "CDISC-AD0731", "CDISC-AD0792");
 
     /**
-     * The 21 {@code <expanded rule id>@<domain>} pairs the three arms measure, sorted — the
+     * The 22 {@code <expanded rule id>@<domain>} pairs the three arms measure, sorted — the
      * per-rule evidence behind "these 15 families may leave {@code INSTRUMENT-HELD}". All 15 are
-     * reached through {@code ADLBC}/BDS; {@code CDISC-AD0369} is additionally reached through
-     * {@code ADAE}/OCCDS (which is what the TSV's AD0369 row already says), and no held family
-     * reaches the {@code ADSL} suite at all.
+     * reached through {@code ADLBC}/BDS (18 pairs); {@code CDISC-AD0369} is additionally reached
+     * through {@code ADAE}/OCCDS (4 pairs, which is what the TSV's AD0369 row already says), and no
+     * held family reaches the {@code ADSL} suite at all.
      * <p>
      * ⚠ Sorted, not in encounter order: {@code ownedTemplateRules()} walks a
      * {@link java.util.HashMap HashMap}'s values, so encounter order is an implementation detail of
@@ -406,7 +406,9 @@ class AdamTemplateDeclaredStructureProbeTest extends AbstractAdamTemplateTest
      * Withholding {@code declaringLibrary} at the {@code templateTests_invalid} call site reds
      * <b>21</b> cases — 17 in {@code AdamTemplatesBdsRuleTest}, 4 in
      * {@code AdamTemplatesOccdsRuleTest}, 0 in {@code AdamTemplatesAdslRuleTest} — <b>set-equal to
-     * {@link #EXPECTED_CASES}</b>. ⚠ That measurement had to be redone: the sweep recorded in the
+     * {@link #EXPECTED_CASES}</b> as it then stood (21 pairs; the BDS pair
+     * {@code CDISC-AD0369-AXDTF@ADLBC} joined on 2026-09-17, so the list now holds 22 and this
+     * count was not re-measured). ⚠ That measurement had to be redone: the sweep recorded in the
      * plan's §6.4 found <b>0 failures</b> at this same site, but it predates the migration.
      * </p>
      *
