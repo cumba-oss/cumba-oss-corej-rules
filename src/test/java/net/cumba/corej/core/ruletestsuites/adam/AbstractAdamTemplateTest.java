@@ -164,8 +164,9 @@ abstract class AbstractAdamTemplateTest extends AbstractAdamRuleTest
      * at runtime. Cached after the first call.
      *
      * <p>
-     * The fixture's ADAE/ADLBC/ADSL labels come from the CDISC pilot study's define.xml, which
-     * carries IG-canonical labels — so this is "ADaM IG truth" for the variables we actually
+     * The fixture's ADAE/ADLBC/ADSL labels are the DatasetJson ADaM examples' dataset column labels
+     * (CDISC's {@code DataExchange-DatasetJson} {@code examples/adam}; {@code AXDTM} / {@code AXTM}
+     * are this project's addition), taken here as the canonical labels of the variables we actually
      * exercise. Variables outside the loaded domains have no library entry and the engine treats
      * {@code library_variable_label} as empty (the rule then folds at the {@code non_empty} guard,
      * mirroring an unknown-variable scenario).

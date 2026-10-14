@@ -66,12 +66,6 @@ abstract class AbstractAdamRuleTest
             + "/src/test/resources/testdata_study/sdtm/define.xml";
 
     /**
-     * ADaM class mapping: dataset define.xml class → ADaM rule scope class name.
-     */
-    static final Map<String, String> CLASS_MAP = Map.of("ADSL", "SUBJECT LEVEL ANALYSIS DATASET",
-            "ADAE", "OCCURRENCE DATA STRUCTURE", "BDS", "BASIC DATA STRUCTURE");
-
-    /**
      * Dataset-to-class mapping read by {@link #getClassName} (an unlisted name defaults to BDS). Of
      * its 10 entries only ADSL, ADAE and ADLBC are datasets the fixture carries; the other seven
      * (ADLBH, ADLBHY, ADQSADAS, ADQSCIBC, ADQSNPIX, ADTTE, ADVS) are names left from the CDISC
