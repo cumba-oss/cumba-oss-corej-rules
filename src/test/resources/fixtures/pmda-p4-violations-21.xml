@@ -17,8 +17,10 @@
                      RDOMAIN=Derived (DD0107), STUDYID=Assigned (DD0108), second
                      USUBJID/VISITNUM deviating (DD0109/DD0110), AEDECOD without a
                      MedDRA reference (DD0113), LBORRES DataType=string (OD0075),
-                     AVAL float vs text codelist (OD0080), BASE Predecessor text
-                     without a dot (DD0148)
+                     AVAL float vs text codelist (OD0080), TRTPN integer vs float
+                     codelist (OD0080), BASE Predecessor text without a dot (DD0148);
+                     AVISITN float vs integer codelist is compatible and must NOT
+                     fire (OD0080 counts 2, not 3: every integer is a float)
        VL.QVAL     - value Origin Collected vs variable Derived (DD0074); value
                      Length 300 over variable 200 (DD0123)
        WC.1        - RangeCheck SoftHard=Medium (DD0044)
@@ -269,6 +271,20 @@
           <TranslatedText xml:lang="en">Analysis Value</TranslatedText>
         </Description>
         <CodeListRef CodeListOID="CL.TEXTFMT"/>
+      </ItemDef>
+      <ItemDef OID="IT.TRTPN" Name="TRTPN" DataType="integer" Length="8"
+               SASFieldName="TRTPN">
+        <Description>
+          <TranslatedText xml:lang="en">Planned Treatment (N)</TranslatedText>
+        </Description>
+        <CodeListRef CodeListOID="CL.FLOAT"/>
+      </ItemDef>
+      <ItemDef OID="IT.AVISITN" Name="AVISITN" DataType="float" Length="8"
+               SASFieldName="AVISITN">
+        <Description>
+          <TranslatedText xml:lang="en">Analysis Visit (N)</TranslatedText>
+        </Description>
+        <CodeListRef CodeListOID="CL.FMT"/>
       </ItemDef>
       <ItemDef OID="IT.QVAL" Name="QVAL" DataType="text" Length="200" SASFieldName="QVAL">
         <Description>

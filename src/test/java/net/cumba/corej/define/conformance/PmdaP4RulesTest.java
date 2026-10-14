@@ -67,12 +67,21 @@ class PmdaP4RulesTest
     /**
      * DD0112 ("no MedDRA definition anywhere") cannot fire on the 2.1 violations document, which
      * must carry MedDRA codelists for the DD0025/DD0112-B/DD0113 violators; it fires on the 2.0
-     * fixture instead.
+     * fixture instead. OD0080 has two violators (a float variable on a text codelist, an integer
+     * variable on a float codelist) next to a float variable on an integer codelist, which is
+     * compatible (every integer is a float, owner 2026-10-12) and must not fire: 2, not 3.
      */
-    private static final Map<String, Integer> EXPECTED_21 = Map.of("PMDA-DD0112", 0);
+    private static final Map<String, Integer> EXPECTED_21 = Map.of(//
+            "PMDA-DD0112", 0, //
+            "PMDA-OD0080", 2);
 
-    /** Dual-version rules with a violator in the 2.0 fixture. */
-    private static final Map<String, Integer> EXPECTED_20 = Map.of("PMDA-DD0112", 1);
+    /**
+     * Dual-version rules with a violator in the 2.0 fixture: OD0080's integer variable on a float
+     * codelist fires, its float variable on an integer codelist does not.
+     */
+    private static final Map<String, Integer> EXPECTED_20 = Map.of(//
+            "PMDA-DD0112", 1, //
+            "PMDA-OD0080", 1);
 
     /** Surefire pins the CWD to target/test-cwd; anchor via projectBasedir (root pom). */
     private static final Path RULES_DIR = TestRules.PMDA;
@@ -179,6 +188,34 @@ class PmdaP4RulesTest
                 .contains("ItemGroupDef[@OID='IG.SDTM20']"), "DD0055 fires on the SDTM dataset");
         assertTrue(results.get("PMDA-DD0073-E").findings().get(0).getXpath()
                 .contains("ItemDef[@OID='IT.LBSPEC20']"), "DD0073-E fires on the SEND origin");
+        assertEquals(List.of("integer vs float"), dataTypeMismatches(results, "IT.TRTPN20"),
+                "OD0080 fires on the integer variable with a float codelist");
+        assertEquals(List.of(), dataTypeMismatches(results, "IT.AVISITN20"),
+                "OD0080 accepts the float variable with an integer codelist");
+    }
+
+
+    @Test
+    void od0080IsCompatibleInOneDirectionOnly()
+    {
+        Map<String, RuleResult> results = evaluateBatch(
+                context("pmda-p4-violations-21.xml", "2.1"));
+        assertEquals(List.of("float vs text"), dataTypeMismatches(results, "IT.AVAL"),
+                "a float variable on a text codelist still fires");
+        assertEquals(List.of("integer vs float"), dataTypeMismatches(results, "IT.TRTPN"),
+                "an integer variable on a float codelist still fires");
+        assertEquals(List.of(), dataTypeMismatches(results, "IT.AVISITN"),
+                "a float variable on an integer codelist is compatible");
+    }
+
+
+    /** The {@code [left vs right]} values of the OD0080 findings on one ItemDef. */
+    private static List<String> dataTypeMismatches(Map<String, RuleResult> aResults,
+            String aItemOid)
+    {
+        return aResults.get("PMDA-OD0080").findings().stream()
+                .filter(finding -> finding.getXpath().endsWith("ItemDef[@OID='" + aItemOid + "']"))
+                .map(finding -> finding.getMessage().replaceFirst("^.*\\[(.*)\\]$", "$1")).toList();
     }
 
 

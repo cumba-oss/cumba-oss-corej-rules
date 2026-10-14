@@ -16,6 +16,8 @@
        CL.SEX      - text codelist with $-prefixed SASFormatName (OD0019/OD0078),
                      nci:ExtCodeID aliases (DD0064-B/-C/-D), ExtendedValue=Yes item
        CL.INTC/CL.FLOATC - integer/float codelists with type-conforming terms
+       IT.AVISITN  - float variable on the integer codelist CL.INTC: compatible,
+                     every integer is a float (OD0080, owner 2026-10-12)
        WC.OK       - RangeCheck SoftHard=Soft (DD0044)
        CL.CUSTOM   - def:IsNonStandard=Yes (DD0130) -->
 <ODM xmlns="http://www.cdisc.org/ns/odm/v1.3"
@@ -79,6 +81,7 @@
           <TranslatedText xml:lang="en">Subject Level Analysis Dataset</TranslatedText>
         </Description>
         <ItemRef ItemOID="IT.BASE" OrderNumber="1" Mandatory="No"/>
+        <ItemRef ItemOID="IT.AVISITN" OrderNumber="2" Mandatory="No"/>
         <def:Class Name="SUBJECT LEVEL ANALYSIS DATASET"/>
         <def:leaf ID="LF.ADSL" xlink:href="adsl.xpt">
           <def:title>adsl.xpt</def:title>
@@ -154,6 +157,14 @@
             <TranslatedText xml:lang="en">ADLB.AVAL</TranslatedText>
           </Description>
         </def:Origin>
+      </ItemDef>
+      <ItemDef OID="IT.AVISITN" Name="AVISITN" DataType="float" Length="8"
+               SignificantDigits="1" SASFieldName="AVISITN">
+        <Description>
+          <TranslatedText xml:lang="en">Analysis Visit (N)</TranslatedText>
+        </Description>
+        <def:Origin Type="Assigned"/>
+        <CodeListRef CodeListOID="CL.INTC"/>
       </ItemDef>
       <ItemDef OID="IT.QVAL" Name="QVAL" DataType="text" Length="200" SASFieldName="QVAL">
         <Description>

@@ -8,12 +8,15 @@
                AESEV def:Origin Type=Collected, a 2.1-vocabulary value (DD0073-D)
        MDV.3 - SEND-IG 4.0 (DD0022-G); LBSPEC def:Origin Type=CRF, an SDTM-vocabulary
                value (DD0073-E)
-       MDV.4 - ADaM-IG 0.9 (DD0022-H); IG def:Class=OTHER STRUCTURE (DD0055-B)
+       MDV.4 - ADaM-IG 0.9 (DD0022-H); IG def:Class=OTHER STRUCTURE (DD0055-B);
+               TRTPN integer vs float codelist (OD0080, dual-version); AVISITN
+               float vs integer codelist is compatible and must NOT fire
        MDV.5 - SEND-IG-AR 1.1 (DD0022-I)
        MDV.6 - SEND-IG-DART 1.0 (DD0022-J)
      No CodeList anywhere names MedDRA, so the document-scoped DD0112 fires here
-     (its counterpart fixtures carry a MedDRA codelist by design). All dual-version
-     P4 rules are satisfied - their violators live in pmda-p4-violations-21.xml. -->
+     (its counterpart fixtures carry a MedDRA codelist by design). All other
+     dual-version P4 rules are satisfied - their violators live in
+     pmda-p4-violations-21.xml. -->
 <ODM xmlns="http://www.cdisc.org/ns/odm/v1.3"
      xmlns:def="http://www.cdisc.org/ns/def/v2.0"
      xmlns:xlink="http://www.w3.org/1999/xlink"
@@ -75,6 +78,28 @@
           <TranslatedText xml:lang="en">Baseline Value</TranslatedText>
         </Description>
       </ItemDef>
+      <ItemDef OID="IT.TRTPN20" Name="TRTPN" DataType="integer" Length="8"
+               SASFieldName="TRTPN">
+        <Description>
+          <TranslatedText xml:lang="en">Planned Treatment (N)</TranslatedText>
+        </Description>
+        <CodeListRef CodeListOID="CL.FLOAT20"/>
+      </ItemDef>
+      <ItemDef OID="IT.AVISITN20" Name="AVISITN" DataType="float" Length="8"
+               SASFieldName="AVISITN">
+        <Description>
+          <TranslatedText xml:lang="en">Analysis Visit (N)</TranslatedText>
+        </Description>
+        <CodeListRef CodeListOID="CL.INT20"/>
+      </ItemDef>
+      <CodeList OID="CL.INT20" Name="Integer Codes" DataType="integer">
+        <EnumeratedItem CodedValue="1"/>
+        <EnumeratedItem CodedValue="2"/>
+      </CodeList>
+      <CodeList OID="CL.FLOAT20" Name="Float Codes" DataType="float">
+        <EnumeratedItem CodedValue="1.5"/>
+        <EnumeratedItem CodedValue="2"/>
+      </CodeList>
     </MetaDataVersion>
     <MetaDataVersion OID="MDV.5" Name="SEND-AR MDV" def:DefineVersion="2.0.0"
                      def:StandardName="SEND-IG-AR" def:StandardVersion="1.1"/>
