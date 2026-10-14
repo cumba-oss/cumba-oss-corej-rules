@@ -236,20 +236,40 @@ only. Central deletes snapshots after 90 days.
 
 ```
 cumba-oss-commons     help · web-api · cdisc-library · bootstrap
-      ▲
 cumba-oss-formats     sas-utils · cdisc-dsj                (independent leaf)
       ▲
-cumba-oss-datatable   datatable · impl · cdisc-define · providers · manager-local · testkit
+cumba-oss-datatable   datatable · impl · cdisc-define · providers · manager-local · testkit · dictionary
       ▲
-cumba-oss-corej       corej-core · report-json · report-xlsx · ruletest · define-conformance
+cumba-oss-corej       corej-core · report-json · report-xlsx · ruletest · authoring · define-conformance
       ▲
-cumba-oss-corej-rules the rule corpus                      (publishes nothing to Central)
+      ├─ cumba-oss-corej-rules             this rule corpus     (publishes nothing to Central)
+      ├─ cumba-oss-corej-cli               the validation CLI   (bundles a pinned corpus release)
+      ├─ cumba-oss-corej-rest              the REST API         (bundles a pinned corpus release)
+      │                                       ◀─ cumba-oss-corej-web              (browser SPA)
+      └─ cumba-oss-corej-rule-editor-rest  the rule editor API  (works on a corpus checkout in git)
+                                              ◀─ cumba-oss-corej-rule-editor-web  (browser SPA)
 ```
 
-`cumba-oss-corej-cli` (the validation CLI) and `cumba-oss-corej-rest` (the REST API,
-with `cumba-oss-corej-web` as its browser SPA) consume the engine and load this corpus
-at runtime from a rules directory — none of them depends on this repository at build
-time.
+`cumba-oss-corej-cli` and `cumba-oss-corej-rest` **bundle a pinned release of this
+corpus**: their build downloads the two release assets at `generate-resources`, verifies
+each against a pinned `sha256` (`dependency.corej-rules.*` in their poms) and stages them
+into the distribution. The corpus is still not a Maven dependency — the engine discovers
+packages through the directory's `packages.json`, and an operator can point it at another
+corpus directory. The rule editor works on a corpus kept in git, such as a clone of this
+repository, and needs no corpus release.
+
+### Engine and corpus compatibility
+
+The corpus and the engine each carry a **rule-language level**: `rules-src/LANGUAGE-LEVEL`
+here and `RuleLanguage.LEVEL` in `cumba-oss-corej-core` (both `5` on `main`).
+`RuleLanguageLevelTest` fails this build when the two differ, so a corpus release is gated
+against the engine level it was built with. ⚠ The engine does **not** read the level at run
+time, so a corpus of another level is not refused when it loads — the pairing is simply
+unsupported. Run a corpus release on the engine it was built against
+(`dependency.cumba-oss-corej.version` in `pom.xml`): the levels first ship with the next
+releases, and engine 0.7.x needs corpus 0.6.x or later; of the current releases, `v0.5.0`
+was built against engine `0.6.0`. Background:
+[`rule-guide/reference/language-level.md`](rule-guide/reference/language-level.md).
 
 ## Build conventions
 
