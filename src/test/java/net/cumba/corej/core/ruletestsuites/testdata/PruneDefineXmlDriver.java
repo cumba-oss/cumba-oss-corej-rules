@@ -4,16 +4,27 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.security.MessageDigest;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HexFormat;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.function.Consumer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.zip.GZIPInputStream;
 import net.cumba.cdisc.define.DefineXmlPruner;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.EnabledIfSystemProperty;
@@ -26,7 +37,11 @@ import org.w3c.dom.NodeList;
  * One-shot driver that regenerates the trimmed test-resource Define-XML files. Keeps only the
  * ItemGroups (domains) actually consumed by the Java-resident test classes and cascades orphan
  * ItemDefs / CodeLists / MethodDefs / CommentDefs / Leafs via
- * {@link DefineXmlPruner#cascadeOrphans()}.
+ * {@link DefineXmlPruner#cascadeOrphans()}. The cascade counts a reference from anywhere, an
+ * analysis results display included, so for the ADaM define the result displays that analyse a
+ * dropped dataset are removed first ({@link #dropForeignResultDisplays}); otherwise they keep that
+ * dataset's definitions alive. {@link #assertReferencesResolve} then proves the written ADaM define
+ * closed: every reference resolves and no definition is left unreferenced.
  *
  * <p>
  * Sources: the SDTM define is the pilot define under the untracked {@code testdata/study/sdtm/}.
@@ -36,7 +51,9 @@ import org.w3c.dom.NodeList;
  * ADaM define is adapted to the fixture beside it ({@link #adaptAdamDefine}): dataset leaves
  * {@code .xpt} → {@code .dsjc}, the two {@code ADLBC} ISO columns {@code AXDTM} / {@code AXTM}
  * declared, and the {@code ODM} {@code SourceSystem} / {@code SourceSystemVersion} attributes
- * removed. The provenance is recorded in {@code testdata_study/README.md}.
+ * removed. The input's md5 is checked first, so a different upstream revision fails instead of
+ * silently producing a different fixture. The provenance is recorded in
+ * {@code testdata_study/README.md}.
  * </p>
  *
  * <p>
@@ -45,13 +62,21 @@ import org.w3c.dom.NodeList;
  * </p>
  *
  * <p>
- * Activated only when {@code -Dprune.defines=true} is passed to the test runner:
+ * Activated only when {@code -Dprune.defines=true} is passed to the test runner. Regenerate the
+ * ADaM define alone:
  * </p>
  *
  * <pre>
- *   mvn -o test -Dtest=PruneDefineXmlDriver -Dprune.defines=true \
+ *   mvn -o test -Dtest=PruneDefineXmlDriver#pruneAdamDefine -Dprune.defines=true \
  *       -Dprune.adam.source=&lt;DataExchange-DatasetJson&gt;/examples/adam/define.xml
  * </pre>
+ *
+ * <p>
+ * Do not run the whole class for that: {@link #pruneSdtmDefine} would rewrite
+ * {@code sdtm/define.xml} from the untracked pilot define, and it has no leaf rewrite, so the
+ * result would name {@code .xpt} datasets where the committed file names the {@code .dsjc} ones
+ * beside it.
+ * </p>
  *
  * <p>
  * The class name intentionally does NOT match the default surefire {@code *Test.java} pattern —
@@ -71,6 +96,12 @@ class PruneDefineXmlDriver // NOSONAR S3577 — Underscore-categorised name is t
      * {@code cdisc-org/DataExchange-DatasetJson} checkout (12 ADaM datasets, Define-XML 2.1).
      */
     private static final String ADAM_SOURCE_PROPERTY = "prune.adam.source";
+
+    /**
+     * md5 of {@code examples/adam/define.xml} at {@code DataExchange-DatasetJson} {@code a379f49a},
+     * the revision {@code testdata_study/README.md} records.
+     */
+    private static final String ADAM_SOURCE_MD5 = "053254bebd18b4d2316854cb0b409f00";
 
     /** Target defines shipped as test resources. */
     private static final Path SDTM_TARGET = Path.of(System.getProperty("projectBasedir"),
@@ -117,6 +148,25 @@ class PruneDefineXmlDriver // NOSONAR S3577 — Underscore-categorised name is t
 
     private static final String XLINK_NS = "http://www.w3.org/1999/xlink";
 
+    private static final String ARM_NS = "http://www.cdisc.org/ns/arm/v1.0";
+
+    /** The fixture dataset that carries the ISO columns, beside the ADaM define. */
+    private static final Path ADLBC_DATASET = ADAM_TARGET.resolveSibling("adlbc.dsjc");
+
+    /**
+     * Reference attribute (local name) → the local name of the element it points at. Each such
+     * attribute must name a declared {@code OID} (for {@code leafID}: a declared {@code ID}).
+     */
+    private static final Map<String, String> REFERENCE_TARGETS = referenceTargets();
+
+    /**
+     * Definitions that exist only to be referenced: each declared one must be the target of at
+     * least one reference. For {@code ItemDef} only {@code ItemRef} and {@code RangeCheck} count (a
+     * variable no dataset or value list carries is dead even if an analysis display names it).
+     */
+    private static final List<String> MUST_BE_REFERENCED = List.of("ItemDef", "ValueListDef",
+            "WhereClauseDef", "CodeList", "MethodDef", "CommentDef");
+
     @Test
     void pruneSdtmDefine() throws Exception
     {
@@ -132,9 +182,53 @@ class PruneDefineXmlDriver // NOSONAR S3577 — Underscore-categorised name is t
         assertTrue(source != null && !source.isBlank(), "-D" + ADAM_SOURCE_PROPERTY
                 + "=<DataExchange-DatasetJson>/examples/adam/define.xml is required");
         Path adamSource = Path.of(source);
-        pruneDefine(adamSource, ADAM_TARGET, ADAM_KEEP, PruneDefineXmlDriver::adaptAdamDefine);
+        assertTrue(Files.isRegularFile(adamSource), "source define not found: " + adamSource);
+        assertEquals(ADAM_SOURCE_MD5, md5(adamSource), adamSource
+                + " is not the DataExchange-DatasetJson a379f49a define the README records");
+        pruneDefine(adamSource, ADAM_TARGET, ADAM_KEEP,
+                doc -> dropForeignResultDisplays(doc, ADAM_KEEP),
+                PruneDefineXmlDriver::adaptAdamDefine);
         assertKeptExactly(adamSource, ADAM_TARGET, ADAM_KEEP);
         assertAdaptedAdamDefine(ADAM_TARGET);
+        assertReferencesResolve(ADAM_TARGET);
+        assertIsoColumnsMatchDataset(ADAM_TARGET, ADLBC_DATASET);
+    }
+
+
+    /**
+     * Removes every {@code arm:ResultDisplay} that analyses a dataset outside {@code keep}, and the
+     * {@code arm:AnalysisResultDisplays} container if none is left. Runs before the cascade: the
+     * cascade counts the display's {@code ItemOID} / {@code WhereClauseOID} references as uses, so
+     * a display of a dropped dataset would otherwise keep that dataset's items, value lists, where
+     * clauses, code lists and methods alive.
+     */
+    private static void dropForeignResultDisplays(Document doc, Set<String> keep)
+    {
+        NodeList displays = doc.getElementsByTagNameNS(ARM_NS, "ResultDisplay");
+        List<Element> drop = new ArrayList<>();
+        for (int i = 0; i < displays.getLength(); i++)
+        {
+            Element display = (Element) displays.item(i);
+            NodeList datasets = display.getElementsByTagNameNS(ARM_NS, "AnalysisDataset");
+            for (int d = 0; d < datasets.getLength(); d++)
+            {
+                if (!keep.contains(((Element) datasets.item(d)).getAttribute("ItemGroupOID")))
+                {
+                    drop.add(display);
+                    break;
+                }
+            }
+        }
+        for (Element display : drop)
+        {
+            Node container = display.getParentNode();
+            container.removeChild(display);
+            if (((Element) container).getElementsByTagNameNS(ARM_NS, "ResultDisplay")
+                    .getLength() == 0)
+            {
+                container.getParentNode().removeChild(container);
+            }
+        }
     }
 
 
@@ -195,8 +289,10 @@ class PruneDefineXmlDriver // NOSONAR S3577 — Underscore-categorised name is t
             text.setTextContent(col.label());
             description.appendChild(text);
             def.appendChild(description);
+            // Assigned, not Derived: Define-XML 2.1 requires a MethodOID on the ItemRef of a
+            // Derived variable (DEFINE-XML-0073), and these columns have no method.
             Element origin = doc.createElementNS(DEF21_NS, "def:Origin");
-            origin.setAttribute("Type", "Derived");
+            origin.setAttribute("Type", "Assigned");
             origin.setAttribute("Source", "Sponsor");
             def.appendChild(origin);
             lastDef.getParentNode().insertBefore(def, defAnchor);
@@ -245,6 +341,127 @@ class PruneDefineXmlDriver // NOSONAR S3577 — Underscore-categorised name is t
 
 
     /**
+     * The written define is closed: every reference attribute ({@link #REFERENCE_TARGETS}) names a
+     * definition the file declares, and every definition of {@link #MUST_BE_REFERENCED} is the
+     * target of at least one reference.
+     */
+    private static void assertReferencesResolve(Path target) throws Exception
+    {
+        Document doc = DefineXmlPruner.forFile(target).getDocument();
+        Map<String, Set<String>> declared = new HashMap<>();
+        Map<String, Set<String>> referenced = new HashMap<>();
+        Map<String, Set<String>> dangling = new TreeMap<>();
+        NodeList all = doc.getElementsByTagName("*");
+        for (int i = 0; i < all.getLength(); i++)
+        {
+            Element el = (Element) all.item(i);
+            String local = el.getLocalName();
+            String id = "leaf".equals(local) ? el.getAttribute("ID") : el.getAttribute("OID");
+            if (!id.isEmpty())
+            {
+                declared.computeIfAbsent(local, k -> new TreeSet<>()).add(id);
+            }
+        }
+        for (int i = 0; i < all.getLength(); i++)
+        {
+            Element el = (Element) all.item(i);
+            var attrs = el.getAttributes();
+            for (int a = 0; a < attrs.getLength(); a++)
+            {
+                Node attr = attrs.item(a);
+                String name = attr.getLocalName() != null ? attr.getLocalName()
+                        : attr.getNodeName();
+                String kind = REFERENCE_TARGETS.get(name);
+                if (kind == null)
+                {
+                    continue;
+                }
+                String value = attr.getNodeValue();
+                if (!declared.getOrDefault(kind, Set.of()).contains(value))
+                {
+                    dangling.computeIfAbsent(name, k -> new TreeSet<>()).add(value);
+                }
+                boolean counts = !"ItemDef".equals(kind) || "ItemRef".equals(el.getLocalName())
+                        || "RangeCheck".equals(el.getLocalName());
+                if (counts)
+                {
+                    referenced.computeIfAbsent(kind, k -> new TreeSet<>()).add(value);
+                }
+            }
+        }
+        assertEquals(Map.of(), dangling, "references to nothing in " + target);
+        Map<String, Set<String>> unreferenced = new TreeMap<>();
+        for (String kind : MUST_BE_REFERENCED)
+        {
+            Set<String> orphans = new TreeSet<>(declared.getOrDefault(kind, Set.of()));
+            orphans.removeAll(referenced.getOrDefault(kind, Set.of()));
+            if (!orphans.isEmpty())
+            {
+                unreferenced.put(kind, orphans);
+            }
+        }
+        assertEquals(Map.of(), unreferenced, "definitions nothing references in " + target);
+    }
+
+
+    private static Map<String, String> referenceTargets()
+    {
+        Map<String, String> m = new LinkedHashMap<>();
+        m.put("ItemGroupOID", "ItemGroupDef");
+        m.put("ItemOID", "ItemDef");
+        m.put("ParameterOID", "ItemDef");
+        m.put("ValueListOID", "ValueListDef");
+        m.put("WhereClauseOID", "WhereClauseDef");
+        m.put("CodeListOID", "CodeList");
+        m.put("MethodOID", "MethodDef");
+        m.put("CommentOID", "CommentDef");
+        m.put("StandardOID", "Standard");
+        m.put("leafID", "leaf");
+        return Map.copyOf(m);
+    }
+
+
+    /**
+     * The ISO columns the define declares are the ones {@code add_adlbc_iso_columns.py} appended to
+     * the dataset: same item OID, name, label and length on both sides.
+     */
+    private static void assertIsoColumnsMatchDataset(Path define, Path dataset) throws Exception
+    {
+        JsonNode metadata;
+        try (BufferedReader in = new BufferedReader(new InputStreamReader(
+                new GZIPInputStream(Files.newInputStream(dataset)), StandardCharsets.UTF_8)))
+        {
+            metadata = new ObjectMapper().readTree(in.readLine());
+        }
+        Map<String, JsonNode> columns = new HashMap<>();
+        for (JsonNode column : metadata.get("columns"))
+        {
+            columns.put(column.get("name").asText(), column);
+        }
+        Document doc = DefineXmlPruner.forFile(define).getDocument();
+        for (IsoColumn col : ADLBC_ISO_COLUMNS)
+        {
+            JsonNode column = columns.get(col.name());
+            assertTrue(column != null, col.name() + " is not a column of " + dataset);
+            Element def = findByOid(doc, "ItemDef", col.oid());
+            String label = def.getElementsByTagNameNS(ODM_NS, "TranslatedText").item(0)
+                    .getTextContent();
+            assertEquals(List.of(col.oid(), col.name(), label, def.getAttribute("Length")),
+                    List.of(column.get("itemOID").asText(), def.getAttribute("Name"),
+                            column.get("label").asText(), column.get("length").asText()),
+                    col.name() + ": define " + define + " vs dataset " + dataset);
+        }
+    }
+
+
+    private static String md5(Path file) throws Exception
+    {
+        return HexFormat.of()
+                .formatHex(MessageDigest.getInstance("MD5").digest(Files.readAllBytes(file)));
+    }
+
+
+    /**
      * The written define holds exactly the kept domains the source carried: every one of them
      * survived the prune, and nothing else did.
      */
@@ -263,12 +480,18 @@ class PruneDefineXmlDriver // NOSONAR S3577 — Underscore-categorised name is t
     {
         pruneDefine(source, target, keep, doc ->
         {
+        }, doc ->
+        {
         });
     }
 
 
+    /**
+     * Prunes {@code source} to {@code keep}: {@code preCascade} sees the document after the
+     * ItemGroups are removed and before the orphan cascade, {@code adapt} after the cascade.
+     */
     private static void pruneDefine(Path source, Path target, Set<String> keep,
-            Consumer<Document> adapt)
+            Consumer<Document> preCascade, Consumer<Document> adapt)
         throws Exception
     {
         assertTrue(Files.isRegularFile(source), "source define not found: " + source);
@@ -285,6 +508,7 @@ class PruneDefineXmlDriver // NOSONAR S3577 — Underscore-categorised name is t
 
         DefineXmlPruner pruner = DefineXmlPruner.forFile(source);
         pruner.removeItemGroups(toRemove.toArray(String[]::new));
+        preCascade.accept(pruner.getDocument());
         pruner.cascadeOrphans();
         adapt.accept(pruner.getDocument());
         Files.createDirectories(target.getParent());

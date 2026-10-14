@@ -20,9 +20,9 @@ GitHub copies at the commits named; "(inference)" marks what was not measured.
 |---|---|---|
 | `adam/adsl.dsjc` | `45f8a7c04dcdd7fa5ee58acc260e8fbd` | **identical** to `examples/adam/adsl.dsjc` |
 | `adam/adae.dsjc` | `8f2cdec712034e4856110ce9afc3b2ff` | **identical** to `examples/adam/adae.dsjc` |
-| `adam/adlbc.dsjc` | `3ee0ba19e49194128e8d4f5d56583760` | **derived** from `examples/adam/adlbc.dsjc` (md5 `f4095b77a8de8bc72a8babd2d5378177`) by `add_adlbc_iso_columns.py`: two empty ISO 8601 text columns `AXDTM` (length 20) and `AXTM` (length 8) appended to the metadata and to every row; every upstream row is otherwise byte-identical (measured: the decompressed rows with the two appended cells removed have the source's md5) |
-| `adam/define.xml` | `35242aec3e5f46e6e995160d4a88bb9d` | **derived** from `examples/adam/define.xml` (Define-XML 2.1, md5 `053254bebd18b4d2316854cb0b409f00`) by `PruneDefineXmlDriver` (`-Dprune.defines=true -Dprune.adam.source=<checkout>/examples/adam/define.xml`): pruned to `IG.ADSL`, `IG.ADAE`, `IG.ADLBC` with the item, code-list, method, comment, value-list and where-clause definitions they use, re-serialised (attribute order, layout); the three dataset leaves renamed from `<dataset>.xpt` to `<dataset>.dsjc` (`href` and title); `ItemDef`s and `ItemRef`s `IT.ADLBC.AXDTM` / `IT.ADLBC.AXTM` added for the two columns above; the `ODM` attributes `SourceSystem` / `SourceSystemVersion` removed (they name the tool that wrote the upstream file, not this one). The leaves `LF.Suppdoc` (`adrg.pdf`) and `LF.Suppdoc2` (`complex-algorithms-example.pdf`) stay because document references point at them; those PDFs are not copied here |
-| `adam/add_adlbc_iso_columns.py` | `cb6d156b01803d7b9fd6ea3df087f839` | **own**: the step that makes `adlbc.dsjc` from the upstream file (usage in its docstring) |
+| `adam/adlbc.dsjc` | `3ee0ba19e49194128e8d4f5d56583760` | **derived** from `examples/adam/adlbc.dsjc` (md5 `f4095b77a8de8bc72a8babd2d5378177`) by `add_adlbc_iso_columns.py`: two empty ISO 8601 text columns `AXDTM` (length 20) and `AXTM` (length 8) appended to the metadata and to every row; every upstream row is otherwise byte-identical (measured: the decompressed rows with the two appended cells removed equal the source's decompressed row lines, md5 `d4490b00dbd6301b9c7b8435058a290a`); the script refuses any input whose md5 is not the source's |
+| `adam/define.xml` | `4e0976c10132de4d064357365213ec4c` | **derived** from `examples/adam/define.xml` (Define-XML 2.1, md5 `053254bebd18b4d2316854cb0b409f00`; the driver refuses any other input) by `PruneDefineXmlDriver` (`-Dtest=PruneDefineXmlDriver#pruneAdamDefine -Dprune.defines=true -Dprune.adam.source=<checkout>/examples/adam/define.xml`): pruned to `IG.ADSL`, `IG.ADAE`, `IG.ADLBC` with the item, code-list, method, comment, value-list and where-clause definitions they use, re-serialised (attribute order, layout); the analysis results display `RD.Table14.3.01` removed (it analyses `IG.ADADAS`, which is not kept; `RD.Table14.5.02`, on `IG.ADAE`, stays), so none of `ADADAS`'s definitions survive; the driver checks that every reference resolves and no definition is left unreferenced; the three dataset leaves renamed from `<dataset>.xpt` to `<dataset>.dsjc` (`href` and title); `ItemDef`s and `ItemRef`s `IT.ADLBC.AXDTM` / `IT.ADLBC.AXTM` added for the two columns above (origin `Assigned` by the sponsor, since a `Derived` origin needs a method, `DEFINE-XML-0073`; the driver checks their OID, name, label and length against `adlbc.dsjc`); the `ODM` attributes `SourceSystem` / `SourceSystemVersion` removed (they name the tool that wrote the upstream file, not this one). The leaves `LF.Suppdoc` (`adrg.pdf`) and `LF.Suppdoc2` (`complex-algorithms-example.pdf`) stay because document references point at them; those PDFs are not copied here |
+| `adam/add_adlbc_iso_columns.py` | `2a942cb6ad2ebfff0db44781fe60226f` | **own**: the step that makes `adlbc.dsjc` from the upstream file (usage in its docstring) |
 
 **Why `AXDTM` / `AXTM`.** The ADaM template tests need a `*DTM` / `*TM` column pair on a BDS dataset to build their
 `CDISC-AD0044` cases, and `CDISC-AD0369`'s `AXDTF` case follows from `AXDTM`; the harness fills in the values each case
@@ -59,6 +59,13 @@ The six datasets are the pilot's SAS XPORT files converted to zlib-compressed Da
 `CumbaDataTable`). The values are unchanged: same rows in the same order, same columns, and every cell equal once
 trailing blanks are trimmed and an empty character value is read as missing (measured 2026-10-14 against the `.xpt`
 files at `667511d4`, read with pandas).
+
+CDISC's pilot repository itself publishes these six domains as Dataset-JSON 1.1:
+`…/tabulations/sdtm/{ae,dm,ds,lb,relrec,ta}.json` (commits `8646d29` "Add Dataset-JSON" and `b8068a0`, both
+2024-12-18). Our values equal those too: same columns, same rows in the same order, every cell equal once trailing
+blanks are trimmed, with `LB`'s floating-point results equal to the last bit (largest relative difference 2.2e-16;
+measured 2026-10-14 at `667511d4`). So the format conversion is CDISC's own; what remains our modification is the
+domain subset, the pruned define and our `.dsjc` serialisation of the same values.
 
 ## Sources
 
@@ -117,7 +124,9 @@ The MIT condition requires this notice in all copies or substantial portions; th
 #### The pilot data's terms — accepted risk and pending request
 
 The `sdtm/` files are a format conversion (SAS XPORT → Dataset-JSON) and a domain subset of the pilot data, and the
-define is trimmed to those domains; clause (b) forbids modifying the data. The project owner accepted this as a
+define is trimmed to those domains; clause (b) forbids modifying the data. The pilot repository publishes the same six
+domains as Dataset-JSON 1.1 itself (see the `sdtm/` section), so the modification that remains is the subset, the
+pruned define and our serialisation of the values. The project owner accepted this as a
 recorded risk (2026-10-14). DatasetJson's own SDTM example is a different study (SDTM-MSG v2, other subjects and
 columns), so it cannot replace these files without rewriting the SDTM suites' expectations. A request to CDISC for
 permission to redistribute the converted, subset data with attribution is **pending**: drafted 2026-10-14 for the

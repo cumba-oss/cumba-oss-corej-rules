@@ -6,17 +6,22 @@ The only change is two ISO 8601 text columns appended at the end, AXDTM (length 
 (length 8), empty in every row. The ADaM template tests need a *DTM / *TM column pair on a BDS
 dataset to build their CDISC-AD0044 cases (and AD0369's AXDTF case follows from AXDTM); the
 template harness writes the values it needs into its own fixture copy. The define.xml beside this
-file declares the same two columns (PruneDefineXmlDriver); keep both in step.
+file declares the same two columns (PruneDefineXmlDriver), and the driver fails unless the item OID,
+name, label and length agree on both sides.
 
 Row text is copied verbatim (only ',"",""' is inserted before each row's closing bracket), so every
 upstream value keeps its exact JSON spelling. The output is gzip with a zero timestamp and no file
-name, so the same input always gives the same bytes.
+name, so the same input always gives the same bytes. The input's md5 is checked first: any other
+file than the a379f49a one stops the script.
 
     python3 add_adlbc_iso_columns.py <DataExchange-DatasetJson>/examples/adam/adlbc.dsjc adlbc.dsjc
 """
 import gzip
+import hashlib
 import json
 import sys
+
+SOURCE_MD5 = "f4095b77a8de8bc72a8babd2d5378177"  # examples/adam/adlbc.dsjc @ a379f49a
 
 ADDED = [
     {"itemOID": "IT.ADLBC.AXDTM", "name": "AXDTM", "label": "Analysis Datetime (ISO)", "dataType": "string",
@@ -27,6 +32,10 @@ ADDED = [
 
 
 def main(src, dst):
+    with open(src, "rb") as f:
+        md5 = hashlib.md5(f.read()).hexdigest()
+    if md5 != SOURCE_MD5:
+        sys.exit("%s has md5 %s, not the DataExchange-DatasetJson a379f49a adlbc.dsjc (%s)" % (src, md5, SOURCE_MD5))
     with gzip.open(src, "rt", encoding="utf-8", newline="\n") as f:
         lines = f.read().split("\n")
     if lines and lines[-1] == "":
