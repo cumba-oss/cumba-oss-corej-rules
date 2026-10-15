@@ -1,6 +1,6 @@
 #!RuleTest
 #test FDA-SD1076 expect=noViolation domain=TF
-#note "SENDIG-DART 1.1 prints no TF; the base-IG view (PLAN-send-base-ig-view, B-BASE) reads it from SENDIG v3.1. Every TF variable is in the SENDIG TF specification -> no finding; the rule EXECUTES (before the view it SKIPPED: no library order for TF). No invalid twin: on the store the library order of a walked SEND domain lists the model class variables too, so a model-only variable is never outside it (pre-existing, every store-backed run)."
+#note "SENDIG-DART 1.1 prints no TF; the base-IG view (PLAN-send-base-ig-view, B-BASE) reads it from SENDIG v3.1. Every TF variable is in the SENDIG TF specification -> no finding; the rule EXECUTES (before the view it SKIPPED: no library order for TF). Since round 2026-10-15 the rule reads the IG specification through core (Req / Exp / Perm), not get_column_order_from_library() (which on the store lists the model class variables too, so before the fix a model-only variable was never outside it); the store-backed invalid twin is FDA-SD1076-invalid-AE."
 #library-ref standard=sendig version=dart-1-1 ct=sendct-2026-03-27
 dataset TF label="Tumor Findings"
 col STUDYID type=Char label="Study Identifier"

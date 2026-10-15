@@ -3614,7 +3614,7 @@ The example above is the complete call.
 
 `get_column_order_from_library()` → **value (a list)**
 
-The column order the CDISC Library publishes for this dataset, as a list — the IG-defined variable order for the dataset's domain, the "expected" side of an ordering check.
+The column order the CDISC Library publishes for this dataset, as a list — the IG's variable order for the dataset's domain, resolved over its class's model variables (below), the "expected" side of an ordering check.
 
 A **registry function**. It takes **no column target** — the `name` / `names` rows of the retired operation are gone, and `get_column_order_from_library(X)` fails to load. It is an **aggregate**: one list for the dataset, computed once per rule and dataset and read by every row. It needs the CDISC Library: without one the rule is **SKIPPED** (*"Rule skipped — no Library access"*).
 
@@ -3622,15 +3622,11 @@ A **registry function**. It takes **no column target** — the `name` / `names` 
 
 ```yaml
 Bindings:
-- name: "$allowed_variables"
-  expression: 'get_model_column_order()'
 - name: "$library_order"
   expression: 'get_column_order_from_library()'
-Check:
-  expression: 'upper(varname()) in $allowed_variables and upper(varname()) not in $library_order'
 ```
 
-The example above is the complete call: a variable the model allows that the implementation guide does not list for the domain (`FDA-SD1076` / `PMDA-SD1076`). For an ADaM dataset the list is the governing data structure's (ADSL, BDS, OCCDS …), selected as `Scope.Data_Structures` detects it, with its naming templates substituted against the dataset's columns (`TRTxxP` → the dataset's `TRT01P`) as `required_variables()` substitutes them. Its `--` and domain-prefixed names resolve as [`required_variables()`](#required_variables) describes. The ADaM stem rules `CDISC-AD0503`–`AD0520` do not read it: they read their stem's phrase through [`label_template("LIBRARY", stem="*SDT")`](#label_template).
+The example above is the complete call. ⚠ **It is not the IG's list alone.** For a dataset of the Events, Interventions, Findings or Findings About class the list is the **resolved** walk: the model's identifiers, the class variables and the timing variables, with the IG's own rows taking each name's place — so every model variable of the class is in it, whether or not the IG lists it for the domain. For the IG-only list (*"which variables does the implementation guide specify for this domain?"*), read the IG rows through their `core` attribute, which only IG rows carry: [`get_dataset_filtered_variables(key_name="core", key_value=…)`](#get_dataset_filtered_variables) for `Req`, `Exp` and `Perm` — as `FDA-SD1076` / `PMDA-SD1076` do (a model variable the IG does not list for the domain). Until rule round 2026-10-15 those two rules compared against this list and could never report on a store-backed run. For an ADaM dataset the list is the governing data structure's (ADSL, BDS, OCCDS …), selected as `Scope.Data_Structures` detects it, with its naming templates substituted against the dataset's columns (`TRTxxP` → the dataset's `TRT01P`) as `required_variables()` substitutes them. Its `--` and domain-prefixed names resolve as [`required_variables()`](#required_variables) describes. The ADaM stem rules `CDISC-AD0503`–`AD0520` do not read it: they read their stem's phrase through [`label_template("LIBRARY", stem="*SDT")`](#label_template).
 
 **When there is nothing to answer** — ⚠ **the rule is SKIPPED** for that dataset, an exception to the totality rule above: an absent or empty column order is *library not available* (*"Rule skipped — library returned no data for get_column_order_from_library"*). To keep a rule answering when the IG has no list for the dataset, bind [`get_dataset_filtered_variables()`](#get_dataset_filtered_variables) instead — the same IG-resolved list intersected with the dataset's columns, which answers the empty set.
 

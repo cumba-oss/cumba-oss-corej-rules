@@ -12,11 +12,19 @@ Scope:
 Bindings:
 - name: "$model_order"
   expression: "get_model_column_order()"
-- name: "$library_order"
-  expression: "get_column_order_from_library()"
+- name: "$ig_req"
+  expression: "get_dataset_filtered_variables(key_name=\"core\", key_value=\"Req\"\
+    )"
+- name: "$ig_exp"
+  expression: "get_dataset_filtered_variables(key_name=\"core\", key_value=\"Exp\"\
+    )"
+- name: "$ig_perm"
+  expression: "get_dataset_filtered_variables(key_name=\"core\", key_value=\"Perm\"\
+    )"
 Check:
   expression: >-
-    upper(varname()) in $model_order and upper(varname()) not in $library_order
+    upper(varname()) in $model_order and upper(varname()) not in $ig_req and upper(varname()) not in
+    $ig_exp and upper(varname()) not in $ig_perm
 Outcome:
   Message: "A Model permissible variable has been added into a standard domain."
 Source:

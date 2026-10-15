@@ -279,7 +279,8 @@ class CustomDomainModelWalkStoreTest
     /**
      * The walk class is the scope class, and all three table-taking walks answer the forced-class
      * walk for it (the §2.1 oracle), which is not empty. An IG-absent domain has no IG dataset to
-     * merge, so algorithm B is algorithm A — which is why {@code FDA-SD1076} stays silent.
+     * merge, so algorithm B is algorithm A. ({@code FDA-SD1076} skips such a domain: since rule
+     * round 2026-10-15 it reads the IG rows through {@code core}, and there are none.)
      */
     private static void assertWalksTheScopeClass(MetadataProvider aProvider, IDataTable aTable,
             String aExpectedClass, String aWhat)

@@ -1,14 +1,14 @@
 #!RuleTest
 #test PMDA-SD1076 expect=noViolation domain=AE
-#note "Every dataset variable is part of the IG AE specification (library column order) -> no model-permissible addition -> no violation."
-#library standard=sdtmig version=3-4
-#library model-column-order AE STUDYID DOMAIN USUBJID AESEQ AETERM AELAT AELOC
-#library column-order AE STUDYID DOMAIN USUBJID AESEQ AETERM
+#note "Round 2026-10-15: store-backed. Every variable is in the SDTMIG 3.4 AE specification (Req / Exp / Perm) -> no finding."
+#library-ref standard=sdtmig version=3-4
 dataset AE label="Adverse Events"
 col STUDYID type=Char
 col DOMAIN  type=Char
 col USUBJID type=Char
 col AESEQ   type=Num
 col AETERM  type=Char
+col AEDECOD type=Char
 ---
-S1 | AE | 001 | 1 | HEADACHE
+S1 | AE | 001 | 1 | HEADACHE | Headache
+---
