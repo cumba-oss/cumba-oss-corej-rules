@@ -1,0 +1,18 @@
+#!RuleTest
+#test FDA-SD1130 expect=noViolation domain=SUPPMH
+#note "PLAN-stopped-rule-engine-fixes item 3 (SR5): the 8-character spelling of SDTMIG 3.3 section 4.5.3.2 (p. 56-57, AEACNOTH -> AEACNOT1): MHCOMMNT continues as MHCOMMN1 - the last character replaced by the digit, not appended - under the one QLABEL the IG prescribes. One family stem (the first 7 characters after the digit is stripped), so the rule must not fire. Fires twice under the rule before its family-stem conjunct."
+#library standard=sdtmig version=3-3
+dataset SUPPMH label="Supplemental Qualifiers for MH"
+col STUDYID  type=Char label="Study Identifier"
+col RDOMAIN  type=Char label="Related Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col IDVAR    type=Char label="Identifying Variable"
+col IDVARVAL type=Char label="Identifying Variable Value"
+col QNAM     type=Char label="Qualifier Variable Name"
+col QLABEL   type=Char label="Qualifier Variable Label"
+col QVAL     type=Char label="Data Value"
+col QORIG    type=Char label="Origin"
+col QEVAL    type=Char label="Evaluator"
+---
+12345 | MH | 99-123 | MHSEQ | 6 | MHCOMMNT | Medical History Comment | first 200 chars of the comment | CRF |
+12345 | MH | 99-123 | MHSEQ | 6 | MHCOMMN1 | Medical History Comment | the rest of the comment | CRF |

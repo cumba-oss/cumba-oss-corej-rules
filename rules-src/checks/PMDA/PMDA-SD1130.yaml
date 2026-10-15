@@ -17,7 +17,8 @@ Requirements:
     - "QNAM"
 Check:
   expression: >-
-    var_exists("QLABEL") and is_inconsistent_across_dataset(QNAM, keys=[QLABEL])
+    var_exists("QLABEL") and is_inconsistent_across_dataset(QNAM, keys=[QLABEL]) and
+    count(distinct(prefix(coalesce(QNAM ~ /^(.*)[0-9]$/$1/, QNAM), 7), group=[QLABEL])) > 1
 Outcome:
   Message: "Inconsistent value for QNAM within QLABEL"
 Source:

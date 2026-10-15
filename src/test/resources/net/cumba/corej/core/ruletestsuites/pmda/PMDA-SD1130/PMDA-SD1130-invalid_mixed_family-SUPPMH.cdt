@@ -1,0 +1,20 @@
+#!RuleTest
+#test PMDA-SD1130 expect=violation domain=SUPPMH
+#note "PLAN-stopped-rule-engine-fixes item 3 (SR4 (a), its named imprecision): one QLABEL carries a continuation family (MHTERM1, MHTERM2) AND a genuinely different qualifier name (MHTRM). Two family stems, so the conjunct holds and the rule fires; the minority is counted over the raw QNAMs, each of which occurs once - a three-way tie - so all three records are reported, the family rows with the stray one. Pinned as the shape of SR4 (a); SR4 (b) would have reported the stray only."
+#library standard=sdtmig version=3-3
+#expectViolationCount 3
+dataset SUPPMH label="Supplemental Qualifiers for MH"
+col STUDYID  type=Char label="Study Identifier"
+col RDOMAIN  type=Char label="Related Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col IDVAR    type=Char label="Identifying Variable"
+col IDVARVAL type=Char label="Identifying Variable Value"
+col QNAM     type=Char label="Qualifier Variable Name"
+col QLABEL   type=Char label="Qualifier Variable Label"
+col QVAL     type=Char label="Data Value"
+col QORIG    type=Char label="Origin"
+col QEVAL    type=Char label="Evaluator"
+---
+12345 | MH | 99-123 | MHSEQ | 6 | MHTERM1 | Reported Term for the Medical History | 2nd ~200 chars of text, split between words | CRF |
+12345 | MH | 99-123 | MHSEQ | 6 | MHTERM2 | Reported Term for the Medical History | last 100 or more chars of text | CRF |
+12345 | MH | 99-125 | MHSEQ | 1 | MHTRM | Reported Term for the Medical History | HEADACHE | CRF |
