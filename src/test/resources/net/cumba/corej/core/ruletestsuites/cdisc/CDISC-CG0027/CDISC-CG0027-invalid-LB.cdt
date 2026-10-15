@@ -1,0 +1,20 @@
+#!RuleTest
+#test CDISC-CG0027 expect=violation domain=LB
+#note "Authority: SDTM and SDTMIG Conformance Rules v2.0 CG0027 (Condition: --SCAT ^= null; Rule: --SCAT ^= --CAT). Row 2: LBSCAT=CHEMISTRY is populated and repeats LBCAT=CHEMISTRY, so the subcategory adds no further level of classification -> fires. Row 1 carries a real subcategory (LIVER FUNCTION) under CHEMISTRY and row 3 leaves LBSCAT null (Condition false): both silent."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=2 USUBJID=01-701-1015 LBSEQ=2
+dataset LB class=FINDINGS label="Laboratory Test Results"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col LBSEQ    type=Num  label="Sequence Number"
+col LBTESTCD type=Char label="Lab Test or Examination Short Name"
+col LBTEST   type=Char label="Lab Test or Examination Name"
+col LBCAT    type=Char label="Category for Lab Test"
+col LBSCAT   type=Char label="Subcategory for Lab Test"
+col LBORRES  type=Char label="Result or Finding in Original Units"
+---
+CDISCPILOT01 | LB | 01-701-1015 | 1 | ALT | Alanine Aminotransferase | CHEMISTRY | LIVER FUNCTION | 27
+CDISCPILOT01 | LB | 01-701-1015 | 2 | SODIUM | Sodium | CHEMISTRY | CHEMISTRY | 140
+CDISCPILOT01 | LB | 01-701-1015 | 3 | HGB | Hemoglobin | HEMATOLOGY | | 13.2

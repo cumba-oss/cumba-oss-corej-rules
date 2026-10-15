@@ -1,0 +1,18 @@
+#!RuleTest
+#test CDISC-CG0415 expect=noViolation domain=TA
+#note "Authority: SDTM and SDTMIG Conformance Rules v2.0 CG0415 (Domain TA, Variable ARMCD; Rule: ARMCD is a valid planned arm code). TA holds only the planned arms PBO and XANHI; screen failures and unassigned subjects appear in DM, not as TA arms -> silent."
+#library standard=sdtmig version=3-4
+dataset TA class="TRIAL DESIGN" label="Trial Arms"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col ARMCD    type=Char label="Planned Arm Code"
+col ARM      type=Char label="Description of Planned Arm"
+col TAETORD  type=Num  label="Planned Order of Element within Arm"
+col ETCD     type=Char label="Element Code"
+col ELEMENT  type=Char label="Description of Element"
+col EPOCH    type=Char label="Epoch"
+---
+CDISCPILOT01 | TA | PBO | Placebo | 1 | SCRN | Screening | SCREENING
+CDISCPILOT01 | TA | PBO | Placebo | 2 | PBO | Placebo | TREATMENT
+CDISCPILOT01 | TA | XANHI | Xanomeline High Dose | 1 | SCRN | Screening | SCREENING
+CDISCPILOT01 | TA | XANHI | Xanomeline High Dose | 2 | XANHI | Xanomeline High Dose | TREATMENT

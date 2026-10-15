@@ -1,0 +1,18 @@
+#!RuleTest
+#test CDISC-CG0046 expect=violation domain=AE
+#note "Authority: SDTM and SDTMIG Conformance Rules v2.0 CG0046 (Condition: --ENRTPT ^= null; Rule: --ENTPT ^= null). Row 2: AEENRTPT=ONGOING is populated but its reference time point AEENTPT is null -> fires. Row 1 has both populated; row 3 has AEENRTPT null (Condition false). AEENTPT is populated on row 1, so the dataset is not the all-empty folded case."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=2 USUBJID=01-701-1023 AESEQ=1 AEENRTPT=ONGOING
+dataset AE class=EVENTS label="Adverse Events"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col AESEQ    type=Num  label="Sequence Number"
+col AETERM   type=Char label="Reported Term for the Adverse Event"
+col AEENRTPT type=Char label="End Relative to Reference Time Point"
+col AEENTPT  type=Char label="End Reference Time Point"
+---
+CDISCPILOT01 | AE | 01-701-1015 | 1 | HEADACHE | ONGOING | END OF STUDY
+CDISCPILOT01 | AE | 01-701-1023 | 1 | NAUSEA | ONGOING |
+CDISCPILOT01 | AE | 01-701-1028 | 1 | DIZZINESS | |

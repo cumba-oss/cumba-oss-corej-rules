@@ -1,0 +1,16 @@
+#!RuleTest
+#test CDISC-CG0406 expect=noViolation domain=LB
+#note "Authority: SDTM and SDTMIG Conformance Rules v2.0 CG0406 (Class FND, Domain NOT(IE); Rule: --TEST length <= 40). Every LBTEST is at most 40 characters: Glucose (7), 'Hemoglobin A1C/Hemoglobin' (25), 'Alanine Aminotransferase Activity, Serum' (exactly 40, the boundary) -> silent. The rule has no variable requirement, so it executes on this FINDINGS dataset."
+#library standard=sdtmig version=3-4
+dataset LB class=FINDINGS label="Laboratory Test Results"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col LBSEQ    type=Num  label="Sequence Number"
+col LBTESTCD type=Char label="Lab Test or Examination Short Name"
+col LBTEST   type=Char label="Lab Test or Examination Name"
+col LBORRES  type=Char label="Result or Finding in Original Units"
+---
+CDISCPILOT01 | LB | 01-701-1015 | 1 | GLUC | Glucose | 5.6
+CDISCPILOT01 | LB | 01-701-1015 | 2 | HBA1CHGB | Hemoglobin A1C/Hemoglobin | 0.061
+CDISCPILOT01 | LB | 01-701-1015 | 3 | ALT | Alanine Aminotransferase Activity, Serum | 27

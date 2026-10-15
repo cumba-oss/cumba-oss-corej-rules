@@ -1,0 +1,16 @@
+#!RuleTest
+#test CDISC-CG0661 expect=noViolation domain=VS
+#note "Authority: SDTM and SDTMIG Conformance Rules v2.0 CG0661 (Condition: --TPTNUM present in dataset; Rule: --TPT present in dataset). The VS dataset carries VSTPTNUM together with VSTPT -> silent. The rule has no variable requirement, so it executes on this dataset."
+#library standard=sdtmig version=3-4
+dataset VS class=FINDINGS label="Vital Signs"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col VSSEQ    type=Num  label="Sequence Number"
+col VSTESTCD type=Char label="Vital Signs Test Short Name"
+col VSORRES  type=Char label="Result or Finding in Original Units"
+col VSTPT    type=Char label="Planned Time Point Name"
+col VSTPTNUM type=Num  label="Planned Time Point Number"
+---
+CDISCPILOT01 | VS | 01-701-1015 | 1 | SYSBP | 130 | AFTER LYING DOWN FOR 5 MINUTES | 1
+CDISCPILOT01 | VS | 01-701-1015 | 2 | SYSBP | 128 | AFTER STANDING FOR 1 MINUTE | 2

@@ -1,0 +1,20 @@
+#!RuleTest
+#test CDISC-CG0654 expect=violation domain=SV
+#note "Authority: SDTM and SDTMIG Conformance Rules v2.0 CG0654 (Condition: SVOCCUR ^= null; Rule: SVPRESP = "Y"). Row 3: an unplanned visit (SVPRESP null) carries SVOCCUR=Y -> fires. Rows 1-2: planned visits (SVPRESP=Y) with SVOCCUR Y / N -> silent. Row 4: an unplanned visit with SVOCCUR null -> silent."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=3 USUBJID=01-701-1015 VISITNUM=2.1
+dataset SV class="SPECIAL PURPOSE" label="Subject Visits"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col VISITNUM type=Num  label="Visit Number"
+col VISIT    type=Char label="Visit Name"
+col SVSTDTC  type=Char label="Start Date/Time of Observation"
+col SVPRESP  type=Char label="Pre-specified"
+col SVOCCUR  type=Char label="Occurrence"
+---
+CDISCPILOT01 | SV | 01-701-1015 | 1 | SCREENING 1 | 2013-12-26 | Y | Y
+CDISCPILOT01 | SV | 01-701-1015 | 2 | BASELINE | 2014-01-02 | Y | N
+CDISCPILOT01 | SV | 01-701-1015 | 2.1 | UNSCHEDULED 2.1 | 2014-01-05 |  | Y
+CDISCPILOT01 | SV | 01-701-1015 | 3.1 | UNSCHEDULED 3.1 | 2014-01-20 |  | 

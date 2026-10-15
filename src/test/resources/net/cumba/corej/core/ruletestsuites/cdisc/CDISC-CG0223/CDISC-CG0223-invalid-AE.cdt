@@ -1,0 +1,31 @@
+#!RuleTest
+#test CDISC-CG0223 expect=violation domain=AE
+#note "Authority: SDTM and SDTMIG Conformance Rules v2.0 CG0223 (Condition: --ENDTC or DM.RFSTDTC does not contain complete values in their date portion; Rule: --ENDY = null). Row 2: AEENDTC=2014-01 has no day, so the study day cannot be derived, yet AEENDY=10 is populated -> fires. Row 4: AEENDTC is complete but the subject's DM.RFSTDTC=2013-12 is partial, so AEENDY=5 has no complete reference -> fires. Row 1: AEENDTC and RFSTDTC complete -> silent. Row 3: AEENDTC partial but AEENDY null -> silent."
+#library standard=sdtmig version=3-4
+#expectViolationCount 2
+#expectViolationAt row=2 USUBJID=01-701-1015 AESEQ=2
+#expectViolationAt row=4 USUBJID=01-701-1023 AESEQ=1
+dataset AE class=EVENTS label="Adverse Events"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col AESEQ    type=Num  label="Sequence Number"
+col AETERM   type=Char label="Reported Term for the Adverse Event"
+col AEENDTC type=Char label="End Date/Time of Adverse Event"
+col AEENDY   type=Num  label="Study Day of End of Adverse Event"
+---
+CDISCPILOT01 | AE | 01-701-1015 | 1 | HEADACHE | 2014-01-05 | 4
+CDISCPILOT01 | AE | 01-701-1015 | 2 | NAUSEA | 2014-01 | 10
+CDISCPILOT01 | AE | 01-701-1015 | 3 | DIZZINESS | 2014-02 |
+CDISCPILOT01 | AE | 01-701-1023 | 1 | RASH | 2014-01-10 | 5
+---
+
+dataset DM class="SPECIAL PURPOSE" label="Demographics"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col RFSTDTC type=Char label="Subject Reference Start Date/Time"
+---
+CDISCPILOT01 | DM | 01-701-1015 | 2014-01-02
+CDISCPILOT01 | DM | 01-701-1023 | 2013-12
+---

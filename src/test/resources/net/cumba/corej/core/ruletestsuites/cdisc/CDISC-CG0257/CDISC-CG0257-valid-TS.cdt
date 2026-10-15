@@ -1,0 +1,15 @@
+#!RuleTest
+#test CDISC-CG0257 expect=noViolation domain=TS
+#note "Authority: SDTM and SDTMIG Conformance Rules v2.0 CG0257 (Domain TS, Variable TSPARMCD; Rule: TSPARMCD value length <= 8). Every TSPARMCD is at most 8 characters: AGEMIN (6), TITLE (5), ADDONTRT (exactly 8, the boundary) -> silent. The rule has no variable requirement, so it executes on this dataset."
+#library standard=sdtmig version=3-4
+dataset TS class="TRIAL DESIGN" label="Trial Summary"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col TSSEQ    type=Num  label="Sequence Number"
+col TSPARMCD type=Char label="Trial Summary Parameter Short Name"
+col TSPARM   type=Char label="Trial Summary Parameter"
+col TSVAL    type=Char label="Parameter Value"
+---
+CDISCPILOT01 | TS | 1 | AGEMIN | Planned Minimum Age of Subjects | P50Y
+CDISCPILOT01 | TS | 1 | TITLE | Trial Title | Safety and Efficacy of the Xanomeline Transdermal Therapeutic System
+CDISCPILOT01 | TS | 1 | ADDONTRT | Added on to Existing Treatments | N

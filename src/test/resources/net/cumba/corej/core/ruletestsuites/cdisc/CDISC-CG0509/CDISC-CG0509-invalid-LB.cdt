@@ -1,0 +1,17 @@
+#!RuleTest
+#test CDISC-CG0509 expect=violation domain=LB
+#note "Authority: SDTM and SDTMIG Conformance Rules v2.0 CG0509 (Rule: FETUSID not present in dataset). FETUSID is a SEND (non-clinical) variable; the human-trial LB dataset carries it -> the dataset-level check fires once for the dataset (reported on its first record), however many records it holds; the value is populated on row 1 only."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=1
+dataset LB class=FINDINGS label="Laboratory Test Results"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col LBSEQ    type=Num  label="Sequence Number"
+col LBTESTCD type=Char label="Lab Test or Examination Short Name"
+col LBORRES  type=Char label="Result or Finding in Original Units"
+col FETUSID type=Char label="Fetus Identifier"
+---
+CDISCPILOT01 | LB | 01-701-1015 | 1 | ALB | 38 | F01
+CDISCPILOT01 | LB | 01-701-1015 | 2 | ALT | 21 | 

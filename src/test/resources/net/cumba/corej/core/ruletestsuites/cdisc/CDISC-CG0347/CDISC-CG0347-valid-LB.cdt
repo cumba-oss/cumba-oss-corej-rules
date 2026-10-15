@@ -1,0 +1,17 @@
+#!RuleTest
+#test CDISC-CG0347 expect=noViolation domain=LB
+#note "Authority: SDTM and SDTMIG Conformance Rules v2.0 CG0347 (Class FND; Condition: the use of 'MULTIPLE' reflects multiple values; Rule: --ORRES ^= 'MULTIPLE'). The two crystal types found for subject 01-701-1023 are reported as two records, each with its own LBORRES; no LBORRES is MULTIPLE -> silent."
+#library standard=sdtmig version=3-4
+dataset LB class=FINDINGS label="Laboratory Test Results"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col LBSEQ    type=Num  label="Sequence Number"
+col LBTESTCD type=Char label="Lab Test or Examination Short Name"
+col LBTEST   type=Char label="Lab Test or Examination Name"
+col LBORRES  type=Char label="Result or Finding in Original Units"
+---
+CDISCPILOT01 | LB | 01-701-1015 | 1 | CRYSTALS | Crystals | CALCIUM OXALATE
+CDISCPILOT01 | LB | 01-701-1023 | 1 | CRYSTALS | Crystals | CALCIUM OXALATE
+CDISCPILOT01 | LB | 01-701-1023 | 2 | CRYSTALS | Crystals | URIC ACID
+CDISCPILOT01 | LB | 01-701-1023 | 3 | GLUC | Glucose | 5.6

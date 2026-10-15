@@ -1,0 +1,15 @@
+#!RuleTest
+#test CDISC-CG0406 expect=skipped domain=IE
+#note "Scope boundary. Authority: SDTM and SDTMIG Conformance Rules v2.0 CG0406 (Class FND, Domain NOT(IE); Rule: --TEST length <= 40). IE is excluded by Scope.Domains.Exclude: SDTMIG allows IETEST up to 200 characters, since it carries the full criterion text. Row 1's IETEST is longer than 40 characters, so the body would fire if the exclusion were dropped - the skip is owed to the scope alone."
+#library standard=sdtmig version=3-4
+dataset IE class=FINDINGS label="Inclusion/Exclusion Criteria Not Met"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col IESEQ    type=Num  label="Sequence Number"
+col IETESTCD type=Char label="Inclusion/Exclusion Criterion Short Name"
+col IETEST   type=Char label="Inclusion/Exclusion Criterion"
+col IECAT    type=Char label="Inclusion/Exclusion Category"
+col IEORRES  type=Char label="I/E Criterion Original Result"
+---
+CDISCPILOT01 | IE | 01-701-1015 | 1 | INCL01 | Males and postmenopausal females at least 50 years of age | INCLUSION | N

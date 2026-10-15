@@ -1,0 +1,19 @@
+#!RuleTest
+#test CDISC-CG0169 expect=violation domain=CO
+#note "Authority: SDTM and SDTMIG Conformance Rules v2.0 CG0169 (Domain CO, Variable COVAL; Condition: no comment > 200 characters; Rule: COVALn not present in dataset). Row 2: the comment is 36 characters and fits COVAL whole, yet the overflow variable COVAL1 is populated -> fires. Row 1: a short comment with COVAL1 null -> silent. Row 3: COVAL holds exactly 200 characters and the remainder continues in COVAL1, the legitimate split of a comment longer than 200 characters -> silent."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=2 USUBJID=01-701-1023 COSEQ=1
+dataset CO class="SPECIAL PURPOSE" label="Comments"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col RDOMAIN  type=Char label="Related Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col COSEQ    type=Num  label="Sequence Number"
+col COVAL    type=Char label="Comment"
+col COVAL1   type=Char label="Comment"
+col CODTC    type=Char label="Date/Time of Comment"
+---
+CDISCPILOT01 | CO | | 01-701-1015 | 1 | SUBJECT MISSED VISIT 4 | | 2014-02-10
+CDISCPILOT01 | CO | | 01-701-1023 | 1 | SUBJECT MISSED VISIT 5 DUE TO TRAVEL | ABROAD | 2014-03-02
+CDISCPILOT01 | CO | | 01-701-1028 | 1 | SUBJECT REPORTED THAT THE STUDY MEDICATION WAS TAKEN WITH FOOD, ON THE MORNING OF VISIT 3 BECAUSE OF MILD NAUSEA; THE SITE STAFF CONFIRMED THE TIMING WITH THE SUBJECT DIARY AND NOTED THAT THE DOSE WAS | NOT REPEATED LATER THAT DAY | 2014-03-15

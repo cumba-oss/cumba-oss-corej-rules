@@ -1,0 +1,21 @@
+#!RuleTest
+#test CDISC-CG0620 expect=violation domain=SE
+#note "Authority: SDTM and SDTMIG Conformance Rules v2.0 CG0620 (Domain: SM, SE; Rule: --SEQ is in a consistent chronological order). Subject 01-701-1023 (rows 3-4): ordered by SESTDTC, the TRT element (2014-01-10) carries SESEQ=1 and the earlier SCRN element (2013-12-27) SESEQ=2, so SESEQ runs backwards in time -> every record of that subject is reported. Subject 01-701-1015 (rows 1-2): SESEQ rises with SESTDTC -> silent."
+#library standard=sdtmig version=3-4
+#expectViolationCount 2
+#expectViolationAt row=3 USUBJID=01-701-1023 SESEQ=1
+#expectViolationAt row=4 USUBJID=01-701-1023 SESEQ=2
+dataset SE class="SPECIAL PURPOSE" label="Subject Elements"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col SESEQ   type=Num  label="Sequence Number"
+col ETCD    type=Char label="Element Code"
+col ELEMENT type=Char label="Description of Element"
+col SESTDTC type=Char label="Start Date/Time of Element"
+col SEENDTC type=Char label="End Date/Time of Element"
+---
+CDISCPILOT01 | SE | 01-701-1015 | 1 | SCRN | Screening | 2013-12-26 | 2014-01-02
+CDISCPILOT01 | SE | 01-701-1015 | 2 | PBO | Placebo | 2014-01-02 | 2014-07-02
+CDISCPILOT01 | SE | 01-701-1023 | 1 | XAN_HI | Xanomeline High Dose | 2014-01-10 | 2014-07-10
+CDISCPILOT01 | SE | 01-701-1023 | 2 | SCRN | Screening | 2013-12-27 | 2014-01-10

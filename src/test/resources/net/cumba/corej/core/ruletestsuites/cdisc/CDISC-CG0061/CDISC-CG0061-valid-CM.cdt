@@ -1,0 +1,16 @@
+#!RuleTest
+#test CDISC-CG0061 expect=noViolation domain=CM
+#note "Authority: SDTM and SDTMIG Conformance Rules v2.0 CG0061 (Condition: --STRTPT ^= null; Rule: --STTPT ^= null). Rows 1-2: CMSTRTPT populated and CMSTTPT names the reference time point. Row 3: CMSTRTPT null (Condition false) -> silent."
+#library standard=sdtmig version=3-4
+dataset CM class=INTERVENTIONS label="Concomitant/Prior Medications"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col CMSEQ    type=Num  label="Sequence Number"
+col CMTRT    type=Char label="Reported Name of Drug, Med, or Therapy"
+col CMSTRTPT type=Char label="Start Relative to Reference Time Point"
+col CMSTTPT  type=Char label="Start Reference Time Point"
+---
+CDISCPILOT01 | CM | 01-701-1015 | 1 | ASPIRIN | BEFORE | INFORMED CONSENT
+CDISCPILOT01 | CM | 01-701-1023 | 1 | METFORMIN | BEFORE | FIRST DOSE
+CDISCPILOT01 | CM | 01-701-1028 | 1 | PARACETAMOL | |

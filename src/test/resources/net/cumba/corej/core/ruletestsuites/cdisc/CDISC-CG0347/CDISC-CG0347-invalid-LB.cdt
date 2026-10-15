@@ -1,0 +1,18 @@
+#!RuleTest
+#test CDISC-CG0347 expect=violation domain=LB
+#note "Authority: SDTM and SDTMIG Conformance Rules v2.0 CG0347 (Class FND; Condition: the use of 'MULTIPLE' reflects multiple values; Rule: --ORRES ^= 'MULTIPLE'). Row 2: LBORRES=MULTIPLE for a crystal identification stands in for several results that belong in separate records -> fires. Rows 1 and 3 carry real single results (CALCIUM OXALATE, 5.6) -> silent."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=2 USUBJID=01-701-1023 LBSEQ=1 LBORRES=MULTIPLE
+dataset LB class=FINDINGS label="Laboratory Test Results"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col LBSEQ    type=Num  label="Sequence Number"
+col LBTESTCD type=Char label="Lab Test or Examination Short Name"
+col LBTEST   type=Char label="Lab Test or Examination Name"
+col LBORRES  type=Char label="Result or Finding in Original Units"
+---
+CDISCPILOT01 | LB | 01-701-1015 | 1 | CRYSTALS | Crystals | CALCIUM OXALATE
+CDISCPILOT01 | LB | 01-701-1023 | 1 | CRYSTALS | Crystals | MULTIPLE
+CDISCPILOT01 | LB | 01-701-1023 | 2 | GLUC | Glucose | 5.6

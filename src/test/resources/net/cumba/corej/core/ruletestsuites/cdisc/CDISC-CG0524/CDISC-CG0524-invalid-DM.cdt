@@ -1,0 +1,23 @@
+#!RuleTest
+#test CDISC-CG0524 expect=violation domain=DM
+#note "Authority: SDTM and SDTMIG Conformance Rules v2.0 CG0524 (Condition: Subject not assigned to treatment; Rule: ACTARMCD = null). The rule reads the condition as ARMNRS giving any reason the actual arm is null (SCREEN FAILURE, NOT ASSIGNED, ASSIGNED, NOT TREATED, UNPLANNED TREATMENT). Row 2: ARMNRS=SCREEN FAILURE with ACTARMCD=SCRNFAIL -> fires. Row 4: ARMNRS=ASSIGNED, NOT TREATED with ACTARMCD=XAN_HI -> fires. Row 1: a treated subject (ARMNRS null) -> silent. Row 3: ARMNRS=UNPLANNED TREATMENT with ACTARMCD null (the treatment is described elsewhere) -> silent."
+#library standard=sdtmig version=3-4
+#expectViolationCount 2
+#expectViolationAt row=2 USUBJID=01-701-1023
+#expectViolationAt row=4 USUBJID=01-701-1033
+dataset DM class="SPECIAL PURPOSE" label="Demographics"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col SUBJID   type=Char label="Subject Identifier for the Study"
+col RFSTDTC  type=Char label="Subject Reference Start Date/Time"
+col ARMCD    type=Char label="Planned Arm Code"
+col ARM      type=Char label="Description of Planned Arm"
+col ACTARMCD type=Char label="Actual Arm Code"
+col ACTARM   type=Char label="Description of Actual Arm"
+col ARMNRS   type=Char label="Reason Arm and/or Actual Arm is Null"
+---
+CDISCPILOT01 | DM | 01-701-1015 | 1015 | 2014-01-02 | PBO | Placebo | PBO | Placebo | 
+CDISCPILOT01 | DM | 01-701-1023 | 1023 |  |  |  | SCRNFAIL | Screen Failure | SCREEN FAILURE
+CDISCPILOT01 | DM | 01-701-1028 | 1028 | 2014-02-11 | PBO | Placebo |  |  | UNPLANNED TREATMENT
+CDISCPILOT01 | DM | 01-701-1033 | 1033 |  | XAN_HI | Xanomeline High Dose | XAN_HI | Xanomeline High Dose | ASSIGNED, NOT TREATED

@@ -1,0 +1,19 @@
+#!RuleTest
+#test CDISC-CG0620 expect=noViolation domain=SE
+#note "Authority: SDTM and SDTMIG Conformance Rules v2.0 CG0620 (Domain: SM, SE; Rule: --SEQ is in a consistent chronological order). Within each subject SESEQ rises with SESTDTC (screening, treatment, follow-up). The records of subject 01-701-1023 are stored out of SESEQ order, which the rule does not care about: only the SESEQ-versus-SESTDTC order within USUBJID matters -> silent."
+#library standard=sdtmig version=3-4
+dataset SE class="SPECIAL PURPOSE" label="Subject Elements"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col SESEQ   type=Num  label="Sequence Number"
+col ETCD    type=Char label="Element Code"
+col ELEMENT type=Char label="Description of Element"
+col SESTDTC type=Char label="Start Date/Time of Element"
+col SEENDTC type=Char label="End Date/Time of Element"
+---
+CDISCPILOT01 | SE | 01-701-1015 | 1 | SCRN | Screening | 2013-12-26 | 2014-01-02
+CDISCPILOT01 | SE | 01-701-1015 | 2 | PBO | Placebo | 2014-01-02 | 2014-07-02
+CDISCPILOT01 | SE | 01-701-1015 | 3 | FU | Follow-up | 2014-07-02 | 2014-07-16
+CDISCPILOT01 | SE | 01-701-1023 | 2 | XAN_HI | Xanomeline High Dose | 2014-01-10 | 2014-07-10
+CDISCPILOT01 | SE | 01-701-1023 | 1 | SCRN | Screening | 2013-12-27 | 2014-01-10

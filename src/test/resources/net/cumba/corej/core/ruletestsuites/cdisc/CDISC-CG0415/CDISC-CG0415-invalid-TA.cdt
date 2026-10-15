@@ -1,0 +1,21 @@
+#!RuleTest
+#test CDISC-CG0415 expect=violation domain=TA
+#note "Authority: SDTM and SDTMIG Conformance Rules v2.0 CG0415 (Domain TA, Variable ARMCD; Rule: ARMCD is a valid planned arm code). SCRNFAIL and NOTASSGN are the DM codes for subjects never assigned to an arm, not planned arms of the trial design. Row 3: ARMCD=SCRNFAIL -> fires. Row 4: ARMCD=notassgn, the same code in lower case -> fires (the comparison ignores case). Rows 1-2 are the planned placebo arm (PBO) -> silent."
+#library standard=sdtmig version=3-4
+#expectViolationCount 2
+#expectViolationAt row=3 ARMCD=SCRNFAIL TAETORD=1
+#expectViolationAt row=4 ARMCD=notassgn TAETORD=1
+dataset TA class="TRIAL DESIGN" label="Trial Arms"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col ARMCD    type=Char label="Planned Arm Code"
+col ARM      type=Char label="Description of Planned Arm"
+col TAETORD  type=Num  label="Planned Order of Element within Arm"
+col ETCD     type=Char label="Element Code"
+col ELEMENT  type=Char label="Description of Element"
+col EPOCH    type=Char label="Epoch"
+---
+CDISCPILOT01 | TA | PBO | Placebo | 1 | SCRN | Screening | SCREENING
+CDISCPILOT01 | TA | PBO | Placebo | 2 | PBO | Placebo | TREATMENT
+CDISCPILOT01 | TA | SCRNFAIL | Screen Failure | 1 | SCRN | Screening | SCREENING
+CDISCPILOT01 | TA | notassgn | Not Assigned | 1 | SCRN | Screening | SCREENING

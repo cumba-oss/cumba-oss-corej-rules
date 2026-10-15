@@ -1,0 +1,17 @@
+#!RuleTest
+#test CDISC-CG0071 expect=noViolation domain=DS
+#note "Authority: SDTM and SDTMIG Conformance Rules v2.0 CG0071 (Condition: DSCAT = 'DISPOSITION EVENT'; Rule: DSTERM = 'COMPLETED' or the reason for discontinuation). Row 1: disposition event with DSTERM=COMPLETED. Row 2: disposition event with the reported reason for discontinuation (SUBJECT MOVED OUT OF THE AREA). Row 3: PROTOCOL MILESTONE (Condition false) -> silent."
+#library standard=sdtmig version=3-4
+dataset DS class=EVENTS label="Disposition"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col DSSEQ   type=Num  label="Sequence Number"
+col DSTERM  type=Char label="Reported Term for the Disposition Event"
+col DSDECOD type=Char label="Standardized Disposition Term"
+col DSCAT   type=Char label="Category for Disposition Event"
+col EPOCH   type=Char label="Epoch"
+---
+CDISCPILOT01 | DS | 01-701-1015 | 2 | COMPLETED | COMPLETED | DISPOSITION EVENT | TREATMENT
+CDISCPILOT01 | DS | 01-701-1023 | 2 | SUBJECT MOVED OUT OF THE AREA | WITHDRAWAL BY SUBJECT | DISPOSITION EVENT | TREATMENT
+CDISCPILOT01 | DS | 01-701-1023 | 1 | INFORMED CONSENT OBTAINED | INFORMED CONSENT OBTAINED | PROTOCOL MILESTONE | SCREENING

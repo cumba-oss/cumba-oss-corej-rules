@@ -1,0 +1,23 @@
+#!RuleTest
+#test CDISC-CG9668 expect=noViolation domain=DM
+#note "Authority: coreJ-minted rule (no SDTM and SDTMIG Conformance Rules v2.0 row; sheet issue #101): the dataset-presence counterpart, for EX (Exposure), of CG0368 (Rule: DM dataset present in study). The same DM dataset as the invalid scenario, but the study also carries an EX dataset, so the presence check is satisfied while evaluating DM."
+#library standard=sdtmig version=3-4
+dataset DM class="SPECIAL PURPOSE" label="Demographics"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col SUBJID  type=Char label="Subject Identifier for the Study"
+---
+CDISCPILOT01 | DM | 01-701-1015 | 1015
+---
+
+dataset EX class=INTERVENTIONS label="Exposure"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col EXSEQ   type=Num  label="Sequence Number"
+col EXTRT   type=Char label="Name of Treatment"
+col EXSTDTC type=Char label="Start Date/Time of Treatment"
+---
+CDISCPILOT01 | EX | 01-701-1015 | 1 | XANOMELINE | 2014-01-02
+---

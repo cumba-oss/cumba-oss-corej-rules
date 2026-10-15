@@ -1,0 +1,18 @@
+#!RuleTest
+#test CDISC-CG0427 expect=noViolation domain=LB
+#note "Authority: SDTM and SDTMIG Conformance Rules v2.0 CG0427 (Condition: --RESCAT ^= null; Rule: --STRESC ^= null). Rows 1-2 carry a result category with a populated LBSTRESC. Row 3 has no category and no result (test not done), so the condition does not hold -> silent."
+#library standard=sdtmig version=3-4
+dataset LB class=FINDINGS label="Laboratory Test Results"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col LBSEQ    type=Num  label="Sequence Number"
+col LBTESTCD type=Char label="Lab Test or Examination Short Name"
+col LBTEST   type=Char label="Lab Test or Examination Name"
+col LBORRES  type=Char label="Result or Finding in Original Units"
+col LBSTRESC type=Char label="Character Result/Finding in Std Format"
+col LBRESCAT type=Char label="Result Category"
+---
+CDISCPILOT01 | LB | 01-701-1015 | 1 | UROBIL | Urobilinogen | NEGATIVE | NEGATIVE | NORMAL
+CDISCPILOT01 | LB | 01-701-1023 | 1 | UROBIL | Urobilinogen | 2+ | 2+ | ABNORMAL
+CDISCPILOT01 | LB | 01-701-1028 | 1 | UROBIL | Urobilinogen |  |  | 

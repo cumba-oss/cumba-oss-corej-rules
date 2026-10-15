@@ -1,0 +1,18 @@
+#!RuleTest
+#test CDISC-CG0372 expect=noViolation domain=LB
+#note "Authority: SDTM and SDTMIG Conformance Rules v2.0 CG0372 (Class FND, TDM; Rule: --TESTCD <= 8 chars and contains only letters, numbers, and underscores and can not start with a number). HBA1C, CHOL, HIAA5 (a digit, not leading), TROPONI and LDL_HDLR (exactly 8 characters with an underscore, the boundary) all comply -> silent."
+#library standard=sdtmig version=3-4
+dataset LB class=FINDINGS label="Laboratory Test Results"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col LBSEQ    type=Num  label="Sequence Number"
+col LBTESTCD type=Char label="Lab Test or Examination Short Name"
+col LBTEST   type=Char label="Lab Test or Examination Name"
+col LBORRES  type=Char label="Result or Finding in Original Units"
+---
+CDISCPILOT01 | LB | 01-701-1015 | 1 | HBA1C | Hemoglobin A1C | 6.1
+CDISCPILOT01 | LB | 01-701-1015 | 2 | CHOL | Cholesterol | 5.2
+CDISCPILOT01 | LB | 01-701-1015 | 3 | HIAA5 | 5-Hydroxyindoleacetic Acid | 25
+CDISCPILOT01 | LB | 01-701-1015 | 4 | TROPONI | Troponin I | 0.01
+CDISCPILOT01 | LB | 01-701-1015 | 5 | LDL_HDLR | LDL Cholesterol/HDL Cholesterol | 2.4

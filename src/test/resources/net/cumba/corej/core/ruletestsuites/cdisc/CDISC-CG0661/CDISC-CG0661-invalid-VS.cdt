@@ -1,0 +1,17 @@
+#!RuleTest
+#test CDISC-CG0661 expect=violation domain=VS
+#note "Authority: SDTM and SDTMIG Conformance Rules v2.0 CG0661 (Condition: --TPTNUM present in dataset; Rule: --TPT present in dataset). The VS dataset carries VSTPTNUM but not VSTPT -> the dataset-level check fires once for the dataset (reported on its first record), however many records it holds."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=1
+dataset VS class=FINDINGS label="Vital Signs"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col VSSEQ    type=Num  label="Sequence Number"
+col VSTESTCD type=Char label="Vital Signs Test Short Name"
+col VSORRES  type=Char label="Result or Finding in Original Units"
+col VSTPTNUM type=Num  label="Planned Time Point Number"
+---
+CDISCPILOT01 | VS | 01-701-1015 | 1 | SYSBP | 130 | 1
+CDISCPILOT01 | VS | 01-701-1015 | 2 | SYSBP | 128 | 2

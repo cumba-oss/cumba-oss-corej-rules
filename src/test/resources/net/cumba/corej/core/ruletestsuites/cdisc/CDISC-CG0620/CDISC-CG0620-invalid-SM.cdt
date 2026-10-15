@@ -1,0 +1,20 @@
+#!RuleTest
+#test CDISC-CG0620 expect=violation domain=SM
+#note "Authority: SDTM and SDTMIG Conformance Rules v2.0 CG0620 (Domain: SM, SE; Rule: --SEQ is in a consistent chronological order). Subject 01-701-1023 (rows 3-4): the later milestone (2014-03-15) carries SMSEQ=1 and the earlier one (2013-06-01) SMSEQ=2 -> every record of that subject is reported. Subject 01-701-1015 (rows 1-2): SMSEQ rises with SMSTDTC -> silent."
+#library standard=sdtmig version=3-4
+#expectViolationCount 2
+#expectViolationAt row=3 USUBJID=01-701-1023 SMSEQ=1
+#expectViolationAt row=4 USUBJID=01-701-1023 SMSEQ=2
+dataset SM class="SPECIAL PURPOSE" label="Subject Disease Milestones"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col SMSEQ   type=Num  label="Sequence Number"
+col MIDS    type=Char label="Disease Milestone Instance Name"
+col MIDSTYPE type=Char label="Disease Milestone Type"
+col SMSTDTC type=Char label="Start Date/Time of Milestone"
+---
+CDISCPILOT01 | SM | 01-701-1015 | 1 | DIAG | INITIAL DIAGNOSIS | 2012-05-14
+CDISCPILOT01 | SM | 01-701-1015 | 2 | HYPO1 | HYPOGLYCEMIC EVENT | 2014-02-20
+CDISCPILOT01 | SM | 01-701-1023 | 1 | HYPO1 | HYPOGLYCEMIC EVENT | 2014-03-15
+CDISCPILOT01 | SM | 01-701-1023 | 2 | DIAG | INITIAL DIAGNOSIS | 2013-06-01

@@ -1,0 +1,20 @@
+#!RuleTest
+#test CDISC-CG0184 expect=violation domain=LB
+#note "Authority: SDTM and SDTMIG Conformance Rules v2.0 CG0184 (Condition: LBORRES = continuous measurement; Rule: LBSTNRC = null). Row 2: urine glucose reported quantitatively (LBORRES=<2.8, a relational operator before a number) while the character reference range LBSTNRC=NEGATIVE is populated -> fires. Row 1: a continuous serum glucose (5.6) with LBSTNRC null -> silent. Row 3: a categorical result (LBORRES=NEGATIVE) with the character range NEGATIVE, outside the Condition -> silent."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=2 USUBJID=01-701-1015 LBSEQ=2
+dataset LB class=FINDINGS label="Laboratory Test Results"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col LBSEQ    type=Num  label="Sequence Number"
+col LBTESTCD type=Char label="Lab Test or Examination Short Name"
+col LBTEST   type=Char label="Lab Test or Examination Name"
+col LBORRES  type=Char label="Result or Finding in Original Units"
+col LBSTRESC type=Char label="Character Result/Finding in Std Format"
+col LBSTNRC  type=Char label="Reference Range for Char Rslt-Std Units"
+---
+CDISCPILOT01 | LB | 01-701-1015 | 1 | GLUC | Glucose | 5.6 | 5.6 |
+CDISCPILOT01 | LB | 01-701-1015 | 2 | GLUC | Glucose | <2.8 | <2.8 | NEGATIVE
+CDISCPILOT01 | LB | 01-701-1015 | 3 | KETONES | Ketones | NEGATIVE | NEGATIVE | NEGATIVE

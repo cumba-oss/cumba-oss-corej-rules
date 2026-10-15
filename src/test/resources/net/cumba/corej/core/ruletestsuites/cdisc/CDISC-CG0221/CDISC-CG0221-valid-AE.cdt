@@ -1,0 +1,28 @@
+#!RuleTest
+#test CDISC-CG0221 expect=noViolation domain=AE
+#note "Authority: SDTM and SDTMIG Conformance Rules v2.0 CG0221 (Condition: --STDTC or DM.RFSTDTC does not contain complete values in their date portion; Rule: --STDY = null). Rows 1-2: AESTDTC carries a complete date (row 2 with a time part, whose date portion is still complete) and the subject's RFSTDTC=2014-01-02 is complete, so AESTDY may be populated. Row 3: AESTDTC=2014-02 is partial and AESTDY is null, as required. Row 4: subject 01-701-1023's RFSTDTC=2013-12 is partial and AESTDY is null -> silent."
+#library standard=sdtmig version=3-4
+dataset AE class=EVENTS label="Adverse Events"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col AESEQ    type=Num  label="Sequence Number"
+col AETERM   type=Char label="Reported Term for the Adverse Event"
+col AESTDTC type=Char label="Start Date/Time of Adverse Event"
+col AESTDY   type=Num  label="Study Day of Start of Adverse Event"
+---
+CDISCPILOT01 | AE | 01-701-1015 | 1 | HEADACHE | 2014-01-05 | 4
+CDISCPILOT01 | AE | 01-701-1015 | 2 | NAUSEA | 2014-01-10T08:30 | 9
+CDISCPILOT01 | AE | 01-701-1015 | 3 | DIZZINESS | 2014-02 |
+CDISCPILOT01 | AE | 01-701-1023 | 1 | RASH | 2014-01-10 |
+---
+
+dataset DM class="SPECIAL PURPOSE" label="Demographics"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col RFSTDTC type=Char label="Subject Reference Start Date/Time"
+---
+CDISCPILOT01 | DM | 01-701-1015 | 2014-01-02
+CDISCPILOT01 | DM | 01-701-1023 | 2013-12
+---

@@ -1,0 +1,21 @@
+#!RuleTest
+#test CDISC-CG0372 expect=violation domain=LB
+#note "Authority: SDTM and SDTMIG Conformance Rules v2.0 CG0372 (Class FND, TDM; Rule: --TESTCD <= 8 chars and contains only letters, numbers, and underscores and can not start with a number). Row 2: LBTESTCD=CHOLESTROL is 10 characters -> fires. Row 3: LBTESTCD=5HIAA starts with a number -> fires. Row 4: LBTESTCD=TROP-I contains a hyphen -> fires. Row 1 (HBA1C: letters and a digit, not leading) is silent."
+#library standard=sdtmig version=3-4
+#expectViolationCount 3
+#expectViolationAt row=2 USUBJID=01-701-1015 LBSEQ=2 LBTESTCD=CHOLESTROL
+#expectViolationAt row=3 USUBJID=01-701-1015 LBSEQ=3 LBTESTCD=5HIAA
+#expectViolationAt row=4 USUBJID=01-701-1015 LBSEQ=4 LBTESTCD=TROP-I
+dataset LB class=FINDINGS label="Laboratory Test Results"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col LBSEQ    type=Num  label="Sequence Number"
+col LBTESTCD type=Char label="Lab Test or Examination Short Name"
+col LBTEST   type=Char label="Lab Test or Examination Name"
+col LBORRES  type=Char label="Result or Finding in Original Units"
+---
+CDISCPILOT01 | LB | 01-701-1015 | 1 | HBA1C | Hemoglobin A1C | 6.1
+CDISCPILOT01 | LB | 01-701-1015 | 2 | CHOLESTROL | Cholesterol | 5.2
+CDISCPILOT01 | LB | 01-701-1015 | 3 | 5HIAA | 5-Hydroxyindoleacetic Acid | 25
+CDISCPILOT01 | LB | 01-701-1015 | 4 | TROP-I | Troponin I | 0.01
