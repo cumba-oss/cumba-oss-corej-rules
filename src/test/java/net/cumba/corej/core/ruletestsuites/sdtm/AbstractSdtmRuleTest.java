@@ -75,8 +75,10 @@ abstract class AbstractSdtmRuleTest
 
     // Trimmed test fixture shipped as module-local resources so tests are not
     // coupled to the full upstream study at ../../testdata/study/. See
-    // PruneDefineXmlDriver for regeneration. Domains present: AE, DM, LB,
-    // RELREC, TA — the set consumed by the Java-resident test methods.
+    // PruneDefineXmlDriver for regeneration. Domains present: AE, DM, DS, LB,
+    // RELREC, TA — the set consumed by the Java-resident test methods. The
+    // define's leaves name the CDISC pilot's own Dataset-JSON files (<domain>.json),
+    // shipped unmodified beside it.
     private static final String SDTM_DEFINE_PATH = System.getProperty("projectBasedir")
             + "/src/test/resources/testdata_study/sdtm/define.xml";
 

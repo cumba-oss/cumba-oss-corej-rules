@@ -17,6 +17,7 @@ import java.util.HashMap;
 import java.util.HexFormat;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
@@ -44,16 +45,19 @@ import org.w3c.dom.NodeList;
  * closed: every reference resolves and no definition is left unreferenced.
  *
  * <p>
- * Sources: the SDTM define is the pilot define under the untracked {@code testdata/study/sdtm/}.
- * The ADaM define is CDISC's MIT-licensed {@code DataExchange-DatasetJson}
- * {@code examples/adam/define.xml} (Define-XML 2.1), passed as {@code -Dprune.adam.source=<path>}
- * so the regeneration names its input instead of relying on an untracked copy. After the prune the
- * ADaM define is adapted to the fixture beside it ({@link #adaptAdamDefine}): dataset leaves
- * {@code .xpt} → {@code .dsjc}, the two {@code ADLBC} ISO columns {@code AXDTM} / {@code AXTM}
- * declared, and the {@code ODM} {@code SourceSystem} / {@code SourceSystemVersion} attributes
- * removed. The input's md5 is checked first, so a different upstream revision fails instead of
- * silently producing a different fixture. The provenance is recorded in
- * {@code testdata_study/README.md}.
+ * Sources: the SDTM define is the CDISC pilot's own
+ * {@code updated-pilot-submission-package/900172/m5/datasets/cdiscpilot01/tabulations/sdtm/define.xml}
+ * ({@code cdisc-org/sdtm-adam-pilot-project} at {@code 667511d4}, Define-XML 1.0), passed as
+ * {@code -Dprune.sdtm.source=<path>}. After the prune its six dataset leaves are renamed
+ * {@code .xpt} → {@code .json} ({@link #adaptSdtmDefine}), the pilot's own Dataset-JSON files
+ * shipped unmodified beside it. The ADaM define is CDISC's MIT-licensed
+ * {@code DataExchange-DatasetJson} {@code examples/adam/define.xml} (Define-XML 2.1), passed as
+ * {@code -Dprune.adam.source=<path>}. After the prune the ADaM define is adapted to the fixture
+ * beside it ({@link #adaptAdamDefine}): dataset leaves {@code .xpt} → {@code .dsjc}, the two
+ * {@code ADLBC} ISO columns {@code AXDTM} / {@code AXTM} declared, and the {@code ODM}
+ * {@code SourceSystem} / {@code SourceSystemVersion} attributes removed. Each input's md5 is
+ * checked first, so a different upstream revision fails instead of silently producing a different
+ * fixture. The provenance is recorded in {@code testdata_study/README.md}.
  * </p>
  *
  * <p>
@@ -62,21 +66,16 @@ import org.w3c.dom.NodeList;
  * </p>
  *
  * <p>
- * Activated only when {@code -Dprune.defines=true} is passed to the test runner. Regenerate the
- * ADaM define alone:
+ * Activated only when {@code -Dprune.defines=true} is passed to the test runner. Regenerate one
+ * define at a time, each naming its own input:
  * </p>
  *
  * <pre>
+ *   mvn -o test -Dtest=PruneDefineXmlDriver#pruneSdtmDefine -Dprune.defines=true \
+ *       -Dprune.sdtm.source=&lt;sdtm-adam-pilot-project&gt;/updated-pilot-submission-package/900172/m5/datasets/cdiscpilot01/tabulations/sdtm/define.xml
  *   mvn -o test -Dtest=PruneDefineXmlDriver#pruneAdamDefine -Dprune.defines=true \
  *       -Dprune.adam.source=&lt;DataExchange-DatasetJson&gt;/examples/adam/define.xml
  * </pre>
- *
- * <p>
- * Do not run the whole class for that: {@link #pruneSdtmDefine} would rewrite
- * {@code sdtm/define.xml} from the untracked pilot define, and it has no leaf rewrite, so the
- * result would name {@code .xpt} datasets where the committed file names the {@code .dsjc} ones
- * beside it.
- * </p>
  *
  * <p>
  * The class name intentionally does NOT match the default surefire {@code *Test.java} pattern —
@@ -87,9 +86,17 @@ import org.w3c.dom.NodeList;
 class PruneDefineXmlDriver // NOSONAR S3577 — Underscore-categorised name is the suite convention.
 {
 
-    /** Upstream SDTM define (the full 22-domain pilot study, untracked). */
-    private static final Path SDTM_SOURCE = Path.of(System.getProperty("repoRoot"),
-            "testdata/study/sdtm/define.xml");
+    /**
+     * System property naming the upstream SDTM define: the CDISC pilot's
+     * {@code tabulations/sdtm/define.xml} (the full 22-domain study, Define-XML 1.0).
+     */
+    private static final String SDTM_SOURCE_PROPERTY = "prune.sdtm.source";
+
+    /**
+     * md5 of the pilot's {@code tabulations/sdtm/define.xml} at {@code sdtm-adam-pilot-project}
+     * {@code 667511d4}, the revision {@code testdata_study/README.md} records.
+     */
+    private static final String SDTM_SOURCE_MD5 = "ecbefff4cf1879b6ebc606e76706fc87";
 
     /**
      * System property naming the upstream ADaM define: {@code examples/adam/define.xml} of a
@@ -146,9 +153,15 @@ class PruneDefineXmlDriver // NOSONAR S3577 — Underscore-categorised name is t
 
     private static final String DEF21_NS = "http://www.cdisc.org/ns/def/v2.1";
 
+    /** The pilot SDTM define is Define-XML 1.0. */
+    private static final String DEF10_NS = "http://www.cdisc.org/ns/def/v1.0";
+
     private static final String XLINK_NS = "http://www.w3.org/1999/xlink";
 
     private static final String ARM_NS = "http://www.cdisc.org/ns/arm/v1.0";
+
+    /** A title's {@code .xpt} suffix, with the trailing whitespace the pilot titles carry. */
+    private static final Pattern XPT_SUFFIX = Pattern.compile("\\.xpt(\\s*)$");
 
     /** The fixture dataset that carries the ISO columns, beside the ADaM define. */
     private static final Path ADLBC_DATASET = ADAM_TARGET.resolveSibling("adlbc.dsjc");
@@ -170,21 +183,30 @@ class PruneDefineXmlDriver // NOSONAR S3577 — Underscore-categorised name is t
     @Test
     void pruneSdtmDefine() throws Exception
     {
-        pruneDefine(SDTM_SOURCE, SDTM_TARGET, SDTM_KEEP);
-        assertKeptExactly(SDTM_SOURCE, SDTM_TARGET, SDTM_KEEP);
+        Path sdtmSource = requiredSource(SDTM_SOURCE_PROPERTY,
+                "<sdtm-adam-pilot-project>/.../tabulations/sdtm/define.xml", SDTM_SOURCE_MD5,
+                "the sdtm-adam-pilot-project 667511d4 define");
+        pruneDefine(sdtmSource, SDTM_TARGET, SDTM_KEEP, doc ->
+        {
+        }, PruneDefineXmlDriver::adaptSdtmDefine);
+        assertKeptExactly(sdtmSource, SDTM_TARGET, SDTM_KEEP);
+        String xml = Files.readString(SDTM_TARGET, StandardCharsets.UTF_8);
+        assertFalse(xml.contains(".xpt"), "an .xpt leaf survived in " + SDTM_TARGET);
+        for (String domain : SDTM_KEEP)
+        {
+            String file = domain.toLowerCase(Locale.ROOT) + ".json";
+            assertTrue(xml.contains("xlink:href=\"" + file + "\""),
+                    file + " leaf missing in " + SDTM_TARGET);
+        }
     }
 
 
     @Test
     void pruneAdamDefine() throws Exception
     {
-        String source = System.getProperty(ADAM_SOURCE_PROPERTY);
-        assertTrue(source != null && !source.isBlank(), "-D" + ADAM_SOURCE_PROPERTY
-                + "=<DataExchange-DatasetJson>/examples/adam/define.xml is required");
-        Path adamSource = Path.of(source);
-        assertTrue(Files.isRegularFile(adamSource), "source define not found: " + adamSource);
-        assertEquals(ADAM_SOURCE_MD5, md5(adamSource), adamSource
-                + " is not the DataExchange-DatasetJson a379f49a define the README records");
+        Path adamSource = requiredSource(ADAM_SOURCE_PROPERTY,
+                "<DataExchange-DatasetJson>/examples/adam/define.xml", ADAM_SOURCE_MD5,
+                "the DataExchange-DatasetJson a379f49a define");
         pruneDefine(adamSource, ADAM_TARGET, ADAM_KEEP,
                 doc -> dropForeignResultDisplays(doc, ADAM_KEEP),
                 PruneDefineXmlDriver::adaptAdamDefine);
@@ -192,6 +214,50 @@ class PruneDefineXmlDriver // NOSONAR S3577 — Underscore-categorised name is t
         assertAdaptedAdamDefine(ADAM_TARGET);
         assertReferencesResolve(ADAM_TARGET);
         assertIsoColumnsMatchDataset(ADAM_TARGET, ADLBC_DATASET);
+    }
+
+
+    /**
+     * The input define named by {@code property}, checked to be the revision the README records
+     * ({@code md5}), so a different upstream file fails instead of producing a different fixture.
+     */
+    private static Path requiredSource(String property, String hint, String md5, String what)
+        throws Exception
+    {
+        String source = System.getProperty(property);
+        assertTrue(source != null && !source.isBlank(),
+                "-D" + property + "=" + hint + " is required");
+        Path path = Path.of(source);
+        assertTrue(Files.isRegularFile(path), "source define not found: " + path);
+        assertEquals(md5, md5(path), path + " is not " + what + " the README records");
+        return path;
+    }
+
+
+    /**
+     * Fits the pruned pilot SDTM define to the fixture beside it: every dataset leaf names the
+     * pilot's own {@code .json} file (the source names {@code .xpt}). The title keeps its trailing
+     * whitespace, so the rename is the only change.
+     */
+    private static void adaptSdtmDefine(Document doc)
+    {
+        NodeList leafs = doc.getElementsByTagNameNS(DEF10_NS, "leaf");
+        for (int i = 0; i < leafs.getLength(); i++)
+        {
+            Element leaf = (Element) leafs.item(i);
+            String href = leaf.getAttributeNS(XLINK_NS, "href");
+            if (href.endsWith(".xpt"))
+            {
+                leaf.setAttributeNS(XLINK_NS, "xlink:href", withExtension(href, ".json"));
+                NodeList titles = leaf.getElementsByTagNameNS(DEF10_NS, "title");
+                for (int t = 0; t < titles.getLength(); t++)
+                {
+                    String title = titles.item(t).getTextContent();
+                    titles.item(t)
+                            .setTextContent(XPT_SUFFIX.matcher(title).replaceFirst(".json$1"));
+                }
+            }
+        }
     }
 
 
@@ -251,11 +317,12 @@ class PruneDefineXmlDriver // NOSONAR S3577 — Underscore-categorised name is t
             String href = leaf.getAttributeNS(XLINK_NS, "href");
             if (href.endsWith(".xpt"))
             {
-                leaf.setAttributeNS(XLINK_NS, "xlink:href", toDsjc(href));
+                leaf.setAttributeNS(XLINK_NS, "xlink:href", withExtension(href, ".dsjc"));
                 NodeList titles = leaf.getElementsByTagNameNS(DEF21_NS, "title");
                 for (int t = 0; t < titles.getLength(); t++)
                 {
-                    titles.item(t).setTextContent(toDsjc(titles.item(t).getTextContent().strip()));
+                    titles.item(t).setTextContent(
+                            withExtension(titles.item(t).getTextContent().strip(), ".dsjc"));
                 }
             }
         }
@@ -300,9 +367,9 @@ class PruneDefineXmlDriver // NOSONAR S3577 — Underscore-categorised name is t
     }
 
 
-    private static String toDsjc(String name)
+    private static String withExtension(String xptName, String extension)
     {
-        return name.substring(0, name.length() - ".xpt".length()) + ".dsjc";
+        return xptName.substring(0, xptName.length() - ".xpt".length()) + extension;
     }
 
 
@@ -473,16 +540,6 @@ class PruneDefineXmlDriver // NOSONAR S3577 — Underscore-categorised name is t
         assertFalse(expected.isEmpty(), "none of " + keep + " is an ItemGroup of " + source);
         assertEquals(expected, new TreeSet<>(collectItemGroupOIDs(target)),
                 "ItemGroups written to " + target);
-    }
-
-
-    private static void pruneDefine(Path source, Path target, Set<String> keep) throws Exception
-    {
-        pruneDefine(source, target, keep, doc ->
-        {
-        }, doc ->
-        {
-        });
     }
 
 
