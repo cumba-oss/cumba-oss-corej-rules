@@ -1,9 +1,9 @@
 #!RuleTest
 #test PMDA-SD1082 expect=violation domain=LB
-#note "Round 2026-10-12 (byte-length): LBSTRESC holds 'µmol', 4 characters but 5 bytes in UTF-8 (the scenario default), and is declared length=4 - one byte short of its stored size - so it fires (4 != 5 bytes). Counting characters (the rule before unit=\"bytes\") compared 4 == 4 and missed it."
+#note "Round 2026-10-12 (byte-length): LBSTRESC holds 'µmol', 4 characters but 5 bytes in UTF-8 (the scenario default), and is declared length=4 - one byte short of its stored size - so it fires (4 != 5 bytes). Counting characters (the rule before unit=\"bytes\") compared 4 == 4 and missed it. The finding reports the length the Check counted, variable_max_size=5 (PLAN-stopped-rule-engine-fixes item 4, SR6: the projection used to recompute it in characters and reported 4)."
 #library standard=sdtmig version=3-4
 #expectViolationCount 1
-#expectViolationAt variable_name=LBSTRESC variable_size=4
+#expectViolationAt variable_name=LBSTRESC variable_size=4 variable_max_size=5
 dataset LB class=FINDINGS label="Laboratory Test Results"
 col STUDYID  type=Char length=12 label="Study Identifier"
 col DOMAIN   type=Char length=2  label="Domain Abbreviation"
