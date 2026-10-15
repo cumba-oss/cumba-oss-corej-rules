@@ -37,8 +37,8 @@ Bindings:
 Check:
   expression: >-
     not empty(DSSTDTC) and DSDECOD == "INFORMED CONSENT OBTAINED" and
-    present_on_multiple_rows_within(DSDECOD, within=USUBJID) and $min_ds_dsstdtc == date(DSSTDTC)
-    and $min_ds_dsstdtc != date(DM.RFICDTC)
+    present_on_multiple_rows_within(DSDECOD, within=USUBJID) and $min_ds_dsstdtc == DSSTDTC and
+    $min_ds_dsstdtc != DM.RFICDTC
 Outcome:
   Message: "DSDECOD equals 'INFORMED CONSENT OBTAINED' on multiple records but the\
     \ earliest DSSTDTC for the subject is not equal to RFICDTC in the DM dataset."

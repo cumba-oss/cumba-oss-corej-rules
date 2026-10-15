@@ -15,6 +15,11 @@ description: |
   certainly not the same day as either EX extreme. Between the phase-3c rewrite and
   H1b this row was expected silent; that expectation was the old behaviour, not a
   separate decision.
+
+  D130 (round 2026-10-15; owner ruling 2026-09-17: "The value must be equal ... the rule
+  compares if both values are the same (the derivation was applied correctly)"): the
+  date() wrapper is gone and DM's copy is compared as TEXT with the value the extreme
+  selected, so subjects 004 and 005 FIRE again -- neither copy is the selected value.
 python_source: rules-sdtmig-3-4.json (CORE-000238)
 rule:
   coreId: CDISC-CG0147
@@ -64,4 +69,23 @@ expected_violations:
       $max_ex_exendtc: '2026-01-10'
       $max_ex_exstdtc: '2026-01-01'
       RFXENDTC: '2026-02-99'
+  # D130 (round 2026-10-15): compared as TEXT, the copy is not the selected value. See description.
+  - rule_id: CDISC-CG0147
+    dataset: DM
+    row_key: {STUDYID: S1, USUBJID: '004'}
+    status: SUCCESS
+    output_variables:
+      $ex_usubjid: '[001, 002, 003, 004, 005]'
+      $max_ex_exendtc: '2026-01-10T09:00'
+      $max_ex_exstdtc: '2026-01-01'
+      RFXENDTC: '2026-01-10'
+  - rule_id: CDISC-CG0147
+    dataset: DM
+    row_key: {STUDYID: S1, USUBJID: '005'}
+    status: SUCCESS
+    output_variables:
+      $ex_usubjid: '[001, 002, 003, 004, 005]'
+      $max_ex_exendtc: '2026-01-10T08:00'
+      $max_ex_exstdtc: '2026-01-01'
+      RFXENDTC: '2026-01-10T10:00+02:00'
 expected_errors: []
