@@ -1,0 +1,19 @@
+#!RuleTest
+#test CDISC-AD0897 expect=noViolation domain=ADLBC
+#note "Round 2026-10-15 review M4: no APERIOD and ADSL carries no TRTxxA at all (only the non-IG TRT1A) -> the record's period cannot be resolved to a variable -> not compared (the owner's 'compare only when exactly one TRTxxA exists'). Before the round this fired (TRTA matched no TRTxxA). An ADSL without TRT01A is a defect of ADSL, reported by the ADSL rules, not by AD0897. With APERIOD populated the period's own variable is read and an absent one fires (invalid_period_without_adsl_variable)."
+#define standard=adamig version=1-3
+dataset ADLBC structure=BDS
+col STUDYID type=Char
+col USUBJID type=Char
+col TRTA type=Char
+---
+CDISCPILOT01 | 01-701-1015 | Xanomeline High Dose
+---
+
+dataset ADSL label="Subject-Level Analysis"
+col STUDYID type=Char
+col USUBJID type=Char
+col TRT1A type=Char
+---
+CDISCPILOT01 | 01-701-1015 | Placebo
+---

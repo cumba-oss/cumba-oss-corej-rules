@@ -1535,7 +1535,7 @@ Bindings:
 - name: "$first_exstdtc"
   expression: 'earliest_date($min_ex_exstdtc, $pool_min_exstdtc)'
 Check:
-  expression: 'not empty(RFXSTDTC) and (USUBJID in $ex_usubjid or $pool_ex_rows > 0) and date(RFXSTDTC) != $first_exstdtc'
+  expression: 'not empty(RFXSTDTC) and (USUBJID in $ex_usubjid or $pool_ex_rows > 0) and RFXSTDTC != $first_exstdtc'
 ```
 
 **Missing and empty** — The extremes' candidate rule, **not** propagation: a missing argument (any identity) and a blank or whitespace-only argument are not candidates, and the other argument decides alone — `earliest_date(.A, date("2020-01-01"))` is `2020-01-01`. So a grouped extreme that has no answer (a subject in no pool, an undeterminable pool) is skipped and the other part is taken. Only when **both** arguments are missing is their identity carried: `.A` and `.A` give `.A`, two distinct identities give the plain missing (rulings register `D85c` / `D86a`). Any other case with no answer — two blanks, a missing beside a blank, an undeterminable pair — is the plain missing (`MIS`). `!=` against a missing answer fires (`D34a`); `empty()` on it is true.
@@ -1756,7 +1756,7 @@ Bindings:
 - name: "$last_exendtc"
   expression: 'latest_date($latest_exendtc, $pool_latest_exendtc)'
 Check:
-  expression: 'not empty(RFXENDTC) and (USUBJID in $ex_subjects or $pool_ex_rows > 0) and date(RFXENDTC) != $last_exendtc and date(RFXENDTC) != $last_exstdtc'
+  expression: 'not empty(RFXENDTC) and (USUBJID in $ex_subjects or $pool_ex_rows > 0) and RFXENDTC != $last_exendtc and RFXENDTC != $last_exstdtc'
 ```
 
 **Missing and empty** — As [`earliest_date`](#earliest_date): a missing or blank argument is skipped and the other decides; both missing carry their identity (`.A` + `.A` is `.A`, `.A` + `.B` is `MIS`); any other no-answer is the plain missing, and `!=` against it fires.
@@ -2130,7 +2130,7 @@ Bindings:
 - name: "$max_ex_exendtc"
   expression: 'max_date(EXENDTC, domain="EX", missing_values="indeterminate", group=[USUBJID])'
 Check:
-  expression: 'USUBJID in $ex_usubjid and date(RFXENDTC) != $max_ex_exstdtc and date(RFXENDTC) != $max_ex_exendtc'
+  expression: 'USUBJID in $ex_usubjid and RFXENDTC != $max_ex_exstdtc and RFXENDTC != $max_ex_exendtc'
 ```
 
 **Minimal — required parameters only**
@@ -2173,7 +2173,7 @@ Bindings:
 - name: "$min_ds_dsstdtc"
   expression: 'min_date(DSSTDTC, domain="DS", group=[USUBJID], filter=(DSDECOD=="INFORMED CONSENT OBTAINED"))'
 Check:
-  expression: 'not empty(DSSTDTC) and DSDECOD == "INFORMED CONSENT OBTAINED" and present_on_multiple_rows_within(DSDECOD, within=USUBJID) and $min_ds_dsstdtc == date(DSSTDTC) and $min_ds_dsstdtc != date(DM.RFICDTC)'
+  expression: 'not empty(DSSTDTC) and DSDECOD == "INFORMED CONSENT OBTAINED" and present_on_multiple_rows_within(DSDECOD, within=USUBJID) and $min_ds_dsstdtc == DSSTDTC and $min_ds_dsstdtc != DM.RFICDTC'
 ```
 
 **Minimal — required parameters only**
@@ -2183,7 +2183,7 @@ Bindings:
 - name: "$min_ds_dsstdtc"
   expression: 'min_date(DSSTDTC, domain="DS", group=[USUBJID])'
 Check:
-  expression: 'DSDECOD == "INFORMED CONSENT OBTAINED" and not empty(DSSTDTC) and date(DSSTDTC) == $min_ds_dsstdtc and not empty(DM.RFICDTC) and date(DM.RFICDTC) != $min_ds_dsstdtc'
+  expression: 'DSDECOD == "INFORMED CONSENT OBTAINED" and not empty(DSSTDTC) and DSSTDTC == $min_ds_dsstdtc and not empty(DM.RFICDTC) and DM.RFICDTC != $min_ds_dsstdtc'
 ```
 
 **When there is nothing to answer** — **missing**, as for `max_date`.

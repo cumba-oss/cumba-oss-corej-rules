@@ -1,0 +1,14 @@
+#!RuleTest
+#test FDA-SD1076 expect=noViolation domain=AE
+#note "Round 2026-10-15 review M1: the dataset spells its columns in lower case. get_dataset_filtered_variables answers the dataset's own spelling, so the IG lists are upper-cased in the binding to compare with upper(varname()); every column is in the SDTMIG 3.4 AE specification -> no finding. Without the upper() the rule reported every IG variable that is also a model variable."
+#library-ref standard=sdtmig version=3-4
+dataset AE label="Adverse Events"
+col studyid type=Char
+col domain  type=Char
+col usubjid type=Char
+col aeseq   type=Num
+col aeterm  type=Char
+col aedecod type=Char
+---
+S1 | AE | 001 | 1 | HEADACHE | Headache
+---

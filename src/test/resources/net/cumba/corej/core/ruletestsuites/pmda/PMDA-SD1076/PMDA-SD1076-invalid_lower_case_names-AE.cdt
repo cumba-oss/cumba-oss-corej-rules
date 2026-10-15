@@ -1,0 +1,17 @@
+#!RuleTest
+#test PMDA-SD1076 expect=violation domain=AE
+#note "Round 2026-10-15 review M1: the invalid AE with its columns spelled in lower case -> aelat (SDTM Events class, not in the SDTMIG 3.4 AE specification) still fires, and only it: the IG lists are upper-cased in the binding (CIT §3: the rule folds both sides)."
+#expectViolationCount 1
+#expectViolationAt variable_name=aelat
+#library-ref standard=sdtmig version=3-4
+dataset AE label="Adverse Events"
+col studyid type=Char
+col domain  type=Char
+col usubjid type=Char
+col aeseq   type=Num
+col aeterm  type=Char
+col aedecod type=Char
+col aelat   type=Char
+---
+S1 | AE | 001 | 1 | HEADACHE | Headache | LEFT
+---

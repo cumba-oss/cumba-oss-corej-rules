@@ -13,20 +13,24 @@ Bindings:
 - name: "$model_order"
   expression: "get_model_column_order()"
 - name: "$ig_req"
-  expression: "get_dataset_filtered_variables(key_name=\"core\", key_value=\"Req\"\
-    )"
+  expression: "upper(get_dataset_filtered_variables(key_name=\"core\", key_value=\"\
+    Req\"))"
 - name: "$ig_exp"
-  expression: "get_dataset_filtered_variables(key_name=\"core\", key_value=\"Exp\"\
-    )"
+  expression: "upper(get_dataset_filtered_variables(key_name=\"core\", key_value=\"\
+    Exp\"))"
 - name: "$ig_perm"
-  expression: "get_dataset_filtered_variables(key_name=\"core\", key_value=\"Perm\"\
-    )"
+  expression: "upper(get_dataset_filtered_variables(key_name=\"core\", key_value=\"\
+    Perm\"))"
 Check:
   expression: >-
     upper(varname()) in $model_order and upper(varname()) not in $ig_req and upper(varname()) not in
     $ig_exp and upper(varname()) not in $ig_perm
 Outcome:
   Message: "A Model permissible variable has been added into a standard domain."
+  Output_Variables:
+  - "!$ig_req"
+  - "!$ig_exp"
+  - "!$ig_perm"
 Source:
   FDA_Validator_Rule_Message: "Model permissible variable added into standard domain"
   FDA_Validator_Rule_Description: "SDTM model variable may be added into standard\

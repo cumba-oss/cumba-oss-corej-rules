@@ -1,6 +1,6 @@
 #!RuleTest
 #test CDISC-AD0720 expect=violation domain=ADLBC
-#note "Round 2026-10-15 (owner): APERIOD blank on the record and ADSL has exactly one TRTxxP (TRT01P) -> compared with TRT01P; TRTP differs -> fires."
+#note "Round 2026-10-15 (owner): APERIOD blank on the record and ADSL has exactly one TRTxxP (TRT01P) -> compared with TRT01P; TRTP differs -> fires. ADSL also carries the numeric TRT01PN, which find_vars(\"ADSL.TRTxxP\") does not count (the count stays exactly one)."
 #expectViolationCount 1
 #expectViolationAt row=1 USUBJID=01-701-1015
 dataset ADLBC
@@ -16,6 +16,7 @@ dataset ADSL label="Subject-Level Analysis"
 col STUDYID type=Char
 col USUBJID type=Char
 col TRT01P type=Char
+col TRT01PN type=Num
 ---
-CDISCPILOT01 | 01-701-1015 | Placebo
+CDISCPILOT01 | 01-701-1015 | Placebo | 1
 ---

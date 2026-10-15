@@ -197,8 +197,10 @@ Bindings:
   expression: 'earliest_date($min_ex_exstdtc, $pool_min_exstdtc)'
 Check:
   expression: >-
-    not empty(RFXSTDTC) and (USUBJID in $ex_usubjid or $pool_ex_rows > 0) and date(RFXSTDTC) != $first_exstdtc
+    not empty(RFXSTDTC) and (USUBJID in $ex_usubjid or $pool_ex_rows > 0) and RFXSTDTC != $first_exstdtc
 ```
+
+The DM date is compared with the selected extreme **as text**, never wrapped in `date()`: the extreme returns the winning row's own value, and the question is whether DM copied it (rulings register `D130`) — a same-day value at another precision is not the copy.
 
 SEND records a dose given to a group-housed pool **once per pool**: the EX row carries `POOLID` and a
 blank `USUBJID`, and POOLDEF maps each pool to its subjects (a subject can be in several pools). A
