@@ -40,7 +40,7 @@ import org.junit.jupiter.api.io.TempDir;
  *
  * <h2>(i) The CDISC MSG v2 example as published: STDTMIG 3.3 + SDTMIG-MD 1.1</h2>
  * <p>
- * All 8 CDISC-2.1 and 5 PMDA-2.1 library rules EXECUTE, with <b>no findings</b> — and the reason is
+ * All 9 CDISC-2.1 and 5 PMDA-2.1 library rules EXECUTE, with <b>no findings</b> — and the reason is
  * the DOCUMENT's defect, not the engine's: its IG standard is spelled {@code STDTMIG} (CDISC's own
  * typo for {@code SDTMIG}), and all 31 datasets reference it. The provider folds hyphens and case
  * ({@code SDTM-IG} = {@code SDTMIG}) but {@code STDTMIG} is a different word, so every
@@ -62,7 +62,7 @@ import org.junit.jupiter.api.io.TempDir;
  *
  * <h2>(ii) The same document with the typo corrected ({@code STDTMIG} → {@code SDTMIG})</h2>
  * <p>
- * Not in the plan's row; added because case (i) leaves 11 of the 13 rules executing over nothing.
+ * Not in the plan's row; added because case (i) leaves 12 of the 14 rules executing over nothing.
  * With the one attribute corrected, SDTMIG 3.3 is in reach for every dataset, and the adjudicated
  * findings are the example's real departures from the published IG:
  * </p>
@@ -89,7 +89,8 @@ import org.junit.jupiter.api.io.TempDir;
  * <p>
  * 0067, 0097, 0098, 0099, 0263, 0266, DD0116 and DD0137 raise nothing here (the Req variables are
  * all {@code Mandatory="Yes"}; every CT-required codelist and item carries its alias or is a marked
- * extension; 3.3 is published; every variable label matches).
+ * extension; 3.3 is published; every variable label matches). 9001 raises nothing either: its
+ * {@code when:} takes SEND defines only.
  * </p>
  * <p>
  * 2026-10-03 store format 5: 0266 / DD0137 used to fire once each on LBTESTCD, because SDTMIG 3.3
@@ -105,10 +106,14 @@ class LibraryRulesRealStoreTest
 
     private static final String MSG = "define-v21-msg-sdtm.xml";
 
-    /** The 8 CDISC Define-XML 2.1 library rules (0263-B is the 2.0 leg). */
+    /**
+     * The 9 CDISC Define-XML 2.1 library rules (0263-B is the 2.0 leg). {@code DEFINE-XML-9001}
+     * reads the Library only for its label exemption (PLAN-define-rule-library-label); a SEND rule,
+     * it executes over nothing on this SDTM define ({@link DefineXml9001RealStoreTest} runs it).
+     */
     private static final Set<String> CDISC_21 = Set.of("DEFINE-XML-0067", "DEFINE-XML-0097",
             "DEFINE-XML-0098", "DEFINE-XML-0099", "DEFINE-XML-0149", "DEFINE-XML-0263",
-            "DEFINE-XML-0265", "DEFINE-XML-0266");
+            "DEFINE-XML-0265", "DEFINE-XML-0266", "DEFINE-XML-9001");
 
     /** The 5 PMDA Define-XML 2.1 library rules. */
     private static final Set<String> PMDA_21 = Set.of("PMDA-DD0116", "PMDA-DD0118", "PMDA-DD0124",
@@ -143,7 +148,7 @@ class LibraryRulesRealStoreTest
         Set<String> expected = new TreeSet<>(CDISC_21);
         expected.addAll(PMDA_21);
         assertEquals(expected, rules.keySet(), "Requires: library rules applicable at 2.1");
-        assertEquals(13, rules.size(), "8 CDISC + 5 PMDA");
+        assertEquals(14, rules.size(), "9 CDISC + 5 PMDA");
         return rules;
     }
 

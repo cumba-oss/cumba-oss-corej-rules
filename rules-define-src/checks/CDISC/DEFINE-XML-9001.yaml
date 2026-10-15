@@ -12,24 +12,19 @@ Severity: "Warning"
 # Specification, not Schema: the requirement is SENDIG 3.1.1 section 4.2.3 prose ("should be
 # used consistently in all labels and comments"), nothing the Define-XML schema constrains.
 Source_Type: "Specification"
+Requires: "library"
 Plain_Text_Rule: "\"Subject\" should be used where applicable to generically refer to \"animal.\" The term \"subject\" should be used consistently in all labels and comments (SENDIG 3.1.1 section 4.2.3): a variable description (ItemDef) or comment (def:CommentDef) of a SEND Define-XML does not use \"animal\" unless it is the SENDIG's own label."
 # Scope: a Description/TranslatedText whose Description belongs to an ItemDef or a def:CommentDef
 # (its owner's OID resolves to an ItemDef / CommentDef - the selector alone would also take
 # ItemGroupDef, MethodDef, Origin and ValueListDef descriptions), in a SEND define: Define-XML
 # 2.0 names the standard on MetaDataVersion/@def:StandardName (the PHUSE send_1 define:
 # "SEND-IG"), 2.1 in def:Standards/def:Standard/@Name ("SENDIG", "SENDIG-DART", ...).
-# The IG-label exemption: no define kind or condition can compare a description with the
-# CDISC Library label of ITS variable (only library_variable_label_matches reads that label, as
-# a whole check). The pattern therefore exempts, as alternatives of the full match, the three
-# SEND IG labels containing "animal" - measured in our metadata store across SENDIG 3.0, 3.1,
-# 3.1.1, SENDIG-DART 1.1, 1.2 and SENDIG-Genetox 1.0 (BWDTC / BGDTC, BWDY / BGDY, BGENDTC); a
-# new IG version adding such a label needs the list extended. The exemption is not tied to the
-# variable: any ItemDef or comment worded exactly as one of the three labels passes.
 Message: "The description [${value}] uses \"animal\"; the SENDIG asks for \"subject\" in all labels and comments."
 Check:
   kind: "matches_regex"
   attribute: "#text"
-  pattern: '(?is)(?!.*\banimals?\b).*|Date/Time Animal Weighed|End Date/Time Animal Weighed|Study Day Animal Weighed'
+  pattern: '(?is)(?!.*\banimals?\b).*'
+  exemptLibraryLabel: true
   when:
     all:
     - any:

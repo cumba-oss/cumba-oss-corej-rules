@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  DEFINE-XML-9001 against the metadata store (PLAN-define-rule-library-label row 11), written for
+  DefineXml9001RealStoreTest: Define-XML 2.1, SENDIG 3.1.1 in def:Standards, every dataset governed
+  by def:StandardOID; the CT standard is a package the store holds (sendct-2024-09-27), since a
+  package the store lacks aborts the binding.
+  BW / BG carry their SENDIG labels (BWDTC, BWDY, BGDTC, BGENDTC: exempt); BWTESTCD is worded as
+  another variable's label (its own is "Test Short Name"), BGDY with the SENDIG 3.0 label (3.1 and
+  3.1.1 publish "Study Day of Start of Interval"), BWANCD is a sponsor variable; comment COM.1 says
+  "animals", COM.2 repeats a label word for word (a comment is never a label).
+-->
+<ODM xmlns="http://www.cdisc.org/ns/odm/v1.3"
+     xmlns:def="http://www.cdisc.org/ns/def/v2.1"
+     FileOID="www.example.org/define/send-animal-labels-21"
+     FileType="Snapshot"
+     ODMVersion="1.3.2"
+     CreationDateTime="2026-10-15T10:00:00">
+  <Study OID="ST.ANIMAL">
+    <GlobalVariables>
+      <StudyName>ANIMAL LABELS</StudyName>
+      <StudyDescription>Synthetic SEND study for the animal-label rule</StudyDescription>
+      <ProtocolName>ANIMAL LABELS</ProtocolName>
+    </GlobalVariables>
+    <MetaDataVersion OID="MDV.ANIMAL.21" Name="Animal labels 2.1" def:DefineVersion="2.1.0">
+      <def:Standards>
+        <def:Standard OID="STD.IG" Name="SENDIG" Type="IG" Version="3.1.1" Status="Final"/>
+        <def:Standard OID="STD.CT" Name="CDISC/NCI" Type="CT" PublishingSet="SEND" Version="2024-09-27" Status="Final"/>
+      </def:Standards>
+      <ItemGroupDef OID="IG.BW" Name="BW" Repeating="Yes" Domain="BW" SASDatasetName="BW" def:Structure="One record per weighing per subject" def:ArchiveLocationID="LF.BW" def:StandardOID="STD.IG">
+        <Description><TranslatedText xml:lang="en">Body Weight</TranslatedText></Description>
+        <ItemRef ItemOID="IT.BW.BWTESTCD" Mandatory="Yes" OrderNumber="1"/>
+        <ItemRef ItemOID="IT.BW.BWDTC" Mandatory="No" OrderNumber="2"/>
+        <ItemRef ItemOID="IT.BW.BWDY" Mandatory="No" OrderNumber="3"/>
+        <ItemRef ItemOID="IT.BW.BWANCD" Mandatory="No" OrderNumber="4"/>
+      </ItemGroupDef>
+      <ItemGroupDef OID="IG.BG" Name="BG" Repeating="Yes" Domain="BG" SASDatasetName="BG" def:Structure="One record per interval per subject" def:ArchiveLocationID="LF.BG" def:StandardOID="STD.IG">
+        <Description><TranslatedText xml:lang="en">Body Weight Gains</TranslatedText></Description>
+        <ItemRef ItemOID="IT.BG.BGDTC" Mandatory="No" OrderNumber="1"/>
+        <ItemRef ItemOID="IT.BG.BGENDTC" Mandatory="No" OrderNumber="2"/>
+        <ItemRef ItemOID="IT.BG.BGDY" Mandatory="No" OrderNumber="3"/>
+      </ItemGroupDef>
+      <ItemDef OID="IT.BW.BWTESTCD" Name="BWTESTCD" DataType="text" Length="40">
+        <Description><TranslatedText xml:lang="en">Date/Time Animal Weighed</TranslatedText></Description>
+      </ItemDef>
+      <ItemDef OID="IT.BW.BWDTC" Name="BWDTC" DataType="text" Length="40" def:CommentOID="COM.1">
+        <Description><TranslatedText xml:lang="en">Date/Time Animal Weighed</TranslatedText></Description>
+      </ItemDef>
+      <ItemDef OID="IT.BW.BWDY" Name="BWDY" DataType="text" Length="40">
+        <Description><TranslatedText xml:lang="en">Study Day Animal Weighed</TranslatedText></Description>
+      </ItemDef>
+      <ItemDef OID="IT.BW.BWANCD" Name="BWANCD" DataType="text" Length="40">
+        <Description><TranslatedText xml:lang="en">Animal Weight Code</TranslatedText></Description>
+      </ItemDef>
+      <ItemDef OID="IT.BG.BGDTC" Name="BGDTC" DataType="text" Length="40" def:CommentOID="COM.2">
+        <Description><TranslatedText xml:lang="en">Date/Time Animal Weighed</TranslatedText></Description>
+      </ItemDef>
+      <ItemDef OID="IT.BG.BGENDTC" Name="BGENDTC" DataType="text" Length="40">
+        <Description><TranslatedText xml:lang="en">End Date/Time Animal Weighed</TranslatedText></Description>
+      </ItemDef>
+      <ItemDef OID="IT.BG.BGDY" Name="BGDY" DataType="text" Length="40">
+        <Description><TranslatedText xml:lang="en">Study Day Animal Weighed</TranslatedText></Description>
+      </ItemDef>
+      <def:CommentDef OID="COM.1">
+        <Description><TranslatedText xml:lang="en">All animals were fasted overnight.</TranslatedText></Description>
+      </def:CommentDef>
+      <def:CommentDef OID="COM.2">
+        <Description><TranslatedText xml:lang="en">Date/Time Animal Weighed</TranslatedText></Description>
+      </def:CommentDef>
+    </MetaDataVersion>
+  </Study>
+</ODM>
