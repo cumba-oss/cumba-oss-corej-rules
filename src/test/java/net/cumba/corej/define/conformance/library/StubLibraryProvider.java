@@ -39,7 +39,8 @@ public final class StubLibraryProvider implements LibraryProvider
      */
     private static final Map<String, String> RS_C_CODES = Map.of(//
             "RS/RSTESTCD", "C96782", //
-            "RS/RSTEST", "C96781");
+            "RS/RSTEST", "C96781", //
+            "RS/RSSTRESC", "C96785");
 
     private static final List<String> RS_VERSIONS = List.of("3.2", "3.3", "3.4");
 

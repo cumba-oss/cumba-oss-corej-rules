@@ -309,7 +309,10 @@ class PmdaLibraryRulesTest
                 .formatted(aIgVersion, aVariable, aCCode);
     }
 
-    /** A CT provider knowing HAMD-17's Test Code and Test Name lists as Clinical Classification. */
+    /**
+     * A CT provider knowing HAMD-17's Test Code and Test Name lists and HAM-A's Standardized
+     * Character Response and Original Response lists as Clinical Classification.
+     */
     private static final class HamdCtProvider implements CtProvider
     {
 
@@ -329,6 +332,10 @@ class PmdaLibraryRulesTest
                     .of(new CodelistClass("Clinical Classification", Optional.of("Test Code")));
             case "C100137" -> Optional
                     .of(new CodelistClass("Clinical Classification", Optional.of("Test Name")));
+            case "C182506" -> Optional.of(new CodelistClass("Clinical Classification",
+                    Optional.of("Character Response")));
+            case "C182468" -> Optional.of(
+                    new CodelistClass("Clinical Classification", Optional.of("Original Response")));
             default -> Optional.empty();
             };
         }
@@ -373,6 +380,23 @@ class PmdaLibraryRulesTest
                 evaluate(rs("3.3", "RSTESTCD", "C100137"), "2.1", new StubLibraryProvider(), ct)
                         .get("PMDA-DD0118").findings().size(),
                 "the Test NAME list on RSTESTCD is a mismatch (T8: the role is matched too)");
+        // rule round 2026-10-15 (owner): RSSTRESC takes the instrument's Standardized Character
+        // Response list (SDTMIG 3.3 RSSTRESC: "For Clinical Classifications, this may be a score";
+        // the Library assigns the oncology list C96785 only)
+        assertEquals(List.of("C96785"), new StubLibraryProvider().variableCodelistCCodes("SDTMIG",
+                "3.3", "RS", "RSSTRESC"));
+        assertEquals(List.of(),
+                evaluate(rs("3.3", "RSSTRESC", "C182506"), "2.1", new StubLibraryProvider(), ct)
+                        .get("PMDA-DD0118").findings(),
+                "RSSTRESC takes the instrument's Standardized Character Response list");
+        assertEquals(1,
+                evaluate(rs("3.3", "RSSTRESC", "C182468"), "2.1", new StubLibraryProvider(), ct)
+                        .get("PMDA-DD0118").findings().size(),
+                "the Original Response list on RSSTRESC is a mismatch (the role is matched too)");
+        assertEquals(1,
+                evaluate(rs("3.2", "RSSTRESC", "C182506"), "2.1", new StubLibraryProvider(), ct)
+                        .get("PMDA-DD0118").findings().size(),
+                "SDTMIG 3.2's RS is Disease Response only");
         // SR7 (a): no CT bound => the class is unknown and the rule fires as before (T4)
         assertEquals(1,
                 evaluate(rs("3.3", "RSTESTCD", "C100138"), "2.1", new StubLibraryProvider())
