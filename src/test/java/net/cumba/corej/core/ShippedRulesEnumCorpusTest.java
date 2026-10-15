@@ -1,5 +1,7 @@
 package net.cumba.corej.core;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.IOException;
@@ -7,9 +9,11 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Stream;
 import net.cumba.corej.core.model.Rule;
 import net.cumba.corej.core.model.RulePackage;
+import net.cumba.corej.core.model.VariableUniverse;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -28,6 +32,75 @@ import org.junit.jupiter.api.Test;
  */
 class ShippedRulesEnumCorpusTest
 {
+
+    /**
+     * The load-error fragments the ratchet treats as an invalid enum value, each keyed by the field
+     * it polices. ⚠ Each is a literal copied from {@code RulePackageLoader}; if the loader rewords
+     * one, the ratchet silently matches nothing for that field. That is why every entry has a
+     * planted probe in {@link #PROBES}, and why {@link #theRatchetIsLive_positiveControl} requires
+     * the two key sets to be equal.
+     */
+    private static final Map<String, String> MARKERS = Map.of("Rule_Type",
+            "is no longer a rule field", "Sensitivity", "Invalid Sensitivity", "Executability",
+            "Invalid Executability",
+            // Fix #236 — Join_Type joined the same fail-loud family. The corpus was parsed before
+            // the gate shipped and carries exactly two states (`left` and absent), so this arm
+            // must stay at zero: a hit means either a new authored value or a regression in the
+            // gate.
+            "Join_Type", "Invalid Join_Type",
+            // The Variable_Universe vocabulary (Data / Define) is closed like the others ...
+            "Variable_Universe", "Invalid Variable_Universe",
+            // ... and `Define` is only legal on a Check that iterates the variable cursor
+            // (PLAN-leaf-scope-domain-inference §3.7, RulePackageLoader.checkVariableUniverse).
+            "Variable_Universe:Define", "Variable_Universe: Define on a Check whose");
+
+    /** One synthetic rule per {@link #MARKERS} key that the loader must reject with that marker. */
+    private static final Map<String, String> PROBES = Map.of("Rule_Type",
+            "\"Rule_Type\": \"Record Data\", \"Check\": {\"expression\": \"AESEQ == 1\"}",
+            "Sensitivity",
+            "\"Sensitivity\": \"Bogus\", \"Check\": {\"expression\": \"AESEQ == 1\"}",
+            "Executability",
+            "\"Executability\": \"Bogus\", \"Check\": {\"expression\": \"AESEQ == 1\"}",
+            "Join_Type",
+            "\"Match_Datasets\": [{\"Name\": \"DM\", \"Keys\": [\"USUBJID\"],"
+                    + " \"Join_Type\": \"sideways\"}], \"Check\": {\"expression\": \"DM.AGE == 1\"}",
+            "Variable_Universe",
+            "\"Variable_Universe\": \"Bogus\", \"Check\": {\"expression\": \"AESEQ == 1\"}",
+            "Variable_Universe:Define",
+            "\"Variable_Universe\": \"Define\", \"Check\": {\"expression\": \"AESEQ == 1\"}");
+
+    /**
+     * The positive control (finding A3 of {@code FINDINGS-unowned-residuals}): the zero the corpus
+     * ratchet below reports is evidence only while each {@link #MARKERS} literal still matches what
+     * the loader emits. Every marker gets a planted rule through the same {@code RulePackageLoader}
+     * entry point, and the planted rule must be caught by exactly that marker. Reword a loader
+     * message and this reds, instead of the ratchet passing over nothing.
+     *
+     * @throws IOException
+     *             never in practice: the probes are in-memory strings
+     */
+    @Test
+    void theRatchetIsLive_positiveControl() throws IOException
+    {
+        assertEquals(MARKERS.keySet(), PROBES.keySet(),
+                "every ratchet marker needs a planted probe, and every probe a marker");
+        for (Map.Entry<String, String> probe : new java.util.TreeMap<>(PROBES).entrySet())
+        {
+            RulePackage pkg = RulePackageLoader.loadFromString(
+                    "{\"rules\": {\"probe\": {" + "\"Core\": {\"Id\": \"PROBE-ENUM\"},"
+                            + " \"Scope\": {\"Domains\": {\"Include\": [\"AE\"]}}, "
+                            + probe.getValue() + "}}}");
+            Rule rule = pkg.getRules().values().iterator().next();
+            String marker = MARKERS.get(probe.getKey());
+            assertNotNull(rule.getLoadError(),
+                    probe.getKey() + ": the loader no longer rejects the planted value at all");
+            assertTrue(rule.getLoadError().contains(marker), probe.getKey()
+                    + ": the loader's message no longer contains the ratchet's marker '" + marker
+                    + "', so the corpus ratchet matches nothing for this field. Message: "
+                    + rule.getLoadError());
+        }
+    }
+
 
     @Test
     void expressionCorpus_hasNoInvalidEnumValues() throws IOException
@@ -153,6 +226,7 @@ class ShippedRulesEnumCorpusTest
     private static void assertFolderClean(Path folder, int expectedPackages) throws IOException
     {
         List<String> offenders = new ArrayList<>();
+        java.util.Set<String> defineUniverseRules = new java.util.TreeSet<>();
         int packages = 0;
         int rules = 0;
         for (Path file : listRulePackages(folder))
@@ -166,15 +240,12 @@ class ShippedRulesEnumCorpusTest
                     continue;
                 }
                 rules++;
+                if (rule.getVariableUniverse() == VariableUniverse.DEFINE)
+                {
+                    defineUniverseRules.add(ruleId(rule));
+                }
                 String loadError = rule.getLoadError();
-                if (loadError != null && (loadError.contains("is no longer a rule field")
-                        || loadError.contains("Invalid Sensitivity")
-                        || loadError.contains("Invalid Executability")
-                        // Fix #236 — Join_Type joined the same fail-loud family. The corpus was
-                        // parsed before the gate shipped and carries exactly two states (`left`
-                        // and absent), so this arm must stay at zero: a hit means either a new
-                        // authored value or a regression in the gate.
-                        || loadError.contains("Invalid Join_Type")))
+                if (loadError != null && MARKERS.values().stream().anyMatch(loadError::contains))
                 {
                     offenders.add(file.getFileName() + "/" + ruleId(rule) + ": " + loadError);
                 }
@@ -191,6 +262,13 @@ class ShippedRulesEnumCorpusTest
                 + "/, saw " + packages + " packages (expected >= " + expectedPackages + ")");
         assertTrue(rules >= 3000,
                 "expected the full shipped corpus in " + folder + "/, saw " + rules + " rules");
+        // The Variable_Universe arms (both MARKERS entries) are only evidence while the corpus
+        // still ships the value they police: 14 distinct rules declared `Define` on 2026-10-15
+        // (10 CDISC + 4 DRAFT). Without this presence half, a corpus that dropped the field would
+        // keep both arms green over nothing.
+        assertTrue(defineUniverseRules.size() >= 10,
+                "expected the `Variable_Universe: Define` population (14 distinct rules as at"
+                        + " 2026-10-15); saw " + defineUniverseRules);
         assertTrue(offenders.isEmpty(), "shipped rules with invalid enum values ("
                 + offenders.size() + "):\n" + String.join("\n", offenders));
     }

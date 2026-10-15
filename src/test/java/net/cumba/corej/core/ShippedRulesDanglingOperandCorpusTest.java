@@ -1,5 +1,6 @@
 package net.cumba.corej.core;
 
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.IOException;
@@ -51,25 +52,64 @@ import org.junit.jupiter.api.Test;
  * <p>
  * ⚠ <b>What this test can and cannot prove.</b> It fails loudly the moment a dangling operand
  * appears anywhere in the shipped corpus — verified by pointing it at a copy of the corpus with one
- * such rule injected (see {@code plans/done/PLAN-not-executable-parks-a-rule.md} phase 3). What it
- * cannot do is demonstrate that {@code validateOperationReferences} detects anything at all: with
- * the corpus clean, a fully neutered pass would still satisfy every assertion below. <b>That proof
- * lives exclusively in {@code DanglingOperationReferenceLoadTest}</b> (corej-core), whose cases
- * drive synthetic fixtures such as {@code $never_defined} through the error channel and the inliner
- * lockstep, plus {@code NotExecutableParksRuleLoadTest} for the parking itself. <b>Do not delete
- * either sibling on the grounds that this one covers the corpus.</b>
+ * such rule injected (see {@code plans/done/PLAN-not-executable-parks-a-rule.md} phase 3). With the
+ * corpus clean, a neutered pass or a reworded loader message would still satisfy the corpus
+ * assertions, so {@link #theRatchetIsLive_positiveControl} drives one planted rule through the same
+ * loader and requires {@link #MARKER} to catch it (added 2026-10-15, after the marker had in fact
+ * gone stale). The full proof of the pass's cases still <b>lives in
+ * {@code DanglingOperationReferenceLoadTest}</b> (corej-core), whose cases drive synthetic fixtures
+ * such as {@code $never_defined} through the error channel and the inliner lockstep, plus
+ * {@code NotExecutableParksRuleLoadTest} for the parking itself. <b>Do not delete either sibling on
+ * the grounds that this one covers the corpus.</b>
  * </p>
  */
 class ShippedRulesDanglingOperandCorpusTest
 {
 
-    /** The load-finding fragment {@code validateOperationReferences} emits. */
-    private static final String MARKER = "which no Operations entry defines";
+    /**
+     * The load-finding fragment {@code validateOperationReferences} emits. ⚠ It read
+     * {@code "which no Operations entry defines"} until 2026-10-15, after the loader had been
+     * reworded to {@code "which no binding defines"} (the Operations-to-Bindings move), so this
+     * ratchet matched nothing and passed over any dangling operand. Found by finding A1 of
+     * {@code FINDINGS-unowned-residuals}; {@link #theRatchetIsLive_positiveControl} now reds on the
+     * next rewording.
+     */
+    private static final String MARKER = "which no binding defines";
 
     @Test
     void expressionCorpus_hasNoDanglingOperandErrors() throws IOException
     {
         assertFolder(CorpusPaths.rules());
+    }
+
+
+    /**
+     * The positive control: the zero above is only evidence while {@link #MARKER} still matches
+     * what the loader emits. A synthetic rule whose {@code Check} reads an operand no binding
+     * defines goes through the same {@code RulePackageLoader} entry point and must be caught by the
+     * same literal. If the loader's message is reworded, this test reds instead of the ratchet
+     * silently matching nothing.
+     *
+     * @throws IOException
+     *             never in practice: the probe is an in-memory string
+     */
+    @Test
+    void theRatchetIsLive_positiveControl() throws IOException
+    {
+        RulePackage pkg = RulePackageLoader.loadFromString("""
+                {"rules": {"probe": {
+                  "Core": {"Id": "PROBE-DANGLING"},
+                  "Scope": {"Domains": {"Include": ["AE"]}},
+                  "Check": {"expression": "AETERM == $never_defined"}
+                }}}
+                """);
+        Rule probe = pkg.getRules().values().iterator().next();
+        assertNotNull(probe.getLoadError(),
+                "the pass that produces the zero above must still detect a dangling operand");
+        assertTrue(probe.getLoadError().contains(MARKER),
+                "the loader's dangling-operand message no longer contains the ratchet's MARKER '"
+                        + MARKER + "', so the corpus ratchet matches nothing. Message: "
+                        + probe.getLoadError());
     }
 
 
