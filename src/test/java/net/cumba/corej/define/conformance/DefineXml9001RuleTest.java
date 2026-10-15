@@ -196,7 +196,8 @@ class DefineXml9001RuleTest
                 item("IT.BW.BWDY", "BWDY", "Study Day Animal Weighed"),
                 comment("COM.1", "All animals were fasted overnight.")
                         + comment("COM.2", "Each subject was fasted overnight."));
-        assertEquals(1, messages(run(xml, "2.1")).size(),
+        assertEquals(List.of("/CommentDef[@OID='COM.1']/Description/TranslatedText"),
+                xpaths(run(xml, "2.1")),
                 "the 'animals' comment fires; the 'subject' comment and the IG label BWDY do not");
     }
 
@@ -254,7 +255,10 @@ class DefineXml9001RuleTest
                         item("IT.DM.DMANIM", "DMANIM", "Sponsor Animal Number")
                                 + item("IT.BG.BGDTC", "BGDTC", "Date/Time Animal Weighed"),
                         comment("COM.1", "Animal room temperature"));
-        assertEquals(2, messages(run(xml, "2.0")).size(),
+        assertEquals(
+                List.of("/ItemDef[@OID='IT.DM.DMANIM']/Description/TranslatedText",
+                        "/CommentDef[@OID='COM.1']/Description/TranslatedText"),
+                xpaths(run(xml, "2.0")),
                 "the sponsor ItemDef and the comment fire; the IG label BGDTC does not");
     }
 
@@ -294,7 +298,10 @@ class DefineXml9001RuleTest
                 item("IT.BW.BWDTC", "BWDTC", "Date/Time Animal Weighed")
                         + item("IT.BW.BWDY", "BWDY", "Study Day Animal Weighed"),
                 "", false);
-        assertEquals(2, messages(run(xml, "2.1")).size());
+        assertEquals(
+                List.of("/ItemDef[@OID='IT.BW.BWDTC']/Description/TranslatedText",
+                        "/ItemDef[@OID='IT.BW.BWDY']/Description/TranslatedText"),
+                xpaths(run(xml, "2.1")));
     }
 
 
