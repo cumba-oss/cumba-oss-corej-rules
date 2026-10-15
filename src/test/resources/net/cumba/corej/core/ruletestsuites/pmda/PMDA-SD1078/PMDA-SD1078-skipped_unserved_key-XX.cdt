@@ -1,0 +1,15 @@
+#!RuleTest
+#test PMDA-SD1078 expect=skipped domain=XX
+#note "XX is a sponsor domain the IG does not define: its library rows (XX in PMDA-SD1078-library.yaml) are the SDTM Model's and carry no core, so get_dataset_filtered_variables(key_name=core, key_value=Perm) can never match -> the rule is SKIPPED (CDW-F1, PLAN-unserved-key-name-skip), not a silent 0-finding pass. XXSEV is empty on every record, so a served key would have fired. Mechanism only: the map-backed provider; the production provider is proven in CustomDomainModelWalkStoreTest."
+#library-include PMDA-SD1078-library.yaml
+#library standard=sdtmig version=3-4
+dataset XX label="Sponsor Events"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col XXSEQ   type=Num  label="Sequence Number"
+col XXTERM  type=Char label="Reported Term"
+col XXSEV   type=Char label="Severity/Intensity"
+---
+CDISCPILOT01 | XX | 01-701-1015 | 1 | HEADACHE |
+CDISCPILOT01 | XX | 01-701-1023 | 1 | NAUSEA   |

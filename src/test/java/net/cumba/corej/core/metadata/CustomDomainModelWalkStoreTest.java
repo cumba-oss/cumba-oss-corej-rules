@@ -793,7 +793,86 @@ class CustomDomainModelWalkStoreTest
     }
 
     // ------------------------------------------------------------------
-    // 5. Sniffer miss — unchanged (CDW-D3 (b))
+    // 5. An unserved key_name SKIPs the rule (CDW-F1, PLAN-unserved-key-name-skip)
+    // ------------------------------------------------------------------
+
+
+    private static void assertSkipsUnserved(RuleExecutionResult aResult, String aWhat)
+    {
+        assertTrue(aResult.isSkipped(), aWhat + " must SKIP: " + aResult.getStatusMessage());
+        // RuleRunner's generic text (U-HOW): the key and the dataset are in the log line.
+        assertEquals("Rule skipped — library returned no data for get_dataset_filtered_variables",
+                aResult.getStatusMessage(), aWhat);
+    }
+
+
+    @Test
+    void theCoreFilterRulesSkipWhereTheLibraryRowsCarryNoCore() throws IOException
+    {
+        // The walk serves an IG-absent domain its class's SDTM Model rows, which carry no `core`:
+        // get_dataset_filtered_variables(key_name="core", key_value=…) can never match there, so
+        // the three core carriers SKIP instead of reporting "executed, 0 findings".
+        IDataTable xx = outOfOrder("XX");
+        for (String[] rule : new String[][]
+        {
+                {
+                        FDA_34, "FDA-SD1078"
+                },
+                {
+                        PMDA_34, "PMDA-SD1078"
+                },
+                {
+                        FDA_34, "FDA-SD1149"
+                }
+        })
+        {
+            assertSkipsUnserved(run(rule[0], SDTMIG_34, rule[1], xx), rule[1] + " SDTMIG 3.4 XX");
+        }
+        // A standard domain an older IG does not define is the same case (P0 census: 3.3 lacks
+        // BE BS CP GF).
+        IDataTable gf = igShaped("GF", provider(SDTMIG_34).getColumnOrder("GF"));
+        assertSkipsUnserved(run("rules-fda-sdtmig-3-3.json", "sdtmig 3-3", "FDA-SD1078", gf),
+                "FDA-SD1078 SDTMIG 3.3 GF");
+        // SEND: the general-observation domains SENDIG-AR 1.0 / DART 1.1 / SENDIG 3.0 leave out.
+        String ar = "rules-fda-sendig-ar-1-0.json";
+        for (String id : List.of("FDA-SD1078", "FDA-SD1149"))
+        {
+            assertSkipsUnserved(run(ar, "sendig ar-1-0", id, standardFindings("LB")),
+                    id + " SENDIG-AR 1.0 LB");
+        }
+        assertSkipsUnserved(run("rules-fda-sendig-dart-1-1.json", "sendig dart-1-1", "FDA-SD1149",
+                standardFindings("EG")), "FDA-SD1149 SENDIG-DART 1.1 EG");
+        IDataTable cv = igShaped("CV", provider("sendig 3-1-1").getColumnOrder("CV"));
+        assertSkipsUnserved(run("rules-fda-sendig-3-0.json", "sendig 3-0", "FDA-SD1149", cv),
+                "FDA-SD1149 SENDIG 3.0 CV");
+    }
+
+
+    @Test
+    void theCoreFilterRulesStillJudgeWhereTheKeyIsServed() throws IOException
+    {
+        // The controls: an IG-defined domain serves `core` (no SKIP, and the rule has teeth), and
+        // an AR-absent dataset whose walk resolves nothing keeps its empty answer (U-DEF).
+        IDataTable lb = table("LB", List.of("STUDYID", "DOMAIN", "USUBJID", "LBSEQ", "LBTESTCD",
+                "LBTEST", "LBORRES", "LBSPEC"), new String[]
+        {
+                "S", "LB", "U1", "1", "T1", "Test", "1", ""
+        });
+        // LBSPEC is Permissible in SDTMIG 3.4 LB and empty on every record.
+        assertEquals(1, count(run(FDA_34, SDTMIG_34, "FDA-SD1078", lb), "FDA-SD1078 LB"));
+        assertEquals(1, count(run(PMDA_34, SDTMIG_34, "PMDA-SD1078", lb), "PMDA-SD1078 LB"));
+        assertEquals(0, count(run(FDA_34, SDTMIG_34, "FDA-SD1149", lb), "FDA-SD1149 LB"));
+        MetadataProvider reference = provider("sendig 3-1-1");
+        IDataTable ts = igShaped("TS", reference.getColumnOrder("TS"));
+        for (String id : List.of("FDA-SD1078", "FDA-SD1149"))
+        {
+            assertEquals(0, count(run("rules-fda-sendig-ar-1-0.json", "sendig ar-1-0", id, ts),
+                    id + " AR TS"), id + " AR TS: empty resolution");
+        }
+    }
+
+    // ------------------------------------------------------------------
+    // 6. Sniffer miss — unchanged (CDW-D3 (b))
     // ------------------------------------------------------------------
 
 

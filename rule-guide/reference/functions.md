@@ -3646,7 +3646,7 @@ Library variables of the current dataset filtered by metadata, intersected with 
 | `key_name` | string | no | The metadata attribute to filter on — a static string literal naming an attribute the Library publishes for a variable (`role`, `core`, `label`, `simpleDatatype`, …); any other name fails to load, naming the attributes that exist |
 | `key_value` | string | no | The value that attribute must have — any **dataset-level** string (a literal, a `$`-binding or the same expression inline; a per-row value fails to load), compared exactly |
 
-A **registry function**. It takes **no column target** — the `name` / `names` rows of the retired operation are gone, and `get_dataset_filtered_variables(X)` fails to load. It is an **aggregate**: one list for the dataset, computed once per rule and dataset and read by every row. It needs the CDISC Library: without one the rule is **SKIPPED** (*"Rule skipped — no Library access"*). Both parameters are read once per call, which is why they must be literals (a column bound there would be read at row 0 and silently stand for every row). A `key_name` the dataset's own Library rows do not carry (`core` on a model-only walk, `role` on an ADaM dataset) is legal and logs a WARNING, because servability is a per-dataset fact.
+A **registry function**. It takes **no column target** — the `name` / `names` rows of the retired operation are gone, and `get_dataset_filtered_variables(X)` fails to load. It is an **aggregate**: one list for the dataset, computed once per rule and dataset and read by every row. It needs the CDISC Library: without one the rule is **SKIPPED** (*"Rule skipped — no Library access"*). Both parameters are read once per call, which is why they must be literals (a column bound there would be read at row 0 and silently stand for every row). A `key_name` the dataset's own Library rows do not carry (`core` on a domain the run's IG does not define, whose rows are the SDTM Model's; `role` on an ADaM dataset) is legal at load, because servability is a per-dataset fact — at run time it **SKIPs** the rule when a `key_value` is given (the filter could never match); without a `key_value` the unserved key matches every row.
 
 **Example**
 
@@ -3668,7 +3668,7 @@ Check:
   expression: 'varname() in $expected_variables and var_is_empty(varname())'
 ```
 
-**When there is nothing to answer** — **the empty set**. `X in $s` is then vacuously false; `X not in $s` is vacuously true and **fires**. Under the Define-XML fallback for an unreachable Library, an empty answer means the define could not answer and the rule is **SKIPPED** instead.
+**When there is nothing to answer** — **the empty set**. `X in $s` is then vacuously false; `X not in $s` is vacuously true and **fires**. Under the Define-XML fallback for an unreachable Library, an empty answer means the define could not answer and the rule is **SKIPPED** instead. ⚠ A `key_name` none of the dataset's Library rows carries, with a `key_value`, is *library not available* and the rule is **SKIPPED** (*"Rule skipped — library returned no data for get_dataset_filtered_variables"*) — never a silent pass: on a sponsor domain, or a standard domain the run's IG leaves out, the rows are the SDTM Model's and carry no `core`. The key, the dataset and the attributes the rows do carry are in the log line.
 
 
 ### get_model_column_order
@@ -3710,7 +3710,7 @@ Model variables filtered by metadata, **not** intersected with the dataset's col
 | `key_value` | string | no | The value that attribute must have — any **dataset-level** string (a literal, a `$`-binding or the same expression inline; a per-row value fails to load), compared exactly |
 | `model_class` | string | no | The general-observation class whose model table to walk — a static string literal; `Events`, `Interventions`, `Findings`, `Findings About` in any letter case and spacing (`"EVENTS"`, `" Findings About "`), any other spelling fails to load |
 
-A **registry function**. It takes **no column target** — the `name` / `names` rows of the retired operation are gone, and `get_model_filtered_variables(X)` fails to load. It is an **aggregate**: one list for the dataset, computed once per rule and dataset and read by every row. It needs the CDISC Library: without one the rule is **SKIPPED** (*"Rule skipped — no Library access"*). The three parameters are read once per call and must be literals. A `key_name` the walked rows do not carry (`core` on a model walk of a standard SDTM domain) is legal and logs a WARNING — SUPP--/SQ-- datasets and every ADaM dataset publish `core` on this walk.
+A **registry function**. It takes **no column target** — the `name` / `names` rows of the retired operation are gone, and `get_model_filtered_variables(X)` fails to load. It is an **aggregate**: one list for the dataset, computed once per rule and dataset and read by every row. It needs the CDISC Library: without one the rule is **SKIPPED** (*"Rule skipped — no Library access"*). The three parameters are read once per call and must be literals. A `key_name` the walked rows do not carry (`core` on a model walk of a standard SDTM domain) is legal at load — SUPP--/SQ-- datasets and every ADaM dataset publish `core` on this walk — and at run time **SKIPs** the rule when a `key_value` is given; without a `key_value` the unserved key matches every row.
 
 **Example**
 
@@ -3732,7 +3732,7 @@ Check:
   expression: 'varname() not in $model_order and varname() not in $library_order and (varname() in $events_vars or varname() in $interventions_vars or varname() in $findings_vars or varname() in $findings_about_vars)'
 ```
 
-**When there is nothing to answer** — **the empty set**. `X in $s` is then vacuously false; `X not in $s` is vacuously true and **fires**. Under the Define-XML fallback for an unreachable Library, an empty answer means the define could not answer and the rule is **SKIPPED** instead. ⚠ With `model_class=`, a class the linked model has no variables for is *library not available* and the rule is **SKIPPED** (*"Rule skipped — library returned no data for get_model_filtered_variables"*) — the dataset's own-class walk answers the empty set, the named-class walk does not.
+**When there is nothing to answer** — **the empty set**. `X in $s` is then vacuously false; `X not in $s` is vacuously true and **fires**. Under the Define-XML fallback for an unreachable Library, an empty answer means the define could not answer and the rule is **SKIPPED** instead. ⚠ With `model_class=`, a class the linked model has no variables for is *library not available* and the rule is **SKIPPED** (*"Rule skipped — library returned no data for get_model_filtered_variables"*) — the dataset's own-class walk answers the empty set, the named-class walk does not. ⚠ Likewise a `key_name` none of the walked rows carries, with a `key_value`: the rule is **SKIPPED** with the same text (*"Rule skipped — library returned no data for get_model_filtered_variables"*); the key, the dataset and the attributes the rows do carry are in the log line.
 
 
 ### get_parent_model_column_order
