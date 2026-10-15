@@ -1,0 +1,21 @@
+#!RuleTest
+#test CDISC-AD0720 expect=violation domain=ADLBC
+#note "Round 2026-10-15 (owner): APERIOD blank on the record and ADSL has exactly one TRTxxP (TRT01P) -> compared with TRT01P; TRTP differs -> fires."
+#expectViolationCount 1
+#expectViolationAt row=1 USUBJID=01-701-1015
+dataset ADLBC
+col STUDYID type=Char
+col USUBJID type=Char
+col TRTP type=Char
+col APERIOD type=Num
+---
+CDISCPILOT01 | 01-701-1015 | Drug Z | 
+---
+
+dataset ADSL label="Subject-Level Analysis"
+col STUDYID type=Char
+col USUBJID type=Char
+col TRT01P type=Char
+---
+CDISCPILOT01 | 01-701-1015 | Placebo
+---

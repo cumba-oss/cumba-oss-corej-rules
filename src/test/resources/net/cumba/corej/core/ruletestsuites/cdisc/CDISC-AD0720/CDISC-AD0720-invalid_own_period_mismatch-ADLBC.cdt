@@ -1,0 +1,23 @@
+#!RuleTest
+#test CDISC-AD0720 expect=violation domain=ADLBC
+#note "Round 2026-10-15 (owner: compare by APERIOD against TRTxxP of the record's own period). Row 1 (APERIOD 1) equals TRT01P -> silent; row 2 (APERIOD 2) equals TRT01P but not TRT02P -> fires. The old rule took any TRTxxP as a match and stayed silent on row 2."
+#expectViolationCount 1
+#expectViolationAt row=2 USUBJID=01-701-1015
+dataset ADLBC
+col STUDYID type=Char
+col USUBJID type=Char
+col TRTP type=Char
+col APERIOD type=Num
+---
+CDISCPILOT01 | 01-701-1015 | Drug X | 1
+CDISCPILOT01 | 01-701-1015 | Drug X | 2
+---
+
+dataset ADSL label="Subject-Level Analysis"
+col STUDYID type=Char
+col USUBJID type=Char
+col TRT01P type=Char
+col TRT02P type=Char
+---
+CDISCPILOT01 | 01-701-1015 | Drug X | Placebo
+---

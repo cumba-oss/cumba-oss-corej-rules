@@ -4,9 +4,11 @@ description: |
   Wave C2 port — T2-MD (Match_Datasets without Operations).
   CDISC-AD0720: TRTP (non-empty) must equal at least one of ADSL's planned-treatment
   variables. Primary domain ADLB (BDS), joined to ADSL on USUBJID. The Check is
-  `not empty(TRTP)` and `TRTP not in` each of colref(find_vars("ADSL.TRTxxP")), ADSL.TRTSEQP,
-  colref(find_vars("ADSL.TRTPGy")) and colref(find_vars("ADSL.TRxxPGy")) — fires when TRTP is
-  populated and matches none of the ADSL planned-treatment cells. (Ported in wave C2 as `all:`
+  `not empty(TRTP)` and either (APERIOD populated and TRTP != the ADSL TRTxxP of that period,
+  colref(concat("ADSL.TRT", printf("%02d", APERIOD), "P"))) or (APERIOD empty, ADSL carries
+  exactly one TRTxxP and TRTP is not it), and TRTP not in ADSL.TRTSEQP,
+  colref(find_vars("ADSL.TRTPGy")) nor colref(find_vars("ADSL.TRxxPGy")). Round 2026-10-15
+  (owner): compare by APERIOD, as CDISC-AD0897. (Ported in wave C2 as `all:`
   of non_empty + 20 not_equal_to leaves over TRTP, TRT01P..TRT10P and TRTPG1..TRTPG9.)
 python_source: rules-adamig-1-3.json (CDISC-AD0720)
 rule:
@@ -16,15 +18,16 @@ datasets:
     row_key: [STUDYID, USUBJID, PARAMCD, AVISITN]
     column_types:
       AVISITN: LONG
+      APERIOD: LONG
     rows:
       # row 0: TRTP matches ADSL.TRT01P for subject 001 — no violation
-      - {STUDYID: S1, USUBJID: '001', PARAMCD: HGB, AVISITN: 1, TRTP: 'Drug A'}
-      # row 1: TRTP non-empty and matches none of ADSL's planned-treatment cells — violation
-      - {STUDYID: S1, USUBJID: '002', PARAMCD: HGB, AVISITN: 1, TRTP: 'Mystery'}
+      - {STUDYID: S1, USUBJID: '001', PARAMCD: HGB, AVISITN: 1, APERIOD: 1, TRTP: 'Drug A'}
+      # row 1: TRTP non-empty and APERIOD 2 and not equal to ADSL.TRT02P (matches none of ADSL's planned-treatment cells) — violation
+      - {STUDYID: S1, USUBJID: '002', PARAMCD: HGB, AVISITN: 1, APERIOD: 2, TRTP: 'Mystery'}
       # row 2: TRTP empty — guard rules out, no violation
-      - {STUDYID: S1, USUBJID: '003', PARAMCD: HGB, AVISITN: 1, TRTP: ''}
+      - {STUDYID: S1, USUBJID: '003', PARAMCD: HGB, AVISITN: 1, APERIOD: 1, TRTP: ''}
       # row 3: TRTP matches ADSL.TR01PG1 (two-digit-segment period-group var) — no violation
-      - {STUDYID: S1, USUBJID: '004', PARAMCD: HGB, AVISITN: 1, TRTP: 'Drug X'}
+      - {STUDYID: S1, USUBJID: '004', PARAMCD: HGB, AVISITN: 1, APERIOD: 1, TRTP: 'Drug X'}
   ADSL:
     row_key: [STUDYID, USUBJID]
     rows:
@@ -57,5 +60,6 @@ expected_violations:
     row_key: {AVISITN: 1, PARAMCD: HGB, STUDYID: S1, USUBJID: '002'}
     status: SUCCESS
     output_variables:
+      APERIOD: '2'
       TRTP: Mystery
 expected_errors: []

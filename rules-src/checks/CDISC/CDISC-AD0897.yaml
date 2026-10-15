@@ -29,8 +29,10 @@ Match_Datasets:
   Cardinality: "n:1"
 Check:
   expression: >-
-    not empty(TRTA) and TRTA != ADSL.TRTA and TRTA not in colref(find_vars("ADSL.TRTxxA")) and TRTA
-    not in colref(find_vars("ADSL.TRTAGy")) and TRTA not in colref(find_vars("ADSL.TRxxAGy"))
+    not empty(TRTA) and (not empty(APERIOD) and TRTA != colref(concat("ADSL.TRT", printf("%02d",
+    APERIOD), "A")) or empty(APERIOD) and count(find_vars("ADSL.TRTxxA")) == 1 and TRTA not in
+    colref(find_vars("ADSL.TRTxxA"))) and TRTA not in colref(find_vars("ADSL.TRTAGy")) and TRTA not
+    in colref(find_vars("ADSL.TRxxAGy"))
 Outcome:
   Message: "TRTA is populated, but does not match any of the character actual treatment\
     \ variable values in ADSL"

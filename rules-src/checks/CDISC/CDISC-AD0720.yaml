@@ -28,9 +28,10 @@ Match_Datasets:
   Cardinality: "n:1"
 Check:
   expression: >-
-    not empty(TRTP) and TRTP not in colref(find_vars("ADSL.TRTxxP")) and TRTP not in ADSL.TRTSEQP
-    and TRTP not in colref(find_vars("ADSL.TRTPGy")) and TRTP not in
-    colref(find_vars("ADSL.TRxxPGy"))
+    not empty(TRTP) and (not empty(APERIOD) and TRTP != colref(concat("ADSL.TRT", printf("%02d",
+    APERIOD), "P")) or empty(APERIOD) and count(find_vars("ADSL.TRTxxP")) == 1 and TRTP not in
+    colref(find_vars("ADSL.TRTxxP"))) and TRTP not in ADSL.TRTSEQP and TRTP not in
+    colref(find_vars("ADSL.TRTPGy")) and TRTP not in colref(find_vars("ADSL.TRxxPGy"))
 Outcome:
   Message: "The value of TRTP was not found among the values of the character planned\
     \ treatment variables in ADSL defined in the IG."

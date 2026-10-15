@@ -1,0 +1,19 @@
+#!RuleTest
+#test CDISC-AD0720 expect=noViolation domain=ADLBC
+#note "Round 2026-10-15 (owner): no APERIOD column and ADSL has several TRTxxP -> the record's period is unknown -> not compared. The old rule fired (TRTP matches neither TRT01P nor TRT02P)."
+dataset ADLBC
+col STUDYID type=Char
+col USUBJID type=Char
+col TRTP type=Char
+---
+CDISCPILOT01 | 01-701-1015 | Drug Z
+---
+
+dataset ADSL label="Subject-Level Analysis"
+col STUDYID type=Char
+col USUBJID type=Char
+col TRT01P type=Char
+col TRT02P type=Char
+---
+CDISCPILOT01 | 01-701-1015 | Drug X | Placebo
+---

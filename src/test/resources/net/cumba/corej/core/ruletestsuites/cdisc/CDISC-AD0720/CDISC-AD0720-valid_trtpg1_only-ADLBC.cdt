@@ -1,6 +1,6 @@
 #!RuleTest
 #test CDISC-AD0720 expect=noViolation domain=ADLBC
-#note "PLAN-dynamic-column-corpus-respelling S4 member-only scenario: ADSL carries ONE planned-treatment variable, TRTPG1, a member of the one-digit TRTPGy family (find_vars(\"ADSL.TRTPGy\")). TRTP equals it, so the rule is silenced by that leg alone; a find_vars literal that missed the family would fire here."
+#note "PLAN-dynamic-column-corpus-respelling S4 member-only scenario: ADSL carries TRT01P (a different value; with no APERIOD and one TRTxxP the record is compared with it, so that leg does not silence the rule) and TRTPG1, a member of the one-digit TRTPGy family (find_vars(\"ADSL.TRTPGy\")). TRTP equals it, so the rule is silenced by that leg alone; a find_vars literal that missed the family would fire here."
 dataset ADLBC
 col STUDYID type=Char
 col USUBJID type=Char
@@ -12,7 +12,8 @@ CDISCPILOT01 | 01-701-1015 | Drug X
 dataset ADSL label="Subject-Level Analysis"
 col STUDYID type=Char
 col USUBJID type=Char
+col TRT01P type=Char
 col TRTPG1 type=Char
 ---
-CDISCPILOT01 | 01-701-1015 | Drug X
+CDISCPILOT01 | 01-701-1015 | Placebo | Drug X
 ---
