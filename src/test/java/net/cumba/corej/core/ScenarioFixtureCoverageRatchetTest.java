@@ -218,7 +218,12 @@ class ScenarioFixtureCoverageRatchetTest
     // without the two suites, 403 with them — NOT the 461 the plan's arithmetic predicted: 463
     // was already carrying 58 rows of slack from earlier corpus movements (not decomposed here),
     // which would have licensed 58 new uncovered rules.
-    private static final int MAX_UNCOVERED = 403;
+    // ⭐ 403 -> 312 on 2026-10-15 (rule round 2026-10-15-b): the 77 CDISC-CG rules whose only
+    // drift guard was a migrated rulespec (LEDGER-cdt-scenarios-owed-after-core-retirement,
+    // re-measured that day) gained their first .cdt suites (204 files). Measured by setting the
+    // ratchet to 0 and reading 312 back: 389 before the suites, so 403 was carrying 14 rows of
+    // slack from earlier corpus movements (not decomposed here).
+    private static final int MAX_UNCOVERED = 312;
 
     /**
      * Floor on the corpus, so a run that loaded nothing cannot report perfect coverage. The corpus
