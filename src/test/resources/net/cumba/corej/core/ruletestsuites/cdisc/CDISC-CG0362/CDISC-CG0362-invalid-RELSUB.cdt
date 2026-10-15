@@ -1,0 +1,18 @@
+#!RuleTest
+#test CDISC-CG0362 expect=violation domain=RELSUB
+#note "Authority: SDTM and SDTMIG Conformance Rules v2.0 CG0362 (Domain RELSUB, Variable USUBJID; Condition: POOLID ^= null; Rule: USUBJID = null). A RELSUB record identifies either a subject (USUBJID) or a pool (POOLID), never both. Row 3 populates both USUBJID=01-701-1023 and POOLID=POOL01 -> fires. Rows 1-2 relate two subjects (POOLID empty) and row 4 relates a pool to a subject (USUBJID empty): silent."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=3 USUBJID=01-701-1023 POOLID=POOL01
+dataset RELSUB class=RELATIONSHIP label="Related Subjects"
+col STUDYID type=Char label="Study Identifier"
+col USUBJID type=Char label="Unique Subject Identifier"
+col POOLID  type=Char label="Pool Identifier"
+col RSUBJID type=Char label="Related Subject or Pool Identifier"
+col SREL    type=Char label="Subject Relationship"
+---
+CDISCPILOT01 | 01-701-1015 |        | 01-701-1016 | MOTHER, BIOLOGICAL
+CDISCPILOT01 | 01-701-1016 |        | 01-701-1015 | CHILD, BIOLOGICAL
+CDISCPILOT01 | 01-701-1023 | POOL01 | 01-701-1024 | IDENTICAL TWIN
+CDISCPILOT01 |             | POOL02 | 01-701-1028 | POOL MEMBER
+---

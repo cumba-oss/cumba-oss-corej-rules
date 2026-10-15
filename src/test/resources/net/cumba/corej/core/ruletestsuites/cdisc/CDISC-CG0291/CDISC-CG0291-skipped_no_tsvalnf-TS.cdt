@@ -1,0 +1,14 @@
+#!RuleTest
+#test CDISC-CG0291 expect=skipped domain=TS
+#note "Authority: SDTM and SDTMIG Conformance Rules v2.0 CG0291 (Condition: TSVALNF = null; Rule: TSVAL not populated with values or synonyms of values in the ISO 21090 null flavor codelist). The TSVALNF column is absent; Requirements.Variables.All [TSVALNF] gates the rule to SKIPPED although row 1 writes 'UNKNOWN' into TSVAL."
+#library standard=sdtmig version=3-4
+dataset TS class="TRIAL DESIGN" label="Trial Summary"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col TSSEQ    type=Num  label="Sequence Number"
+col TSPARMCD type=Char label="Trial Summary Parameter Short Name"
+col TSPARM   type=Char label="Trial Summary Parameter"
+col TSVAL    type=Char label="Parameter Value"
+---
+CDISCPILOT01 | TS | 1 | AGEMAX | Planned Maximum Age of Subjects | UNKNOWN
+---

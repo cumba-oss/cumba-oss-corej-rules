@@ -1,0 +1,19 @@
+#!RuleTest
+#test CDISC-CG0456 expect=noViolation domain=TS
+#note "Authority: SDTM and SDTMIG Conformance Rules v2.0 CG0456 (Condition: TSPARMCD = 'FCNTRY'; Rule: TSVCDREF = 'ISO 3166-1 alpha-3'). Every record meeting the Condition codes its value against the required terminology; the other parameters (TITLE, and a parameter coded against a different dictionary) are outside the Condition. TSPARMCD and TSVCDREF are present, so the rule executes and does not fire."
+#library standard=sdtmig version=3-3
+dataset TS class="TRIAL DESIGN" label="Trial Summary"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col TSSEQ    type=Num label="Sequence Number"
+col TSPARMCD type=Char label="Trial Summary Parameter Short Name"
+col TSPARM   type=Char label="Trial Summary Parameter"
+col TSVAL    type=Char label="Parameter Value"
+col TSVALCD  type=Char label="Parameter Value Code"
+col TSVCDREF type=Char label="Name of the Reference Terminology"
+col TSVCDVER type=Char label="Version of the Reference Terminology"
+---
+CDISCPILOT01 | TS | 1 | TITLE | Trial Title | A Study of Xanomeline | | |
+CDISCPILOT01 | TS | 1 | FCNTRY | Planned Country of Investigational Sites | USA | USA | ISO 3166-1 alpha-3 | 
+CDISCPILOT01 | TS | 1 | REGID | Registry Identifier | NCT00000000 | NCT00000000 | ClinicalTrials.gov | 
+---

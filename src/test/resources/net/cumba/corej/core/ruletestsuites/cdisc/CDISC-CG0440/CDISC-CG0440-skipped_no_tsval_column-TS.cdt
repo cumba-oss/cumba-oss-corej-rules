@@ -1,0 +1,13 @@
+#!RuleTest
+#test CDISC-CG0440 expect=skipped domain=TS
+#note "Authority: SDTM and SDTMIG Conformance Rules v2.0 CG0440 (Condition: TSPARMCD = 'PLANSUB'; Rule: TSVAL is integer and > 0). The TS dataset carries no TSVAL column; Requirements.Variables.All [TSPARMCD, TSVAL] is unmet, so the rule skips instead of judging an absent value."
+#library standard=sdtmig version=3-3
+dataset TS class="TRIAL DESIGN" label="Trial Summary"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col TSSEQ    type=Num label="Sequence Number"
+col TSPARMCD type=Char label="Trial Summary Parameter Short Name"
+col TSPARM   type=Char label="Trial Summary Parameter"
+---
+CDISCPILOT01 | TS | 1 | PLANSUB | Planned Number of Subjects
+---

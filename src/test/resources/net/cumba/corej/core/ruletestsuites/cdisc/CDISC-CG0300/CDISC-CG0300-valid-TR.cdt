@@ -1,0 +1,17 @@
+#!RuleTest
+#test CDISC-CG0300 expect=noViolation domain=TR
+#note "Authority: SDTM and SDTMIG Conformance Rules v2.0 CG0300 (Rule: TRLAT not present in dataset). Anatomical location of a tumor/lesion belongs in TU, not on each TR measurement record. The TR dataset has no TRLAT column (location lives in TU) -> silent."
+#library standard=sdtmig version=3-4
+dataset TR class=FINDINGS label="Tumor/Lesion Results"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col TRSEQ    type=Num  label="Sequence Number"
+col TRLNKID  type=Char label="Link ID"
+col TRTESTCD type=Char label="Tumor/Lesion Assessment Short Name"
+col TRTEST   type=Char label="Tumor/Lesion Assessment Test Name"
+col TRORRES  type=Char label="Result or Finding in Original Units"
+---
+CDISCPILOT01 | TR | 01-701-1015 | 1 | T01 | LDIAM | Longest Diameter | 22
+CDISCPILOT01 | TR | 01-701-1015 | 2 | T02 | LDIAM | Longest Diameter | 15
+---

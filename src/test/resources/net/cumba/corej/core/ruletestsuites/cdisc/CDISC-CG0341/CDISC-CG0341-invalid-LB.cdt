@@ -1,0 +1,18 @@
+#!RuleTest
+#test CDISC-CG0341 expect=violation domain=LB
+#note "Authority: SDTM and SDTMIG Conformance Rules v2.0 CG0341 (Rule: --TESTCD ^= 'OTHER'). Row 2's LBTESTCD is the catch-all 'OTHER', which does not identify a test -> fires. Row 1's LBTESTCD 'ALB' -> silent."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=2 LBSEQ=2 LBTESTCD=OTHER
+dataset LB class=FINDINGS label="Laboratory Test Results"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col LBSEQ    type=Num  label="Sequence Number"
+col LBTESTCD type=Char label="Lab Test or Examination Short Name"
+col LBTEST   type=Char label="Lab Test or Examination Name"
+col LBORRES  type=Char label="Result or Finding in Original Units"
+---
+CDISCPILOT01 | LB | 01-701-1015 | 1 | ALB | Albumin | 38
+CDISCPILOT01 | LB | 01-701-1015 | 2 | OTHER | Other Test | POSITIVE
+---

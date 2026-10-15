@@ -1,0 +1,20 @@
+#!RuleTest
+#test CDISC-CG0262 expect=violation domain=TS
+#note "Authority: SDTM and SDTMIG Conformance Rules v2.0 CG0262 (Condition: TSVAL(n+1) ^= null; Rule: TSVALn ^= null). Row 2 carries TSVAL2 while TSVAL1 is null, a gap in the overflow chain -> fires. Row 1 fills TSVAL then TSVAL1 with TSVAL2 null (no gap) -> silent. Row 3 uses TSVAL only -> silent."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=2 TSPARMCD=OBJPRIM
+dataset TS class="TRIAL DESIGN" label="Trial Summary"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col TSSEQ    type=Num  label="Sequence Number"
+col TSPARMCD type=Char label="Trial Summary Parameter Short Name"
+col TSPARM   type=Char label="Trial Summary Parameter"
+col TSVAL    type=Char label="Parameter Value"
+col TSVAL1   type=Char label="Parameter Value 1"
+col TSVAL2   type=Char label="Parameter Value 2"
+---
+CDISCPILOT01 | TS | 1 | TITLE | Trial Title | A Randomized, Double-Blind, Placebo-Controlled Study of Xanomeline | Transdermal Therapeutic System in Patients with Mild to Moderate | 
+CDISCPILOT01 | TS | 1 | OBJPRIM | Trial Primary Objective | To determine whether Xanomeline TTS improves cognition |  | in patients with mild to moderate Alzheimer's disease
+CDISCPILOT01 | TS | 1 | AGEMIN | Planned Minimum Age of Subjects | P50Y |  | 
+---

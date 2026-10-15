@@ -1,0 +1,19 @@
+#!RuleTest
+#test CDISC-CG0049 expect=violation domain=AE
+#note "Authority: SDTM and SDTMIG Conformance Rules v2.0 CG0049 (Rule: --DECOD and --PTCD have a one-to-one relationship). Preferred term code AEPTCD=10019211 is paired with two different AEDECOD values (HEADACHE on row 1, MIGRAINE on row 2), so the mapping is not one-to-one -> both records of the inconsistent pair fire. Row 3 (10028813 / NAUSEA) is consistently mapped and is silent."
+#library standard=sdtmig version=3-4
+#expectViolationCount 2
+#expectViolationAt row=1 AEPTCD=10019211 AEDECOD=HEADACHE
+#expectViolationAt row=2 AEPTCD=10019211 AEDECOD=MIGRAINE
+dataset AE class=EVENTS label="Adverse Events"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col AESEQ   type=Num  label="Sequence Number"
+col AETERM  type=Char label="Reported Term for the Adverse Event"
+col AEDECOD type=Char label="Dictionary-Derived Term"
+col AEPTCD  type=Num  label="Preferred Term Code"
+---
+CDISCPILOT01 | AE | 01-701-1015 | 1 | HEADACHE | HEADACHE | 10019211
+CDISCPILOT01 | AE | 01-701-1023 | 1 | MIGRAINE | MIGRAINE | 10019211
+CDISCPILOT01 | AE | 01-701-1028 | 1 | NAUSEA | NAUSEA | 10028813

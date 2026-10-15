@@ -1,0 +1,19 @@
+#!RuleTest
+#test CDISC-CG0570 expect=violation domain=DM
+#note "Authority: SDTM and SDTMIG Conformance Rules v2.0 CG0570 (Rule: ARM not in ('Screen Failure', 'Not Assigned', 'Unplanned Treatment', 'Not Treated')). Row 2 records the screen failure in ARM (ARM = Screen Failure) instead of ARMNRS -> fires; row 3 uses NOT ASSIGNED in upper case, which the check compares case-insensitively -> fires. Row 1 (Placebo) and row 4 (ARM empty, reason in ARMNRS) are silent."
+#library standard=sdtmig version=3-4
+#expectViolationCount 2
+#expectViolationAt row=2 USUBJID=S1-002 ARM="Screen Failure"
+#expectViolationAt row=3 USUBJID=S1-003 ARM="NOT ASSIGNED"
+dataset DM class="SPECIAL PURPOSE" label="Demographics"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col ARMCD   type=Char label="Planned Arm Code"
+col ARM     type=Char label="Description of Planned Arm"
+col ARMNRS  type=Char label="Reason Arm and/or Actual Arm is Null"
+---
+S1 | DM | S1-001 | PBO  | Placebo        |
+S1 | DM | S1-002 | SCRNFAIL | Screen Failure |
+S1 | DM | S1-003 | NOTASSGN | NOT ASSIGNED   |
+S1 | DM | S1-004 |      |                | SCREEN FAILURE

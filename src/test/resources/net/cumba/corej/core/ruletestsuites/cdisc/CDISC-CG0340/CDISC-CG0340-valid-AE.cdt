@@ -1,0 +1,18 @@
+#!RuleTest
+#test CDISC-CG0340 expect=noViolation domain=AE
+#note "Authority: SDTM and SDTMIG Conformance Rules v2.0 CG0340 (Rule: --SCAT ^= --BODSYS). No AESCAT repeats its AEBODSYS; row 3's AESCAT is null. Both columns are present, so the rule executes -> silent."
+#library standard=sdtmig version=3-4
+dataset AE class=EVENTS label="Adverse Events"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col AESEQ    type=Num  label="Sequence Number"
+col AETERM   type=Char label="Reported Term for the Adverse Event"
+col AEDECOD  type=Char label="Dictionary-Derived Term"
+col AEBODSYS type=Char label="Body System or Organ Class"
+col AESCAT   type=Char label="Subcategory for Adverse Event"
+---
+CDISCPILOT01 | AE | 01-701-1015 | 1 | HEADACHE | HEADACHE | NERVOUS SYSTEM DISORDERS | STUDY DRUG RELATED
+CDISCPILOT01 | AE | 01-701-1015 | 2 | DIARRHOEA | DIARRHOEA | GASTROINTESTINAL DISORDERS | NOT RELATED
+CDISCPILOT01 | AE | 01-701-1023 | 1 | PALPITATIONS | PALPITATIONS | CARDIAC DISORDERS | 
+---

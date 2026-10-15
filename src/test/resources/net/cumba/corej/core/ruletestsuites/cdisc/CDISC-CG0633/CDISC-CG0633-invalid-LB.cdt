@@ -1,0 +1,16 @@
+#!RuleTest
+#test CDISC-CG0633 expect=violation domain=LB
+#note "Authority: SDTM and SDTMIG Conformance Rules v2.0 CG0633 (Rule: RPPLSTDY not present in dataset; not permitted in human clinical trials). LB carries a RPPLSTDY column (populated on row 1, empty on row 2) -> the dataset-level presence check fires once."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+dataset LB class=FINDINGS label="Laboratory Test Results"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col LBSEQ    type=Num  label="Sequence Number"
+col LBTESTCD type=Char label="Lab Test or Examination Short Name"
+col LBORRES  type=Char label="Result or Finding in Original Units"
+col RPPLSTDY type=Num label="Planned Repro Phase Day of Obs Start"
+---
+S1 | LB | S1-001 | 1 | ALT | 25 | 3
+S1 | LB | S1-002 | 1 | ALT | 31 | 

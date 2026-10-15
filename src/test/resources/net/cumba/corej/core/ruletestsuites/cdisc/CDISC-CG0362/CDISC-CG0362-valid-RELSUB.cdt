@@ -1,0 +1,15 @@
+#!RuleTest
+#test CDISC-CG0362 expect=noViolation domain=RELSUB
+#note "Authority: SDTM and SDTMIG Conformance Rules v2.0 CG0362 (Domain RELSUB, Variable USUBJID; Condition: POOLID ^= null; Rule: USUBJID = null). Every record identifies exactly one of USUBJID / POOLID: rows 1-2 are subject records (POOLID empty), row 3 is a pool record with USUBJID empty. POOLID is present, so the rule executes and does not fire."
+#library standard=sdtmig version=3-4
+dataset RELSUB class=RELATIONSHIP label="Related Subjects"
+col STUDYID type=Char label="Study Identifier"
+col USUBJID type=Char label="Unique Subject Identifier"
+col POOLID  type=Char label="Pool Identifier"
+col RSUBJID type=Char label="Related Subject or Pool Identifier"
+col SREL    type=Char label="Subject Relationship"
+---
+CDISCPILOT01 | 01-701-1015 |        | 01-701-1016 | MOTHER, BIOLOGICAL
+CDISCPILOT01 | 01-701-1016 |        | 01-701-1015 | CHILD, BIOLOGICAL
+CDISCPILOT01 |             | POOL02 | 01-701-1028 | POOL MEMBER
+---

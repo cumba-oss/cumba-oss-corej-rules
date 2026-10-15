@@ -1,0 +1,17 @@
+#!RuleTest
+#test CDISC-CG0151 expect=violation domain=DM
+#note "Authority: SDTM and SDTMIG Conformance Rules v2.0 CG0151 (Rule: USUBJID unique within a submission). USUBJID 01-701-1015 occurs on two DM records (rows 1 and 3), so it does not identify one subject -> every record of the duplicate fires. Row 2 (01-701-1023) is unique and silent."
+#library standard=sdtmig version=3-4
+#expectViolationCount 2
+#expectViolationAt row=1 USUBJID=01-701-1015 SUBJID=1015
+#expectViolationAt row=3 USUBJID=01-701-1015 SUBJID=1016
+dataset DM class="SPECIAL PURPOSE" label="Demographics"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col SUBJID   type=Char label="Subject Identifier for the Study"
+col SITEID   type=Char label="Study Site Identifier"
+---
+CDISCPILOT01 | DM | 01-701-1015 | 1015 | 701
+CDISCPILOT01 | DM | 01-701-1023 | 1023 | 701
+CDISCPILOT01 | DM | 01-701-1015 | 1016 | 701

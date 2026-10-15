@@ -1,0 +1,18 @@
+#!RuleTest
+#test CDISC-CG0066 expect=violation domain=DS
+#note "Authority: SDTM and SDTMIG Conformance Rules v2.0 CG0066 (Condition: DSCAT = 'PROTOCOL MILESTONE'; Rule: DSTERM = DSDECOD). Row 2 is a protocol milestone whose verbatim DSTERM=CONSENT SIGNED differs from DSDECOD=INFORMED CONSENT OBTAINED -> fires. Row 1 is a milestone with DSTERM = DSDECOD. Row 3 is a DISPOSITION EVENT, where the verbatim term may differ from the decode (Condition false), silent."
+#library standard=sdtmig version=3-2
+#expectViolationCount 1
+#expectViolationAt row=2 USUBJID=01-701-1023 DSTERM="CONSENT SIGNED"
+dataset DS class=EVENTS label="Disposition"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col DSSEQ   type=Num  label="Sequence Number"
+col DSTERM  type=Char label="Reported Term for the Disposition Event"
+col DSDECOD type=Char label="Standardized Disposition Term"
+col DSCAT   type=Char label="Category for Disposition Event"
+---
+CDISCPILOT01 | DS | 01-701-1015 | 1 | INFORMED CONSENT OBTAINED | INFORMED CONSENT OBTAINED | PROTOCOL MILESTONE
+CDISCPILOT01 | DS | 01-701-1023 | 1 | CONSENT SIGNED | INFORMED CONSENT OBTAINED | PROTOCOL MILESTONE
+CDISCPILOT01 | DS | 01-701-1023 | 2 | PATIENT MOVED AWAY | LOST TO FOLLOW-UP | DISPOSITION EVENT

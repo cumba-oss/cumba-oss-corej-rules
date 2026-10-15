@@ -1,0 +1,20 @@
+#!RuleTest
+#test CDISC-CG0041 expect=violation domain=AE
+#note "Authority: SDTM and SDTMIG Conformance Rules v2.0 CG0041 (Condition: AESCAN = 'Y' or AESCONG = 'Y' or AESDISAB = 'Y' or AESDTH = 'Y' or AESHOSP = 'Y' or AESLIFE = 'Y' or AESOD = 'Y' or AESMIE = 'Y'; Rule: AESER = 'Y'). Row 2: AESHOSP=Y (hospitalisation) but AESER=N -> fires. Row 1: AESDTH=Y with AESER=Y is conformant. Row 3: no criterion is Y, the Condition does not hold, silent."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=2 USUBJID=01-701-1023 AESER=N
+dataset AE class=EVENTS label="Adverse Events"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col AESEQ   type=Num  label="Sequence Number"
+col AETERM  type=Char label="Reported Term for the Adverse Event"
+col AESER   type=Char label="Serious Event"
+col AESDTH  type=Char label="Results in Death"
+col AESHOSP type=Char label="Requires or Prolongs Hospitalization"
+col AESLIFE type=Char label="Is Life Threatening"
+---
+CDISCPILOT01 | AE | 01-701-1015 | 1 | MYOCARDIAL INFARCTION | Y | Y | Y | Y
+CDISCPILOT01 | AE | 01-701-1023 | 1 | PNEUMONIA | N | N | Y | N
+CDISCPILOT01 | AE | 01-701-1028 | 1 | HEADACHE | N | N | N | N

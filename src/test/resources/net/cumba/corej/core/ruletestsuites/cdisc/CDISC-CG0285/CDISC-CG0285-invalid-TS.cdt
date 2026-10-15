@@ -1,0 +1,17 @@
+#!RuleTest
+#test CDISC-CG0285 expect=violation domain=TS
+#note "Authority: SDTM and SDTMIG Conformance Rules v2.0 CG0285 (Condition: TSPARMCD = SSTDTC; Rule: TSVAL conforms to ISO 8601 date). Row 2 records the study start date as '02JAN2014' (a SAS DATE9-style text), which is not ISO 8601 -> fires. Row 1 is TSPARMCD=AGEMIN with a non-date TSVAL 'P50Y', outside the Condition -> silent."
+#library standard=sdtmig version=3-3
+#expectViolationCount 1
+#expectViolationAt row=2 TSPARMCD=SSTDTC TSVAL=02JAN2014
+dataset TS class="TRIAL DESIGN" label="Trial Summary"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col TSSEQ    type=Num  label="Sequence Number"
+col TSPARMCD type=Char label="Trial Summary Parameter Short Name"
+col TSPARM   type=Char label="Trial Summary Parameter"
+col TSVAL    type=Char label="Parameter Value"
+---
+CDISCPILOT01 | TS | 1 | AGEMIN | Planned Minimum Age of Subjects | P50Y
+CDISCPILOT01 | TS | 1 | SSTDTC | Study Start Date | 02JAN2014
+---

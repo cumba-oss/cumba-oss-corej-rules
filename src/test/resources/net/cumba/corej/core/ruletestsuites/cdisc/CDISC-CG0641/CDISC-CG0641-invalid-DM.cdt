@@ -1,0 +1,15 @@
+#!RuleTest
+#test CDISC-CG0641 expect=violation domain=DM
+#note "Authority: SDTM and SDTMIG Conformance Rules v2.0 CG0641 (Rule: AGETXT not present in dataset). The rule is Partially Executable (possible overreporting); this scenario covers only the executable part, the presence of the AGETXT column in DM. DM carries AGETXT (populated on row 2, empty on row 1) -> the dataset-level presence check fires once."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+dataset DM class="SPECIAL PURPOSE" label="Demographics"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col AGE     type=Num  label="Age"
+col AGEU    type=Char label="Age Units"
+col AGETXT  type=Char label="Age Range"
+---
+S1 | DM | S1-001 | 45 | YEARS |
+S1 | DM | S1-002 | .  | YEARS | 18-65

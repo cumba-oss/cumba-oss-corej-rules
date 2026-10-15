@@ -1,0 +1,20 @@
+#!RuleTest
+#test CDISC-CG0339 expect=violation domain=AE
+#note "Authority: SDTM and SDTMIG Conformance Rules v2.0 CG0339 (Rule: --CAT ^= --BODSYS). Row 1's AECAT 'Nervous system disorders' repeats AEBODSYS 'NERVOUS SYSTEM DISORDERS' (case-insensitive) -> fires. Row 2's AECAT 'STUDY DRUG RELATED' differs from AEBODSYS -> silent. Row 3's AECAT is null, so there is no redundant value -> silent."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=1 AESEQ=1 AEBODSYS="NERVOUS SYSTEM DISORDERS"
+dataset AE class=EVENTS label="Adverse Events"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col AESEQ    type=Num  label="Sequence Number"
+col AETERM   type=Char label="Reported Term for the Adverse Event"
+col AEDECOD  type=Char label="Dictionary-Derived Term"
+col AEBODSYS type=Char label="Body System or Organ Class"
+col AECAT    type=Char label="Category for Adverse Event"
+---
+CDISCPILOT01 | AE | 01-701-1015 | 1 | HEADACHE | HEADACHE | NERVOUS SYSTEM DISORDERS | Nervous system disorders
+CDISCPILOT01 | AE | 01-701-1015 | 2 | DIARRHOEA | DIARRHOEA | GASTROINTESTINAL DISORDERS | STUDY DRUG RELATED
+CDISCPILOT01 | AE | 01-701-1023 | 1 | PALPITATIONS | PALPITATIONS | CARDIAC DISORDERS | 
+---

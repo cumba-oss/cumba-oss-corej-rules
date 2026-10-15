@@ -1,0 +1,15 @@
+#!RuleTest
+#test CDISC-CG0285 expect=noViolation domain=TS
+#note "Authority: SDTM and SDTMIG Conformance Rules v2.0 CG0285 (Condition: TSPARMCD = SSTDTC; Rule: TSVAL conforms to ISO 8601 date). The SSTDTC record carries the ISO 8601 date '2014-01-02'; the AGEMIN record's non-date TSVAL 'P50Y' is outside the Condition. TSPARMCD is present, so the rule executes -> silent."
+#library standard=sdtmig version=3-3
+dataset TS class="TRIAL DESIGN" label="Trial Summary"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col TSSEQ    type=Num  label="Sequence Number"
+col TSPARMCD type=Char label="Trial Summary Parameter Short Name"
+col TSPARM   type=Char label="Trial Summary Parameter"
+col TSVAL    type=Char label="Parameter Value"
+---
+CDISCPILOT01 | TS | 1 | AGEMIN | Planned Minimum Age of Subjects | P50Y
+CDISCPILOT01 | TS | 1 | SSTDTC | Study Start Date | 2014-01-02
+---

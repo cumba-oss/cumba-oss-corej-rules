@@ -1,0 +1,15 @@
+#!RuleTest
+#test CDISC-CG0570 expect=noViolation domain=DM
+#note "Authority: SDTM and SDTMIG Conformance Rules v2.0 CG0570 (Rule: ARM not in ('Screen Failure', 'Not Assigned', 'Unplanned Treatment', 'Not Treated')). ARM holds real planned-arm descriptions (Placebo, Drug A); the non-assigned subject leaves ARM empty and gives the reason in ARMNRS -> no row fires."
+#library standard=sdtmig version=3-4
+dataset DM class="SPECIAL PURPOSE" label="Demographics"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col ARMCD   type=Char label="Planned Arm Code"
+col ARM     type=Char label="Description of Planned Arm"
+col ARMNRS  type=Char label="Reason Arm and/or Actual Arm is Null"
+---
+S1 | DM | S1-001 | PBO  | Placebo |
+S1 | DM | S1-002 | DRGA | Drug A  |
+S1 | DM | S1-003 |      |         | SCREEN FAILURE

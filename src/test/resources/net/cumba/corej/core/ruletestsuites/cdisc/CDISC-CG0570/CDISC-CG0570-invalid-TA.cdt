@@ -1,0 +1,18 @@
+#!RuleTest
+#test CDISC-CG0570 expect=violation domain=TA
+#note "Authority: SDTM and SDTMIG Conformance Rules v2.0 CG0570 (Rule: ARM not in ('Screen Failure', 'Not Assigned', 'Unplanned Treatment', 'Not Treated')). Row 3 defines a trial arm described as Not Treated, which is a reserved non-arm description -> fires. Rows 1-2 (arm Drug A) are silent."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=3 ARMCD=NOTTRT ARM="Not Treated"
+dataset TA class="TRIAL DESIGN" label="Trial Arms"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col ARMCD   type=Char label="Planned Arm Code"
+col ARM     type=Char label="Description of Planned Arm"
+col TAETORD type=Num  label="Planned Order of Element within Arm"
+col ETCD    type=Char label="Element Code"
+col ELEMENT type=Char label="Description of Element"
+---
+S1 | TA | DRGA   | Drug A      | 1 | SCRN | Screening
+S1 | TA | DRGA   | Drug A      | 2 | TRTA | Drug A
+S1 | TA | NOTTRT | Not Treated | 1 | SCRN | Screening

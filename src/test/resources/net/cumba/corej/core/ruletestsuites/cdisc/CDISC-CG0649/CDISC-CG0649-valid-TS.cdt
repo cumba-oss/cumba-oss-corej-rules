@@ -1,0 +1,16 @@
+#!RuleTest
+#test CDISC-CG0649 expect=noViolation domain=TS
+#note "Authority: SDTM and SDTMIG Conformance Rules v2.0 CG0649 (Condition: TSVAL not populated with values or synonyms of values in the ISO 21090 null flavor codelist (or other terms that can be represented as null flavors), unless the term is included in published terminology; Rule: TSVALNF = null). Executable part only (Partially Executable, possible underreporting). Rows with a real TSVAL leave TSVALNF empty; the row without a value (AGEMAX) leaves TSVAL empty and states the null flavor PINF in TSVALNF -> no row fires."
+#library standard=sdtmig version=3-4
+dataset TS class="TRIAL DESIGN" label="Trial Summary"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col TSSEQ    type=Num  label="Sequence Number"
+col TSPARMCD type=Char label="Trial Summary Parameter Short Name"
+col TSPARM   type=Char label="Trial Summary Parameter"
+col TSVAL    type=Char label="Parameter Value"
+col TSVALNF  type=Char label="Parameter Value Null Flavor"
+---
+S1 | TS | 1 | TITLE  | Trial Title                     | A Study of Drug A |
+S1 | TS | 1 | SSTDTC | Study Start Date                | 2024-01-15        |
+S1 | TS | 1 | AGEMAX | Planned Maximum Age of Subjects |                   | PINF

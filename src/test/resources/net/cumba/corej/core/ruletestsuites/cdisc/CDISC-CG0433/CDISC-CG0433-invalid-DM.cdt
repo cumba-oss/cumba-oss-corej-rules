@@ -1,0 +1,19 @@
+#!RuleTest
+#test CDISC-CG0433 expect=violation domain=DM
+#note "Authority: SDTM and SDTMIG Conformance Rules v2.0 CG0433 (Domain DM, Variable AGE; Condition: AGEU ^= null and AGETXT = null; Rule: AGE ^= null). Row 2 has AGEU=YEARS populated but neither AGE nor AGETXT -> fires. Row 1 carries AGE=64 and row 3 carries AGETXT=18-65 (AGE null, AGETXT populated, so the Condition does not hold); both are silent. AGE and AGETXT are each populated somewhere, so the finding is record-level, not the folded dataset message."
+#library standard=sdtmig version=3-3
+#expectViolationCount 1
+#expectViolationAt row=2 USUBJID=01-701-1023 AGEU=YEARS
+dataset DM class="SPECIAL PURPOSE" label="Demographics"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col SUBJID  type=Char label="Subject Identifier for the Study"
+col AGE     type=Num  label="Age"
+col AGETXT  type=Char label="Age Range"
+col AGEU    type=Char label="Age Units"
+---
+CDISCPILOT01 | DM | 01-701-1015 | 1015 | 64 |       | YEARS
+CDISCPILOT01 | DM | 01-701-1023 | 1023 |    |       | YEARS
+CDISCPILOT01 | DM | 01-701-1028 | 1028 |    | 18-65 | YEARS
+---

@@ -1,0 +1,17 @@
+#!RuleTest
+#test CDISC-CG0344 expect=noViolation domain=LB
+#note "Authority: SDTM and SDTMIG Conformance Rules v2.0 CG0344 (Class FND, Domain ALL; Rule: --TESTCD ^= 'MULTIPLE'). Each test is its own record with its own LBTESTCD; none equals 'MULTIPLE', so the rule executes (LBTESTCD present, FINDINGS class) and does not fire."
+#library standard=sdtmig version=3-4
+dataset LB class=FINDINGS label="Laboratory Test Results"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col LBSEQ    type=Num  label="Sequence Number"
+col LBTESTCD type=Char label="Lab Test or Examination Short Name"
+col LBTEST   type=Char label="Lab Test or Examination Name"
+col LBORRES  type=Char label="Result or Finding in Original Units"
+---
+CDISCPILOT01 | LB | 01-701-1015 | 1 | ALB | Albumin | 4.1
+CDISCPILOT01 | LB | 01-701-1015 | 2 | GLUC | Glucose | 102
+CDISCPILOT01 | LB | 01-701-1023 | 1 | GLUC | Glucose | 98
+---

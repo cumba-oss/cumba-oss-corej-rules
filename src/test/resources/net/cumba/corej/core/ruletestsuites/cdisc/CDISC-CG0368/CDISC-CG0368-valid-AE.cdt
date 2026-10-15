@@ -1,0 +1,22 @@
+#!RuleTest
+#test CDISC-CG0368 expect=noViolation domain=AE
+#note "Authority: SDTM and SDTMIG Conformance Rules v2.0 CG0368 (Condition: study on human subjects; Rule: DM dataset present in study). The same AE dataset as the invalid scenario, but the study also carries a DM dataset, so the presence check is satisfied while evaluating AE."
+#library standard=sdtmig version=3-4
+dataset AE class=EVENTS label="Adverse Events"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col AESEQ   type=Num  label="Sequence Number"
+col AETERM  type=Char label="Reported Term for the Adverse Event"
+---
+CDISCPILOT01 | AE | 01-701-1015 | 1 | HEADACHE
+---
+
+dataset DM class="SPECIAL PURPOSE" label="Demographics"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col SUBJID  type=Char label="Subject Identifier for the Study"
+---
+CDISCPILOT01 | DM | 01-701-1015 | 1015
+---

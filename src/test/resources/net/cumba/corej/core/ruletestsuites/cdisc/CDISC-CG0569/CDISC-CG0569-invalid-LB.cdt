@@ -1,0 +1,22 @@
+#!RuleTest
+#test CDISC-CG0569 expect=violation domain=LB
+#note "Authority: SDTM and SDTMIG Conformance Rules v2.0 CG0569 (Condition: --LOBXFL = 'Y'; Rule: --STRESC ^= null). Row 1: LBLOBXFL = Y with LBSTRESC 25 -> silent. Row 2: LBLOBXFL = Y on a NOT DONE record with LBSTRESC empty -> fires. Row 3: LBSTRESC empty but LBLOBXFL empty -> condition not met, silent. LBSTRESC is excluded from the projection (Output_Variables !--STRESC), so the pin names LBLOBXFL and the identity only."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=2 USUBJID=S1-001 LBSEQ=2 LBLOBXFL=Y
+dataset LB class=FINDINGS label="Laboratory Test Results"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col LBSEQ    type=Num  label="Sequence Number"
+col LBTESTCD type=Char label="Lab Test or Examination Short Name"
+col LBTEST   type=Char label="Lab Test or Examination Name"
+col LBORRES  type=Char label="Result or Finding in Original Units"
+col LBSTRESC type=Char label="Character Result/Finding in Std Format"
+col LBSTRESN type=Num  label="Numeric Result/Finding in Standard Units"
+col LBSTAT   type=Char label="Completion Status"
+col LBLOBXFL type=Char label="Last Observation Before Exposure Flag"
+---
+S1 | LB | S1-001 | 1 | ALT | Alanine Aminotransferase   | 25 | 25 | 25 |          | Y
+S1 | LB | S1-001 | 2 | AST | Aspartate Aminotransferase |    |    |    | NOT DONE | Y
+S1 | LB | S1-002 | 1 | AST | Aspartate Aminotransferase |    |    |    | NOT DONE |

@@ -1,0 +1,19 @@
+#!RuleTest
+#test CDISC-CG0244 expect=noViolation domain=TA
+#note "Authority: SDTM and SDTMIG Conformance Rules v2.0 CG0244 (Rule: ARM not in ('Screen Failure', 'Not Assigned', 'Unplanned Treatment', 'Not Treated'); Domain: TA, TV). Every TA record describes a planned arm (Placebo, Xanomeline High Dose); none carries a non-treatment ARM value -> silent."
+#library standard=sdtmig version=3-2
+dataset TA class="TRIAL DESIGN" label="Trial Arms"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col ARMCD   type=Char label="Planned Arm Code"
+col ARM     type=Char label="Description of Planned Arm"
+col TAETORD type=Num  label="Planned Order of Element within Arm"
+col ETCD    type=Char label="Element Code"
+col ELEMENT type=Char label="Description of Element"
+col EPOCH   type=Char label="Epoch"
+---
+CDISCPILOT01 | TA | PBO | Placebo | 1 | SCRN | Screening | SCREENING
+CDISCPILOT01 | TA | PBO | Placebo | 2 | PBO | Placebo | TREATMENT
+CDISCPILOT01 | TA | XANHI | Xanomeline High Dose | 1 | SCRN | Screening | SCREENING
+CDISCPILOT01 | TA | XANHI | Xanomeline High Dose | 2 | XANHI | Xanomeline High Dose | TREATMENT
+---

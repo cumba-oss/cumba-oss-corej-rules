@@ -1,0 +1,17 @@
+#!RuleTest
+#test CDISC-CG0258 expect=violation domain=TS
+#note "Authority: SDTM and SDTMIG Conformance Rules v2.0 CG0258 (Rule: TSPARM value length <= 40). Row 2's TSPARM 'Planned Maximum Age of Subjects in the Trial Population' is 55 characters -> fires. Row 1's TSPARM 'Trial Title' (11 characters) is within the limit -> silent."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=2 TSPARMCD=AGEMAX
+dataset TS class="TRIAL DESIGN" label="Trial Summary"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col TSSEQ    type=Num  label="Sequence Number"
+col TSPARMCD type=Char label="Trial Summary Parameter Short Name"
+col TSPARM   type=Char label="Trial Summary Parameter"
+col TSVAL    type=Char label="Parameter Value"
+---
+CDISCPILOT01 | TS | 1 | TITLE | Trial Title | Safety and Efficacy of Xanomeline
+CDISCPILOT01 | TS | 1 | AGEMAX | Planned Maximum Age of Subjects in the Trial Population | P90Y
+---

@@ -1,0 +1,22 @@
+#!RuleTest
+#test CDISC-CG0202 expect=violation domain=SUPPAE
+#note "Authority: SDTM and SDTMIG Conformance Rules v2.0 CG0202 (Condition: QORIG = 'Assigned'; Rule: QEVAL ^= null). Row 1's QORIG is Assigned (a subjective, assigned value) and QEVAL is null -> fires. Row 2 is Assigned with QEVAL=ADJUDICATION COMMITTEE -> silent. Row 3's QORIG is CRF, outside the Condition, so its null QEVAL is allowed -> silent. QEVAL is populated on row 2, so the finding is per row, not the folded dataset-level form."
+#library standard=sdtmig version=3-3
+#expectViolationCount 1
+#expectViolationAt row=1 QNAM=AERELNST
+dataset SUPPAE class=RELATIONSHIP label="Supplemental Qualifiers for AE"
+col STUDYID  type=Char label="Study Identifier"
+col RDOMAIN  type=Char label="Related Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col IDVAR    type=Char label="Identifying Variable"
+col IDVARVAL type=Char label="Identifying Variable Value"
+col QNAM     type=Char label="Qualifier Variable Name"
+col QLABEL   type=Char label="Qualifier Variable Label"
+col QVAL     type=Char label="Data Value"
+col QORIG    type=Char label="Origin"
+col QEVAL    type=Char label="Evaluator"
+---
+CDISCPILOT01 | AE | 01-701-1015 | AESEQ | 1 | AERELNST | Relationship to Non-Study Treatment | POSSIBLY RELATED | Assigned | 
+CDISCPILOT01 | AE | 01-701-1015 | AESEQ | 2 | AEADJ | Adjudicated Seriousness | SERIOUS | Assigned | ADJUDICATION COMMITTEE
+CDISCPILOT01 | AE | 01-701-1023 | AESEQ | 1 | AETRTEM | Treatment Emergent Flag | Y | CRF | 
+---

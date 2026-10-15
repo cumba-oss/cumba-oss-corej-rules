@@ -1,0 +1,20 @@
+#!RuleTest
+#test CDISC-CG0519 expect=noViolation domain=DM
+#note "Authority: SDTM and SDTMIG Conformance Rules v2.0 CG0519 (Condition: ARM = null; Rule: ARMNRS ^= null). Row 1 is a treated subject with every arm variable populated. Rows 2-3 leave the actual (row 2) or all (row 3) arm variables empty and give the reason in ARMNRS (ASSIGNED, NOT TREATED / SCREEN FAILURE) -> no row fires."
+#library standard=sdtmig version=3-4
+dataset DM class="SPECIAL PURPOSE" label="Demographics"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col SUBJID   type=Char label="Subject Identifier for the Study"
+col RFSTDTC  type=Char label="Subject Reference Start Date/Time"
+col RFENDTC  type=Char label="Subject Reference End Date/Time"
+col ARMCD    type=Char label="Planned Arm Code"
+col ARM      type=Char label="Description of Planned Arm"
+col ACTARMCD type=Char label="Actual Arm Code"
+col ACTARM   type=Char label="Description of Actual Arm"
+col ARMNRS   type=Char label="Reason Arm and/or Actual Arm is Null"
+---
+S1 | DM | S1-001 | 001 | 2024-01-10 | 2024-06-10 | PBO  | Placebo | PBO | Placebo |
+S1 | DM | S1-002 | 002 |            |            | DRGA | Drug A  |     |         | ASSIGNED, NOT TREATED
+S1 | DM | S1-003 | 003 |            |            |      |         |     |         | SCREEN FAILURE

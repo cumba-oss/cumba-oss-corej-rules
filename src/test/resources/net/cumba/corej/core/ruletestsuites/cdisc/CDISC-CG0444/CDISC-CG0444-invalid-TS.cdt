@@ -1,0 +1,23 @@
+#!RuleTest
+#test CDISC-CG0444 expect=violation domain=TS
+#note "Authority: SDTM and SDTMIG Conformance Rules v2.0 CG0444 (Domain TS, Variable TSVCDREF; Condition: TSPARMCD in ('COMPTRT', 'CURTRT', 'TRT'); Rule: TSVCDREF = 'UNII'). row 3 (COMPTRT, TSVCDREF=WHODRUG) meets the Condition with a different reference terminology -> fires. Silent: row 1 (TITLE, outside the Condition); row 2 (TRT, TSVCDREF=UNII); row 4 (CURTRT, TSVCDREF=UNII); row 5 (INDIC, TSVCDREF=SNOMED)."
+#library standard=sdtmig version=3-3
+#expectViolationCount 1
+#expectViolationAt row=3 TSSEQ=1 TSPARMCD=COMPTRT TSVCDREF="WHODRUG"
+dataset TS class="TRIAL DESIGN" label="Trial Summary"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col TSSEQ    type=Num label="Sequence Number"
+col TSPARMCD type=Char label="Trial Summary Parameter Short Name"
+col TSPARM   type=Char label="Trial Summary Parameter"
+col TSVAL    type=Char label="Parameter Value"
+col TSVALCD  type=Char label="Parameter Value Code"
+col TSVCDREF type=Char label="Name of the Reference Terminology"
+col TSVCDVER type=Char label="Version of the Reference Terminology"
+---
+CDISCPILOT01 | TS | 1 | TITLE | Trial Title | A Study of Xanomeline | | |
+CDISCPILOT01 | TS | 1 | TRT | Investigational Therapy or Treatment | XANOMELINE | 9ORU4MLZSD | UNII | 
+CDISCPILOT01 | TS | 1 | COMPTRT | Comparative Treatment Name | PLACEBO |  | WHODRUG | GLOBAL B3 MARCH 2022
+CDISCPILOT01 | TS | 1 | CURTRT | Current Therapy or Treatment | DONEPEZIL | 8SSC91326P | UNII | 
+CDISCPILOT01 | TS | 1 | INDIC | Trial Disease/Condition Indication | Alzheimer's disease | 26929004 | SNOMED | 2022-03-01
+---

@@ -1,0 +1,18 @@
+#!RuleTest
+#test CDISC-CG0569 expect=skipped domain=LB
+#note "Authority: SDTM and SDTMIG Conformance Rules v2.0 CG0569 (Condition: --LOBXFL = 'Y'; Rule: --STRESC ^= null). LB carries no LBLOBXFL column; Requirements.Variables.All [--STRESC, --LOBXFL] is unmet -> the rule is skipped. Row 2 has LBSTRESC empty, so nothing could be judged without the flag."
+#library standard=sdtmig version=3-4
+dataset LB class=FINDINGS label="Laboratory Test Results"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col LBSEQ    type=Num  label="Sequence Number"
+col LBTESTCD type=Char label="Lab Test or Examination Short Name"
+col LBTEST   type=Char label="Lab Test or Examination Name"
+col LBORRES  type=Char label="Result or Finding in Original Units"
+col LBSTRESC type=Char label="Character Result/Finding in Std Format"
+col LBSTRESN type=Num  label="Numeric Result/Finding in Standard Units"
+col LBSTAT   type=Char label="Completion Status"
+---
+S1 | LB | S1-001 | 1 | ALT | Alanine Aminotransferase   | 25 | 25 | 25 |
+S1 | LB | S1-001 | 2 | AST | Aspartate Aminotransferase |    |    |    | NOT DONE

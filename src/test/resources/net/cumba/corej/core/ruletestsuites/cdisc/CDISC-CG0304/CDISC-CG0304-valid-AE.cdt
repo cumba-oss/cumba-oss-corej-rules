@@ -1,0 +1,15 @@
+#!RuleTest
+#test CDISC-CG0304 expect=noViolation domain=AE
+#note "Authority: SDTM and SDTMIG Conformance Rules v2.0 CG0304 (Rule: AEREASND not present in dataset). The 'not done' qualifier is not permitted in AE. The AE dataset has no AEREASND column -> silent."
+#library standard=sdtmig version=3-4
+dataset AE class=EVENTS label="Adverse Events"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col AESEQ   type=Num  label="Sequence Number"
+col AETERM  type=Char label="Reported Term for the Adverse Event"
+col AEDECOD type=Char label="Dictionary-Derived Term"
+---
+CDISCPILOT01 | AE | 01-701-1015 | 1 | APPLICATION SITE ERYTHEMA | APPLICATION SITE ERYTHEMA
+CDISCPILOT01 | AE | 01-701-1015 | 2 | DIARRHOEA | DIARRHOEA
+---

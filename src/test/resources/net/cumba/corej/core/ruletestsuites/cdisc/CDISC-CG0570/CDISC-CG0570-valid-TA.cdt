@@ -1,0 +1,17 @@
+#!RuleTest
+#test CDISC-CG0570 expect=noViolation domain=TA
+#note "Authority: SDTM and SDTMIG Conformance Rules v2.0 CG0570 (Rule: ARM not in ('Screen Failure', 'Not Assigned', 'Unplanned Treatment', 'Not Treated')). Both trial arms carry real planned-arm descriptions (Drug A, Placebo) -> no row fires."
+#library standard=sdtmig version=3-4
+dataset TA class="TRIAL DESIGN" label="Trial Arms"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col ARMCD   type=Char label="Planned Arm Code"
+col ARM     type=Char label="Description of Planned Arm"
+col TAETORD type=Num  label="Planned Order of Element within Arm"
+col ETCD    type=Char label="Element Code"
+col ELEMENT type=Char label="Description of Element"
+---
+S1 | TA | DRGA | Drug A  | 1 | SCRN | Screening
+S1 | TA | DRGA | Drug A  | 2 | TRTA | Drug A
+S1 | TA | PBO  | Placebo | 1 | SCRN | Screening
+S1 | TA | PBO  | Placebo | 2 | TRTP | Placebo

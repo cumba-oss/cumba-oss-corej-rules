@@ -1,0 +1,16 @@
+#!RuleTest
+#test CDISC-CG0343 expect=noViolation domain=AE
+#note "Authority: SDTM and SDTMIG Conformance Rules v2.0 CG0343 (Class EVT, Domain ALL; Rule: --TERM ^= 'OTHER'). Every AETERM reports the actual event; none equals the placeholder 'OTHER', so the rule executes (AETERM present, EVENTS class) and does not fire."
+#library standard=sdtmig version=3-4
+dataset AE class=EVENTS label="Adverse Events"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col AESEQ   type=Num  label="Sequence Number"
+col AETERM  type=Char label="Reported Term for the Adverse Event"
+col AEDECOD type=Char label="Dictionary-Derived Term"
+---
+CDISCPILOT01 | AE | 01-701-1015 | 1 | HEADACHE | Headache
+CDISCPILOT01 | AE | 01-701-1015 | 2 | NAUSEA | Nausea
+CDISCPILOT01 | AE | 01-701-1023 | 1 | OTHER INSECT BITES | Arthropod bite
+---

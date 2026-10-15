@@ -1,0 +1,16 @@
+#!RuleTest
+#test CDISC-CG0634 expect=violation domain=LB
+#note "Authority: SDTM and SDTMIG Conformance Rules v2.0 CG0634 (Rule: RPLENDY not present in dataset; not permitted in human clinical trials). LB carries a RPPLENDY column (populated on row 1, empty on row 2) -> the dataset-level presence check fires once. The Source row names RPLENDY; the rule implements the proposed correction to RPPLENDY (sheet issue #69), which is the SENDIG-DART variable name -- the scenario follows the rule."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+dataset LB class=FINDINGS label="Laboratory Test Results"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col LBSEQ    type=Num  label="Sequence Number"
+col LBTESTCD type=Char label="Lab Test or Examination Short Name"
+col LBORRES  type=Char label="Result or Finding in Original Units"
+col RPPLENDY type=Num label="Planned Repro Phase Day of Obs End"
+---
+S1 | LB | S1-001 | 1 | ALT | 25 | 5
+S1 | LB | S1-002 | 1 | ALT | 31 | 

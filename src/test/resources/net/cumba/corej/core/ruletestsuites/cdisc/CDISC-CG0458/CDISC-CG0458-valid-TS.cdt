@@ -1,0 +1,19 @@
+#!RuleTest
+#test CDISC-CG0458 expect=noViolation domain=TS
+#note "Authority: SDTM and SDTMIG Conformance Rules v2.0 CG0458 (Condition: TSPARMCD in ('INDIC', 'TDIGRP'); Rule: TSVCDREF = 'SNOMED'). Every record meeting the Condition codes its value against the required terminology; the other parameters (TITLE, and a parameter coded against a different dictionary) are outside the Condition. TSPARMCD and TSVCDREF are present, so the rule executes and does not fire."
+#library standard=sdtmig version=3-3
+dataset TS class="TRIAL DESIGN" label="Trial Summary"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col TSSEQ    type=Num label="Sequence Number"
+col TSPARMCD type=Char label="Trial Summary Parameter Short Name"
+col TSPARM   type=Char label="Trial Summary Parameter"
+col TSVAL    type=Char label="Parameter Value"
+col TSVALCD  type=Char label="Parameter Value Code"
+col TSVCDREF type=Char label="Name of the Reference Terminology"
+col TSVCDVER type=Char label="Version of the Reference Terminology"
+---
+CDISCPILOT01 | TS | 1 | TITLE | Trial Title | A Study of Xanomeline | | |
+CDISCPILOT01 | TS | 1 | INDIC | Trial Disease/Condition Indication | Alzheimer's disease | 26929004 | SNOMED | 2022-03-01
+CDISCPILOT01 | TS | 1 | TRT | Investigational Therapy or Treatment | XANOMELINE | 9ORU4MLZSD | UNII | 
+---

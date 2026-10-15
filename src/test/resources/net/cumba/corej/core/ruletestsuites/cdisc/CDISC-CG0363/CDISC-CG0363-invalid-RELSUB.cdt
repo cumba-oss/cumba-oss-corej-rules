@@ -1,0 +1,17 @@
+#!RuleTest
+#test CDISC-CG0363 expect=violation domain=RELSUB
+#note "Authority: SDTM and SDTMIG Conformance Rules v2.0 CG0363 (Domain RELSUB, Variable RSUBJID; Condition: RSUBJID ^= null; Rule: RSUBJID ^= USUBJID). A subject cannot be related to itself. Row 2 has RSUBJID=01-701-1016 equal to its own USUBJID -> fires. Row 1 relates 01-701-1015 to a different subject and row 3 is a pool record (USUBJID empty, RSUBJID populated): silent."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=2 USUBJID=01-701-1016 RSUBJID=01-701-1016
+dataset RELSUB class=RELATIONSHIP label="Related Subjects"
+col STUDYID type=Char label="Study Identifier"
+col USUBJID type=Char label="Unique Subject Identifier"
+col POOLID  type=Char label="Pool Identifier"
+col RSUBJID type=Char label="Related Subject or Pool Identifier"
+col SREL    type=Char label="Subject Relationship"
+---
+CDISCPILOT01 | 01-701-1015 |        | 01-701-1016 | MOTHER, BIOLOGICAL
+CDISCPILOT01 | 01-701-1016 |        | 01-701-1016 | CHILD, BIOLOGICAL
+CDISCPILOT01 |             | POOL02 | 01-701-1028 | POOL MEMBER
+---

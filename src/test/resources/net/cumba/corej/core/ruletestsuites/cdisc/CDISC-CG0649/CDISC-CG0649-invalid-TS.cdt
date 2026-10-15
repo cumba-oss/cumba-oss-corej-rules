@@ -1,0 +1,19 @@
+#!RuleTest
+#test CDISC-CG0649 expect=violation domain=TS
+#note "Authority: SDTM and SDTMIG Conformance Rules v2.0 CG0649 (Condition: TSVAL not populated with values or synonyms of values in the ISO 21090 null flavor codelist (or other terms that can be represented as null flavors), unless the term is included in published terminology; Rule: TSVALNF = null). Partially Executable (possible underreporting): the published-terminology exception is not modelled, so this scenario covers only TSVAL holding a real, non-null-flavor value. Row 2: TSVAL = 2024-01-15 (a real date) with TSVALNF = NI -> fires. Row 1: real TSVAL, TSVALNF empty -> silent. Row 3: TSVAL empty with TSVALNF = NA (the normal null-flavor use) -> silent. Row 4: TSVAL = UNKNOWN, a null-flavor synonym, with TSVALNF = UNK -> silent."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=2 TSSEQ=1 TSPARMCD=SSTDTC TSVAL=2024-01-15 TSVALNF=NI
+dataset TS class="TRIAL DESIGN" label="Trial Summary"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col TSSEQ    type=Num  label="Sequence Number"
+col TSPARMCD type=Char label="Trial Summary Parameter Short Name"
+col TSPARM   type=Char label="Trial Summary Parameter"
+col TSVAL    type=Char label="Parameter Value"
+col TSVALNF  type=Char label="Parameter Value Null Flavor"
+---
+S1 | TS | 1 | TITLE  | Trial Title               | A Study of Drug A |
+S1 | TS | 1 | SSTDTC | Study Start Date          | 2024-01-15        | NI
+S1 | TS | 1 | AGEMAX | Planned Maximum Age of Subjects |             | NA
+S1 | TS | 1 | DCUTDTC | Data Cutoff Date         | UNKNOWN           | UNK

@@ -1,0 +1,16 @@
+#!RuleTest
+#test CDISC-CG0040 expect=violation domain=AE
+#note "Authority: SDTM and SDTMIG Conformance Rules v2.0 CG0040 (Rule: AEOCCUR not present in dataset). The AE dataset carries the AEOCCUR column -> the dataset-level check fires once for the dataset (reported on its first record), however many records it holds."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=1
+dataset AE class=EVENTS label="Adverse Events"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col AESEQ   type=Num  label="Sequence Number"
+col AETERM  type=Char label="Reported Term for the Adverse Event"
+col AEOCCUR type=Char label="Adverse Event Occurrence"
+---
+CDISCPILOT01 | AE | 01-701-1015 | 1 | HEADACHE | Y
+CDISCPILOT01 | AE | 01-701-1023 | 1 | NAUSEA |

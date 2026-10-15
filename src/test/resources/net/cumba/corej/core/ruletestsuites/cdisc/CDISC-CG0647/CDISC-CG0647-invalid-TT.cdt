@@ -1,0 +1,13 @@
+#!RuleTest
+#test CDISC-CG0647 expect=violation domain=TT
+#note "Authority: SDTM and SDTMIG Conformance Rules v2.0 CG0647 (Rule: TJ dataset not present; not used in human clinical trials). The study ships a TT dataset -> the anchored presence check fires once, on its anchor. The Source row names TJ; the rule implements the proposed correction to TT (sheet issue #71) -- the scenario follows the rule."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+dataset TT class="TRIAL DESIGN" label="Trial Repro Stages"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col RSTGCD  type=Char label="Repro Stage Code"
+col RSTAGE  type=Char label="Description of Repro Stage"
+col TTSTRL  type=Char label="Repro Stage Start Rule"
+---
+S1 | TT | PM | PREMATING | Start of premating period

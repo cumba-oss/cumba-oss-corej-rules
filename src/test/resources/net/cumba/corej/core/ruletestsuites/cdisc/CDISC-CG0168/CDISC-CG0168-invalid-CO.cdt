@@ -1,0 +1,20 @@
+#!RuleTest
+#test CDISC-CG0168 expect=violation domain=CO
+#note "Authority: SDTM and SDTMIG Conformance Rules v2.0 CG0168 (Condition: IDVAR ^= null; Rule: CODTC = null). Row 1 relates the comment to parent AE record AESEQ=1 (IDVAR populated) and still carries CODTC -> fires. Row 2 is a standalone comment (IDVAR null), where CODTC is allowed -> silent."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=1 COSEQ=1 IDVAR=AESEQ CODTC=2014-01-05
+dataset CO class="SPECIAL PURPOSE" label="Comments"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col RDOMAIN  type=Char label="Related Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col COSEQ    type=Num  label="Sequence Number"
+col IDVAR    type=Char label="Identifying Variable"
+col IDVARVAL type=Char label="Identifying Variable Value"
+col COVAL    type=Char label="Comment"
+col CODTC    type=Char label="Date/Time of Comment"
+---
+CDISCPILOT01 | CO | AE | 01-701-1015 | 1 | AESEQ | 1 | Subject reported headache resolved overnight | 2014-01-05
+CDISCPILOT01 | CO |  | 01-701-1015 | 2 |  |  | Subject moved to a new address | 2014-01-06
+---

@@ -1,0 +1,21 @@
+#!RuleTest
+#test CDISC-CG0440 expect=violation domain=TS
+#note "Authority: SDTM and SDTMIG Conformance Rules v2.0 CG0440 (Domain TS, Variable TSVAL; Condition: TSPARMCD = 'PLANSUB'; Rule: TSVAL is integer and > 0). Row 2 (PLANSUB, TSVAL=0) is an integer but not greater than 0 and row 3 (PLANSUB, TSVAL=about 250) is not an integer -> both fire. Row 1 (TITLE, free text) is outside the Condition and row 4 (PLANSUB, TSVAL=300) is a positive integer: silent."
+#library standard=sdtmig version=3-3
+#expectViolationCount 2
+#expectViolationAt row=2 TSSEQ=1 TSPARMCD=PLANSUB TSVAL=0
+#expectViolationAt row=3 TSSEQ=2 TSPARMCD=PLANSUB TSVAL="about 250"
+dataset TS class="TRIAL DESIGN" label="Trial Summary"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col TSSEQ    type=Num label="Sequence Number"
+col TSPARMCD type=Char label="Trial Summary Parameter Short Name"
+col TSPARM   type=Char label="Trial Summary Parameter"
+col TSVAL    type=Char label="Parameter Value"
+col TSVALNF  type=Char label="Parameter Null Flavor"
+---
+CDISCPILOT01 | TS | 1 | TITLE | Trial Title | A Study of Xanomeline |
+CDISCPILOT01 | TS | 1 | PLANSUB | Planned Number of Subjects | 0 |
+CDISCPILOT01 | TS | 2 | PLANSUB | Planned Number of Subjects | about 250 |
+CDISCPILOT01 | TS | 3 | PLANSUB | Planned Number of Subjects | 300 |
+---

@@ -1,0 +1,15 @@
+#!RuleTest
+#test CDISC-CG0456 expect=skipped domain=TS
+#note "Authority: SDTM and SDTMIG Conformance Rules v2.0 CG0456 (Condition: TSPARMCD = 'FCNTRY'; Rule: TSVCDREF = 'ISO 3166-1 alpha-3'). The TS dataset carries no TSVCDREF column; Requirements.Variables.All [TSPARMCD, TSVCDREF] is unmet, so the rule skips instead of reporting every in-condition record against an absent column."
+#library standard=sdtmig version=3-3
+dataset TS class="TRIAL DESIGN" label="Trial Summary"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col TSSEQ    type=Num label="Sequence Number"
+col TSPARMCD type=Char label="Trial Summary Parameter Short Name"
+col TSPARM   type=Char label="Trial Summary Parameter"
+col TSVAL    type=Char label="Parameter Value"
+col TSVALCD  type=Char label="Parameter Value Code"
+---
+CDISCPILOT01 | TS | 1 | FCNTRY | Planned Country of Investigational Sites | USA | USA
+---

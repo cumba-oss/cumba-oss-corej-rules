@@ -1,0 +1,18 @@
+#!RuleTest
+#test CDISC-CG0338 expect=violation domain=CM
+#note "Authority: SDTM and SDTMIG Conformance Rules v2.0 CG0338 (Rule: --SCAT ^= --DECOD); the rule covers EVENTS and INTERVENTIONS). Row 2's CMSCAT 'Aspirin' repeats CMDECOD 'ASPIRIN' (case-insensitive) -> fires. Row 1's CMSCAT 'ANALGESIC' differs from CMDECOD 'PARACETAMOL' -> silent."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=2 CMSEQ=2 CMDECOD=ASPIRIN
+dataset CM class=INTERVENTIONS label="Concomitant/Concomitant Medications"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col CMSEQ   type=Num  label="Sequence Number"
+col CMTRT   type=Char label="Reported Name of Drug, Med, or Therapy"
+col CMDECOD type=Char label="Standardized Medication Name"
+col CMSCAT  type=Char label="Subcategory for Medication"
+---
+CDISCPILOT01 | CM | 01-701-1015 | 1 | TYLENOL | PARACETAMOL | ANALGESIC
+CDISCPILOT01 | CM | 01-701-1015 | 2 | ASA | ASPIRIN | Aspirin
+---

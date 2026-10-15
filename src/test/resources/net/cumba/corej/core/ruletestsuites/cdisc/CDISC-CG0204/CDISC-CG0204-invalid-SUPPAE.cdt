@@ -1,0 +1,21 @@
+#!RuleTest
+#test CDISC-CG0204 expect=violation domain=SUPPAE
+#note "Authority: SDTM and SDTMIG Conformance Rules v2.0 CG0204 (Condition: IDVAR ^= null; Rule: IDVARVAL ^= null). Row 2 names IDVAR=AESEQ but leaves IDVARVAL null, so the parent record cannot be identified -> fires. Row 1 has IDVAR=AESEQ with IDVARVAL=1 -> silent. Row 3 is a subject-level qualifier (IDVAR and IDVARVAL both null) -> silent. IDVARVAL is populated on row 1, so the finding is per row, not the folded dataset-level form."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=2 USUBJID=01-701-1015 IDVAR=AESEQ QNAM=AETRTEM
+dataset SUPPAE class=RELATIONSHIP label="Supplemental Qualifiers for AE"
+col STUDYID  type=Char label="Study Identifier"
+col RDOMAIN  type=Char label="Related Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col IDVAR    type=Char label="Identifying Variable"
+col IDVARVAL type=Char label="Identifying Variable Value"
+col QNAM     type=Char label="Qualifier Variable Name"
+col QLABEL   type=Char label="Qualifier Variable Label"
+col QVAL     type=Char label="Data Value"
+col QORIG    type=Char label="Origin"
+---
+CDISCPILOT01 | AE | 01-701-1015 | AESEQ | 1 | AETRTEM | Treatment Emergent Flag | Y | DERIVED
+CDISCPILOT01 | AE | 01-701-1015 | AESEQ |  | AETRTEM | Treatment Emergent Flag | N | DERIVED
+CDISCPILOT01 | AE | 01-701-1023 |  |  | AESUBJFL | Subject Had Any AE Flag | Y | DERIVED
+---

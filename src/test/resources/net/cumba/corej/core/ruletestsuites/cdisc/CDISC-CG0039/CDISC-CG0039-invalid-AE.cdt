@@ -1,0 +1,18 @@
+#!RuleTest
+#test CDISC-CG0039 expect=violation domain=AE
+#note "Authority: SDTM and SDTMIG Conformance Rules v2.0 CG0039 (Condition: Primary SOC used for analysis; Rule: --BODSYS = --SOC). Row 2: AEBODSYS=GASTROINTESTINAL DISORDERS differs from the primary SOC AESOC=NERVOUS SYSTEM DISORDERS -> fires. Row 1 carries the same SOC on both sides and is silent."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt row=2 USUBJID=01-701-1023 AESEQ=1
+dataset AE class=EVENTS label="Adverse Events"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col AESEQ   type=Num  label="Sequence Number"
+col AETERM  type=Char label="Reported Term for the Adverse Event"
+col AEDECOD  type=Char label="Dictionary-Derived Term"
+col AEBODSYS type=Char label="Body System or Organ Class"
+col AESOC    type=Char label="Primary System Organ Class"
+---
+CDISCPILOT01 | AE | 01-701-1015 | 1 | HEADACHE | HEADACHE | NERVOUS SYSTEM DISORDERS | NERVOUS SYSTEM DISORDERS
+CDISCPILOT01 | AE | 01-701-1023 | 1 | DIZZINESS | DIZZINESS | GASTROINTESTINAL DISORDERS | NERVOUS SYSTEM DISORDERS

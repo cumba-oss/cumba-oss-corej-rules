@@ -1,0 +1,17 @@
+#!RuleTest
+#test CDISC-CG0356 expect=violation domain=DM
+#note "Authority: SDTM and SDTMIG Conformance Rules v2.0 CG0356 (Domain DM, Variable SPECIES; Rule: SPECIES not present in dataset). SPECIES is a non-clinical (SEND) variable and must not be used in the human-clinical DM domain. This DM dataset carries a SPECIES column, so the presence check fires once for the dataset (regardless of the column's values: row 1 is populated, row 2 is not); the finding lists SPECIES by name, with no value."
+#library standard=sdtmig version=3-4
+#expectViolationCount 1
+#expectViolationAt nameOnly=SPECIES
+dataset DM class="SPECIAL PURPOSE" label="Demographics"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col SUBJID  type=Char label="Subject Identifier for the Study"
+col SEX     type=Char label="Sex"
+col SPECIES type=Char label="Species"
+---
+CDISCPILOT01 | DM | 01-701-1015 | 1015 | F | HUMAN
+CDISCPILOT01 | DM | 01-701-1023 | 1023 | M | 
+---

@@ -1,0 +1,21 @@
+#!RuleTest
+#test CDISC-CG0193 expect=noViolation domain=MB
+#note "Authority: SDTM and SDTMIG Conformance Rules v2.0 CG0193 (Condition: MBTESTCD = 'ORGANISM' and MBSTRESC ^= 'NO GROWTH' and MBMETHOD ^= 'GRAM STAIN'; Rule: MBRESCAT ^= null). Every identified organism outside the exclusions carries MBRESCAT (rows 1-2); row 3 (NO GROWTH) and row 4 (GRAM STAIN) are excluded by the Condition. MBTESTCD and MBMETHOD are present, so the rule executes -> silent."
+#library standard=sdtmig version=3-2
+dataset MB class=FINDINGS label="Microbiology Specimen"
+col STUDYID  type=Char label="Study Identifier"
+col DOMAIN   type=Char label="Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col MBSEQ    type=Num  label="Sequence Number"
+col MBTESTCD type=Char label="Microbiology Test or Finding Short Name"
+col MBTEST   type=Char label="Microbiology Test or Finding Name"
+col MBORRES  type=Char label="Result or Finding in Original Units"
+col MBSTRESC type=Char label="Character Result/Finding in Std Format"
+col MBRESCAT type=Char label="Result Category"
+col MBMETHOD type=Char label="Method of Test or Examination"
+---
+CDISCPILOT01 | MB | 01-701-1015 | 1 | ORGANISM | Organism Present | STAPHYLOCOCCUS AUREUS | STAPHYLOCOCCUS AUREUS | INFECTING | CULTURE
+CDISCPILOT01 | MB | 01-701-1015 | 2 | ORGANISM | Organism Present | ESCHERICHIA COLI | ESCHERICHIA COLI | COLONIZER | CULTURE
+CDISCPILOT01 | MB | 01-701-1023 | 1 | ORGANISM | Organism Present | NO GROWTH | NO GROWTH |  | CULTURE
+CDISCPILOT01 | MB | 01-701-1023 | 2 | ORGANISM | Organism Present | GRAM POSITIVE COCCI | GRAM POSITIVE COCCI |  | GRAM STAIN
+---

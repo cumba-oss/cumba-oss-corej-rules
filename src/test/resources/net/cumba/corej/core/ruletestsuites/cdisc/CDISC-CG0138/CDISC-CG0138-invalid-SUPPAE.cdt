@@ -1,0 +1,18 @@
+#!RuleTest
+#test CDISC-CG0138 expect=violation domain=SUPPAE
+#note "Authority: SDTM and SDTMIG Conformance Rules v2.0 CG0138 (Condition: Population flags included in submission; Rule: Population flags in SUPPDM). Row 2: the subject-level population flag ITT is submitted in SUPPAE instead of SUPPDM -> fires. Row 1 (AETRTEM, an AE-level qualifier) is legitimate in SUPPAE and silent."
+#library standard=sdtmig version=3-2
+#expectViolationCount 1
+#expectViolationAt row=2 QNAM=ITT
+dataset SUPPAE class=RELATIONSHIP label="Supplemental Qualifiers for AE"
+col STUDYID  type=Char label="Study Identifier"
+col RDOMAIN  type=Char label="Related Domain Abbreviation"
+col USUBJID  type=Char label="Unique Subject Identifier"
+col IDVAR    type=Char label="Identifying Variable"
+col IDVARVAL type=Char label="Identifying Variable Value"
+col QNAM     type=Char label="Qualifier Variable Name"
+col QLABEL   type=Char label="Qualifier Variable Label"
+col QVAL     type=Char label="Data Value"
+---
+CDISCPILOT01 | AE | 01-701-1015 | AESEQ | 1 | AETRTEM | Treatment Emergent Flag | Y
+CDISCPILOT01 | AE | 01-701-1015 | AESEQ | 1 | ITT | Intent to Treat Population Flag | Y

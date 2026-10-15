@@ -1,0 +1,16 @@
+#!RuleTest
+#test CDISC-CG0345 expect=noViolation domain=CM
+#note "Authority: SDTM and SDTMIG Conformance Rules v2.0 CG0345 (Class INT, Domain ALL; Rule: --TRT ^= 'MULTIPLE'). Every CMTRT names the medication actually taken; none equals the placeholder 'MULTIPLE', so the rule executes (CMTRT present, INTERVENTIONS class) and does not fire."
+#library standard=sdtmig version=3-4
+dataset CM class=INTERVENTIONS label="Concomitant/Prior Medications"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN  type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col CMSEQ   type=Num  label="Sequence Number"
+col CMTRT   type=Char label="Reported Name of Drug, Med, or Therapy"
+col CMDECOD type=Char label="Standardized Medication Name"
+---
+CDISCPILOT01 | CM | 01-701-1015 | 1 | ASPIRIN | ACETYLSALICYLIC ACID
+CDISCPILOT01 | CM | 01-701-1015 | 2 | PARACETAMOL | PARACETAMOL
+CDISCPILOT01 | CM | 01-701-1023 | 1 | MULTIPLE VITAMINS PRODUCT | VITAMINS NOS
+---
