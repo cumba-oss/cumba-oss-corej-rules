@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -68,8 +69,15 @@ import org.junit.jupiter.api.io.TempDir;
  * <ul>
  * <li>0265 / DD0136: CM's label "Concomitant Medications" is "Concomitant/Prior Medications" in
  * SDTMIG 3.3, TS's "Trial Summary" is "Trial Summary Information";</li>
- * <li>DD0118 ×2: RSTESTCD / RSTEST reference the HAMD-17 codelists {@code C100138} /
- * {@code C100137}, while the Library assigns RS only {@code C96782} / {@code C96781}.</li>
+ * <li>DD0118: none since {@code PLAN-stopped-rule-engine-fixes} item 2 (owner 2026-10-12, SR2 / SR3
+ * / T8). RSTESTCD / RSTEST reference the HAMD-17 codelists {@code C100138} / {@code C100137} while
+ * the Library assigns RS only the oncology lists {@code C96782} / {@code C96781} — but RS since
+ * SDTMIG 3.3 also holds clinical classifications, each with its own instrument codelist, and the
+ * example binds {@code sdtmct-2020-12-18}, where both lists are <i>Clinical Classification</i>
+ * (Test Code / Test Name). The shipped rule's {@code exempt:} block covers exactly that, reading
+ * the class from the BOUND CT only (SR7 (a)); they fired twice before.
+ * {@link #msgExampleWithoutItsCtStandardsKeepsTheDd0118Findings} pins the accepted gap: with no CT
+ * bound the class is unknown and both findings stay.</li>
  * </ul>
  * <p>
  * 0149 / DD0124 raise nothing since rule round 2026-10-12 (owner, DCE-1: "a value-level codelist
@@ -112,8 +120,6 @@ class LibraryRulesRealStoreTest
                     + " = Concomitant Medications vs Concomitant/Prior Medications",
             "DEFINE-XML-0265 /ItemGroupDef[@OID='IG.TS']"
                     + " = Trial Summary vs Trial Summary Information",
-            "PMDA-DD0118 /ItemGroupDef[@OID='IG.RS']/ItemRef[5] = RSTESTCD: C100138 vs C96782",
-            "PMDA-DD0118 /ItemGroupDef[@OID='IG.RS']/ItemRef[6] = RSTEST: C100137 vs C96781",
             "PMDA-DD0136 /ItemGroupDef[@OID='IG.CM']"
                     + " = Concomitant Medications vs Concomitant/Prior Medications",
             "PMDA-DD0136 /ItemGroupDef[@OID='IG.TS']"
@@ -188,6 +194,46 @@ class LibraryRulesRealStoreTest
             assertEquals(CORRECTED_EXPECTED, RealStoreDefineRun.findingLines(results));
             assertFalse(binding.libraryBasis().contains("products not held"),
                     binding.libraryBasis());
+            // the product path bound the CT the define declares - the class source of DD0118's
+            // exemption (SR7 (a): the bound CT only)
+            assertTrue(binding.ctProvider().isPresent(), "the 2.1 define declares its CT");
+        }
+    }
+
+
+    /**
+     * SR7 (a) / T4, the accepted gap pinned: the corrected MSG example with its two CT
+     * {@code def:Standard} elements removed binds NO CT — the binding a 2.0 define always gets,
+     * since {@code def:Standards} is a 2.1 element — so DD0118's exemption has no class source and
+     * both HAMD-17 findings stay. The engine never selects a CT version on its own (owner
+     * 2026-10-12: <i>"we only use the bound CT when there is one"</i>); {@code -ct} / CT Packages
+     * on the run would bind one.
+     */
+    @Test
+    void msgExampleWithoutItsCtStandardsKeepsTheDd0118Findings()
+    {
+        Path define = RealStoreDefineRun.variant(MSG, tempDir, "Name=\"STDTMIG\"",
+                "Name=\"SDTMIG\"",
+                "<def:Standard OID=\"STD.4\" Name=\"CDISC/NCI\" Type=\"CT\" PublishingSet=\"DEFINE-XML\""
+                        + " Version=\"2020-12-18\" Status=\"Final\" def:CommentOID=\"COM.ST4\"/>",
+                "",
+                "<def:Standard OID=\"STD.3\" Name=\"CDISC/NCI\" Type=\"CT\" PublishingSet=\"SDTM\""
+                        + " Version=\"2020-12-18\" Status=\"Final\" def:CommentOID=\"COM.ST3\"/>",
+                "");
+        Map<String, ConformanceRule> rules = roster();
+        try (DefineStoreBinding binding = DefineStoreBinding.resolve(define, List.of(), store()))
+        {
+            assertTrue(binding.ctProvider().isEmpty(), "no CT declared, none bound");
+            Map<String, RuleResult> results = RealStoreDefineRun.evaluate(define, "2.1", binding,
+                    rules);
+            RealStoreDefineRun.dump("msg-library-21-corrected-no-ct", results);
+            RealStoreDefineRun.assertAllExecuted(results);
+            List<String> expected = new ArrayList<>(CORRECTED_EXPECTED);
+            expected.add(2,
+                    "PMDA-DD0118 /ItemGroupDef[@OID='IG.RS']/ItemRef[5] = RSTESTCD: C100138 vs C96782");
+            expected.add(3,
+                    "PMDA-DD0118 /ItemGroupDef[@OID='IG.RS']/ItemRef[6] = RSTEST: C100137 vs C96781");
+            assertEquals(expected, RealStoreDefineRun.findingLines(results));
         }
     }
 }

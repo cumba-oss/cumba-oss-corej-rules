@@ -11,9 +11,13 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import net.cumba.cdisc.define.DefineDomIo;
+import net.cumba.corej.define.conformance.ct.CodelistClass;
+import net.cumba.corej.define.conformance.ct.CtCodelist;
+import net.cumba.corej.define.conformance.ct.CtProvider;
 import net.cumba.corej.define.conformance.engine.DefineConformanceEngine;
 import net.cumba.corej.define.conformance.engine.DefineConformanceInput;
 import net.cumba.corej.define.conformance.engine.DefineConformanceReport;
@@ -27,6 +31,7 @@ import net.cumba.corej.define.conformance.report.Severity;
 import net.cumba.corej.define.conformance.rule.ConformanceRule;
 import net.cumba.corej.define.conformance.rule.RuleRepository;
 import net.cumba.corej.define.conformance.tree.ElementNodeBuilder;
+import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
@@ -239,15 +244,152 @@ class PmdaLibraryRulesTest
 
     private static DocumentContext context(String aXml, String aVersion, LibraryProvider aProvider)
     {
+        return context(aXml, aVersion, aProvider, null);
+    }
+
+
+    private static DocumentContext context(String aXml, String aVersion, LibraryProvider aProvider,
+            @Nullable CtProvider aCtProvider)
+    {
         try (InputStream in = new ByteArrayInputStream(aXml.getBytes(StandardCharsets.UTF_8)))
         {
             return new DocumentContext(ElementNodeBuilder.build(DefineDomIo.parse(in)), aVersion,
-                    null, null, List.of(), aProvider);
+                    aCtProvider, null, List.of(), aProvider);
         }
         catch (Exception e)
         {
             throw new IllegalStateException(e);
         }
+    }
+
+
+    /**
+     * A 2.1 document with one RS dataset governed by SDTMIG {@code aIgVersion}, whose
+     * {@code aVariable} is bound to a codelist aliased {@code aCCode}.
+     */
+    private static String rs(String aIgVersion, String aVariable, String aCCode)
+    {
+        return """
+                <ODM xmlns="http://www.cdisc.org/ns/odm/v1.3"
+                     xmlns:def="http://www.cdisc.org/ns/def/v2.1"
+                     FileOID="www.example.org/define/rs" FileType="Snapshot"
+                     ODMVersion="1.3.2" CreationDateTime="2026-10-15T10:15:30">
+                  <Study OID="ST.RS">
+                    <GlobalVariables>
+                      <StudyName>RS</StudyName>
+                      <StudyDescription>RS clinical classification fixture</StudyDescription>
+                      <ProtocolName>RS</ProtocolName>
+                    </GlobalVariables>
+                    <MetaDataVersion OID="MDV.001" Name="MDV" def:DefineVersion="2.1.0">
+                      <def:Standards>
+                        <def:Standard OID="STD.SDTM" Name="SDTMIG" Type="IG" Version="%s"/>
+                      </def:Standards>
+                      <ItemGroupDef OID="IG.RS" Name="RS" Domain="RS" Repeating="Yes"
+                                    Purpose="Tabulation" def:StandardOID="STD.SDTM"
+                                    def:Structure="One record per response assessment per subject">
+                        <Description>
+                          <TranslatedText xml:lang="en">Disease Response and Clin Classification</TranslatedText>
+                        </Description>
+                        <ItemRef ItemOID="IT.RS.VAR" Mandatory="Yes"/>
+                      </ItemGroupDef>
+                      <ItemDef OID="IT.RS.VAR" Name="%s" DataType="text" Length="8">
+                        <Description>
+                          <TranslatedText xml:lang="en">Response Assessment</TranslatedText>
+                        </Description>
+                        <CodeListRef CodeListOID="CL.HAMD"/>
+                      </ItemDef>
+                      <CodeList OID="CL.HAMD" Name="HAMD 17 Test Code" DataType="text">
+                        <EnumeratedItem CodedValue="HAMD101"/>
+                        <Alias Context="nci:ExtCodeID" Name="%s"/>
+                      </CodeList>
+                    </MetaDataVersion>
+                  </Study>
+                </ODM>
+                """
+                .formatted(aIgVersion, aVariable, aCCode);
+    }
+
+    /** A CT provider knowing HAMD-17's Test Code and Test Name lists as Clinical Classification. */
+    private static final class HamdCtProvider implements CtProvider
+    {
+
+        @Override
+        public Optional<CtCodelist> codelistByCCode(String aCCode)
+        {
+            return Optional.empty();
+        }
+
+
+        @Override
+        public Optional<CodelistClass> codelistClass(String aCCode)
+        {
+            return switch (aCCode)
+            {
+            case "C100138" -> Optional
+                    .of(new CodelistClass("Clinical Classification", Optional.of("Test Code")));
+            case "C100137" -> Optional
+                    .of(new CodelistClass("Clinical Classification", Optional.of("Test Name")));
+            default -> Optional.empty();
+            };
+        }
+    }
+
+    /**
+     * PLAN-stopped-rule-engine-fixes item 2 (SR2 / SR3 / SR7 / T8): the SHIPPED PMDA-DD0118 with
+     * its {@code exempt:} block. RS since SDTMIG 3.3 holds clinical classifications, each with its
+     * own instrument codelist (SDTMIG 3.3 RSTESTCD: "For Clinical Classifications (when RSCAT is a
+     * term in codelist CCCAT), QRS Naming Rules apply. These instruments have individual dedicated
+     * terminology codelists"), while the Library assigns RSTESTCD the oncology list C96782 only.
+     * With a CT bound that classes HAMD-17's list, RS 3.3 is silent; RS 3.2 (Disease Response
+     * only), the wrong role (RSTESTCD on the Test NAME list) and a run without CT still fire.
+     */
+    @Test
+    void dd0118ExemptsAClinicalClassificationCodelistOnRsSince33WhenCtIsBound()
+    {
+        HamdCtProvider ct = new HamdCtProvider();
+        // precondition: the stub library assigns RS its oncology lists for 3.2 and 3.3, so a
+        // silence below is the exemption's, never an empty library answer
+        assertEquals(List.of("C96782"), new StubLibraryProvider().variableCodelistCCodes("SDTMIG",
+                "3.3", "RS", "RSTESTCD"));
+        assertEquals(List.of("C96782"), new StubLibraryProvider().variableCodelistCCodes("SDTMIG",
+                "3.2", "RS", "RSTESTCD"));
+        Map<String, RuleResult> exempt = evaluate(rs("3.3", "RSTESTCD", "C100138"), "2.1",
+                new StubLibraryProvider(), ct);
+        assertEquals(ExecutionStatus.EXECUTED, exempt.get("PMDA-DD0118").status());
+        assertEquals(List.of(), exempt.get("PMDA-DD0118").findings(),
+                "RS 3.3 + a Clinical Classification Test Code list on RSTESTCD is conformant");
+        assertEquals(List.of(),
+                evaluate(rs("3.3", "RSTEST", "C100137"), "2.1", new StubLibraryProvider(), ct)
+                        .get("PMDA-DD0118").findings(),
+                "RSTEST takes the instrument's Test Name list");
+
+        assertEquals(
+                "Codelist NCI Code does not match the Standard Codelist NCI Code "
+                        + "[RSTESTCD: C100138 vs C96782]",
+                evaluate(rs("3.2", "RSTESTCD", "C100138"), "2.1", new StubLibraryProvider(), ct)
+                        .get("PMDA-DD0118").findings().get(0).getMessage(),
+                "SDTMIG 3.2's RS is Disease Response only");
+        assertEquals(1,
+                evaluate(rs("3.3", "RSTESTCD", "C100137"), "2.1", new StubLibraryProvider(), ct)
+                        .get("PMDA-DD0118").findings().size(),
+                "the Test NAME list on RSTESTCD is a mismatch (T8: the role is matched too)");
+        // SR7 (a): no CT bound => the class is unknown and the rule fires as before (T4)
+        assertEquals(1,
+                evaluate(rs("3.3", "RSTESTCD", "C100138"), "2.1", new StubLibraryProvider())
+                        .get("PMDA-DD0118").findings().size(),
+                "without a bound CT the exemption is inert");
+    }
+
+
+    private static Map<String, RuleResult> evaluate(String aXml, String aVersion,
+            LibraryProvider aProvider, CtProvider aCtProvider)
+    {
+        List<ConformanceRule> rules = RuleRepository.loadDirectory(RULES_DIR).stream()
+                .filter(rule -> LIB_IDS.contains(rule.ruleId())).toList();
+        DocumentContext context = context(aXml, aVersion, aProvider, aCtProvider);
+        RuleEvaluator evaluator = new RuleEvaluator();
+        return rules.stream().collect(Collectors.toMap(ConformanceRule::ruleId,
+                rule -> evaluator.evaluate(rule, context)));
     }
 
 

@@ -30,6 +30,19 @@ public final class StubLibraryProvider implements LibraryProvider
             "AE/AESEV", "C66769", //
             "AE/AEACN", "C66767");
 
+    /**
+     * RS as the Library publishes it in SDTMIG 3.2, 3.3 and 3.4 alike: the oncology Tumor Response
+     * lists only, although SDTMIG 3.3+ RS also holds clinical classifications with their own
+     * instrument codelists (PMDA-DD0118's {@code exempt:} block, PLAN-stopped-rule-engine-fixes).
+     * Served for those three versions; the slice above stays 3.4-only so every other test keeps its
+     * library-unknown material.
+     */
+    private static final Map<String, String> RS_C_CODES = Map.of(//
+            "RS/RSTESTCD", "C96782", //
+            "RS/RSTEST", "C96781");
+
+    private static final List<String> RS_VERSIONS = List.of("3.2", "3.3", "3.4");
+
     private static final Map<String, String> QUALIFIER_LABELS = Map.of(//
             "OCCUR", "Occurrence", //
             "STAT", "Completion Status");
@@ -66,6 +79,12 @@ public final class StubLibraryProvider implements LibraryProvider
     public Optional<String> variableCodelistCCode(String aStandardName, String aStandardVersion,
             String aDatasetName, String aVariableName)
     {
+        String key = aDatasetName + "/" + aVariableName;
+        if (RS_C_CODES.containsKey(key) && "SDTMIG".equals(aStandardName.replace("-", ""))
+                && RS_VERSIONS.contains(aStandardVersion))
+        {
+            return Optional.of(RS_C_CODES.get(key));
+        }
         return known(aStandardName, aStandardVersion)
                 ? Optional.ofNullable(VARIABLE_C_CODES.get(aDatasetName + "/" + aVariableName))
                 : Optional.empty();
