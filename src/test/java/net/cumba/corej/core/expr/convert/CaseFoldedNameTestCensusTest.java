@@ -109,7 +109,10 @@ class CaseFoldedNameTestCensusTest
 
     private static final int EXPECTED_FOLDED_MEMBERSHIP_RULES = 50;
 
-    private static final int EXPECTED_FOLDED_MEMBERSHIP_SITES = 124;
+    // 2026-10-15 (rule round 2026-10-15, FDA/PMDA-SD1076): membership sites 124 -> 128, rules
+    // unchanged. Each SD1076 now tests `upper(varname()) not in` the three core-filtered IG lists
+    // ($ig_req / $ig_exp / $ig_perm) instead of one $library_order: +2 sites per rule.
+    private static final int EXPECTED_FOLDED_MEMBERSHIP_SITES = 128;
 
     private static final Set<String> PREDICATES = Set.of("ends_with", "starts_with", "contains",
             "does_not_contain", "prefix_matches", "suffix_matches");
