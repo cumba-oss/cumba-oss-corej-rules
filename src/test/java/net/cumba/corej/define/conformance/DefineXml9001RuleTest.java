@@ -316,7 +316,7 @@ class DefineXml9001RuleTest
     {
         assertEquals(ExecutionStatus.EXECUTED, aResult.status());
         return aResult.findings().stream().map(ConformanceFinding::getXpath)
-                .map(x -> x.substring(x.indexOf("/", x.indexOf("MetaDataVersion[")))).toList();
+                .map(x -> x.substring(x.indexOf('/', x.indexOf("MetaDataVersion[")))).toList();
     }
 
     /**
