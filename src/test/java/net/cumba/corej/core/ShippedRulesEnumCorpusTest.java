@@ -152,7 +152,7 @@ class ShippedRulesEnumCorpusTest
     @Test
     void shippedJoinTypeVocabulary_isClosed() throws IOException
     {
-        java.util.Map<String, Integer> byValue = new java.util.TreeMap<>();
+        Map<String, Integer> byValue = new java.util.TreeMap<>();
         java.util.Set<String> rulesWithLeft = new java.util.TreeSet<>();
         for (Path file : listRulePackages(CorpusPaths.rules()))
         {
