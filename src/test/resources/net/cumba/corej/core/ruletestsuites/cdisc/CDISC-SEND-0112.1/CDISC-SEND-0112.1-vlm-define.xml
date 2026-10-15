@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- CDISC-SEND-0112.1, PLAN-stopped-rule-engine-fixes item 1 (Define-XML 2.1 section 5.3.12.3: "In some cases, def:Origin will be provided only at the Value level"): DM.AGE carries a derivation method at the VALUE level only - both value-level entries (AGEU=WEEKS / DAYS) have it, the variable level has none. -->
+<ODM xmlns:def="http://www.cdisc.org/ns/def/v2.1" ODMVersion="1.3.2" FileType="Snapshot"
+     FileOID="DEF.CDISC.SEND01121VLM" CreationDateTime="2026-01-01T00:00:00">
+  <Study OID="S1">
+    <MetaDataVersion OID="MDV.1" Name="CDISC-SEND-0112.1 value-level method fixture" DefineVersion="2.1.0"
+                     StandardName="SEND" StandardVersion="3.1.1">
+
+      <ItemGroupDef OID="IG.DM" Name="DM" Domain="DM" Repeating="No" Purpose="Tabulation"
+                    SASDatasetName="DM">
+        <ItemRef ItemOID="IT.DM.STUDYID" OrderNumber="1" Mandatory="Yes" Role="Identifier"/>
+        <ItemRef ItemOID="IT.DM.USUBJID" OrderNumber="2" Mandatory="Yes" Role="Identifier"/>
+        <ItemRef ItemOID="IT.DM.AGEU" OrderNumber="3" Mandatory="Yes" Role="Topic"/>
+        <ItemRef ItemOID="IT.DM.AGE" OrderNumber="4" Mandatory="No" Role="Record Qualifier"/>
+      </ItemGroupDef>
+
+      <ItemDef OID="IT.DM.STUDYID" Name="STUDYID" DataType="text" Length="20">
+        <Description><TranslatedText xml:lang="en">Study Identifier</TranslatedText></Description>
+        <def:Origin Type="Collected"/>
+      </ItemDef>
+      <ItemDef OID="IT.DM.USUBJID" Name="USUBJID" DataType="text" Length="20">
+        <Description><TranslatedText xml:lang="en">Unique Subject Identifier</TranslatedText></Description>
+        <def:Origin Type="Collected"/>
+      </ItemDef>
+      <ItemDef OID="IT.DM.AGEU" Name="AGEU" DataType="text" Length="8">
+        <Description><TranslatedText xml:lang="en">Age Unit</TranslatedText></Description>
+        <def:Origin Type="Collected"/>
+      </ItemDef>
+      <ItemDef OID="IT.DM.AGE" Name="AGE" DataType="integer" Length="3">
+        <Description><TranslatedText xml:lang="en">Age</TranslatedText></Description>
+        <def:Origin Type="Derived"/>
+        <def:ValueListRef ValueListOID="VL.DM.AGE"/>
+      </ItemDef>
+      <ItemDef OID="IT.DM.AGE.WEEKS" Name="AGE_WEEKS" DataType="integer" Length="3">
+        <Description><TranslatedText xml:lang="en">Age (WEEKS)</TranslatedText></Description>
+        <def:Origin Type="Derived"/>
+      </ItemDef>
+      <ItemDef OID="IT.DM.AGE.DAYS" Name="AGE_DAYS" DataType="integer" Length="3">
+        <Description><TranslatedText xml:lang="en">Age (DAYS)</TranslatedText></Description>
+        <def:Origin Type="Derived"/>
+      </ItemDef>
+
+      <def:ValueListDef OID="VL.DM.AGE">
+        <ItemRef ItemOID="IT.DM.AGE.WEEKS" OrderNumber="1" Mandatory="No" MethodOID="MT.AGE.WEEKS">
+          <def:WhereClauseRef WhereClauseOID="WC.AGE.WEEKS"/>
+        </ItemRef>
+        <ItemRef ItemOID="IT.DM.AGE.DAYS" OrderNumber="2" Mandatory="No" MethodOID="MT.AGE.DAYS">
+          <def:WhereClauseRef WhereClauseOID="WC.AGE.DAYS"/>
+        </ItemRef>
+      </def:ValueListDef>
+
+      <def:WhereClauseDef OID="WC.AGE.WEEKS">
+        <RangeCheck SoftHard="Soft" def:ItemOID="IT.DM.AGEU" Comparator="EQ">
+          <CheckValue>WEEKS</CheckValue>
+        </RangeCheck>
+      </def:WhereClauseDef>
+      <def:WhereClauseDef OID="WC.AGE.DAYS">
+        <RangeCheck SoftHard="Soft" def:ItemOID="IT.DM.AGEU" Comparator="EQ">
+          <CheckValue>DAYS</CheckValue>
+        </RangeCheck>
+      </def:WhereClauseDef>
+      <MethodDef OID="MT.AGE.WEEKS" Name="AGE for AGEU=WEEKS" Type="Computation">
+        <Description><TranslatedText xml:lang="en">Age derived for AGEU=WEEKS.</TranslatedText></Description>
+      </MethodDef>
+      <MethodDef OID="MT.AGE.DAYS" Name="AGE for AGEU=DAYS" Type="Computation">
+        <Description><TranslatedText xml:lang="en">Age derived for AGEU=DAYS.</TranslatedText></Description>
+      </MethodDef>
+    </MetaDataVersion>
+  </Study>
+</ODM>

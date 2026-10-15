@@ -1,0 +1,13 @@
+#!RuleTest
+#test CDISC-SEND-0137 expect=noViolation domain=EX
+#note "PLAN-stopped-rule-engine-fixes item 1 (Define-XML 2.1 section 5.3.12.3: a variable may be documented at the value level only): EX.EXDOSE has no comment at the variable level but every value-level entry of its def:ValueListDef (EXTRT=PLACEBO / DRUG A) carries one. The define documents the variable completely, so the rule must not fire. Fires (one finding on EXDOSE) under the rule before its var_vlm_has_comment(\"DEFINE\") != true conjunct."
+#library standard=sendig version=3-1-1
+#define-xml CDISC-SEND-0137-vlm-define.xml
+dataset EX
+col STUDYID  type=Char
+col USUBJID  type=Char
+col EXTRT    type=Char
+col EXDOSE   type=Num
+---
+S1 | S1-001 | PLACEBO | 0
+S1 | S1-002 | DRUG A | 10

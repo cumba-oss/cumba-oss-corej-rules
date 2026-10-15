@@ -785,7 +785,7 @@ Check:
   expression: 'max_value_length(AETERM) > var_length("DEFINE")'
 ```
 
-**Bytes** — `var_length() != max_value_length(variable_name, unit="bytes")` compares a variable's declared width with the longest value as stored, in bytes, which is what an XPT width means; with no usable table encoding the byte count is missing and the comparison does not fire.
+**Bytes** — `var_length() != max_value_length(variable_name, unit="bytes")` compares a variable's declared width with the longest value as stored, in bytes, which is what an XPT width means. With no usable table encoding (none declared, or `MIXED`) the byte count is missing; comparisons are total, so `!=` on it fires and the finding's `variable_max_size` prints the numeric default. A finding reports the length in the Check's own unit: `variable_max_size` is computed from the call the Check wrote (`unit=`, `encoding=` included), not from a plain character count.
 
 **Minimal — required parameters only**
 
@@ -4123,6 +4123,57 @@ Whether Define-XML documents the variable per value — its `ItemDef` carries a 
 
 ```yaml
 expression: 'var_has_value_list("DEFINE") == true and vlm_has_method(varname()) != true'
+```
+
+### var_vlm_has_comment
+
+`var_vlm_has_comment([x,] "DEFINE")` → **value**
+
+Whether EVERY value-level entry of the variable carries a comment: its `ItemDef`'s `def:ValueListRef` names a `def:ValueListDef` with at least one `ItemRef`, and each entry's value-level `ItemDef` resolves and carries a `def:CommentOID`. `false` for a variable without a value list, or whose value list does not resolve, holds no entry, or has one entry without a comment; missing for a variable the define does not declare. One answer per variable, so a Check stays variable-level under both universes — unlike the per-record `vlm_has_comment(x)`, which answers the entry matching each row; `DEFINE` only.
+
+| parameter | type | required | description |
+|---|---|---|---|
+| `x` | string, or a per-row expression | no | The variable's name as a string (`"AETERM"`) or an expression whose value names it; a bare column fails to load; defaults to the variable being iterated |
+| `level` | level | yes | Which metadata to read — supported here: `DEFINE` |
+
+**Example** — a variable documented per value (Define-XML 2.1 §5.3.12.3) is not reported for lacking a variable-level comment:
+
+```yaml
+expression: 'not empty(var_name("DEFINE")) and var_has_comment("DEFINE") == false and var_vlm_has_comment("DEFINE") != true'
+```
+
+### var_vlm_has_method
+
+`var_vlm_has_method([x,] "DEFINE")` → **value**
+
+Whether EVERY value-level entry of the variable carries a derivation method (`ItemRef/@MethodOID` in its `def:ValueListDef`, each entry's `ItemDef` resolving); otherwise as `var_vlm_has_comment`. `DEFINE` only.
+
+| parameter | type | required | description |
+|---|---|---|---|
+| `x` | string, or a per-row expression | no | The variable's name as a string (`"AETERM"`) or an expression whose value names it; a bare column fails to load; defaults to the variable being iterated |
+| `level` | level | yes | Which metadata to read — supported here: `DEFINE` |
+
+**Example**
+
+```yaml
+expression: 'var_origin_type("DEFINE") == "Derived" and var_has_method("DEFINE") == false and var_vlm_has_method("DEFINE") != true'
+```
+
+### var_vlm_has_origin
+
+`var_vlm_has_origin([x,] "DEFINE")` → **value**
+
+Whether EVERY value-level entry of the variable has an origin (a `def:Origin` element or the v2.0 `@Origin` attribute on each entry's value-level `ItemDef`); otherwise as `var_vlm_has_comment`. `DEFINE` only.
+
+| parameter | type | required | description |
+|---|---|---|---|
+| `x` | string, or a per-row expression | no | The variable's name as a string (`"AETERM"`) or an expression whose value names it; a bare column fails to load; defaults to the variable being iterated |
+| `level` | level | yes | Which metadata to read — supported here: `DEFINE` |
+
+**Example**
+
+```yaml
+expression: 'not empty(var_name("DEFINE")) and empty(var_origin_type("DEFINE")) and var_vlm_has_origin("DEFINE") != true'
 ```
 
 ### var_label

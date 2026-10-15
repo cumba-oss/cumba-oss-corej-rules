@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- CDISC-SEND-0014, PLAN-stopped-rule-engine-fixes item 1 (Define-XML 2.1 section 5.3.12.3: "In some cases, def:Origin will be provided only at the Value level"): DM.AGEU carries a comment at the VALUE level only - both value-level entries (ARMCD=A / B) have it, the variable level has none. -->
+<ODM xmlns:def="http://www.cdisc.org/ns/def/v2.1" ODMVersion="1.3.2" FileType="Snapshot"
+     FileOID="DEF.CDISC.SEND0014VLM" CreationDateTime="2026-01-01T00:00:00">
+  <Study OID="S1">
+    <MetaDataVersion OID="MDV.1" Name="CDISC-SEND-0014 value-level comment fixture" DefineVersion="2.1.0"
+                     StandardName="SEND" StandardVersion="3.1.1">
+
+      <ItemGroupDef OID="IG.DM" Name="DM" Domain="DM" Repeating="No" Purpose="Tabulation"
+                    SASDatasetName="DM">
+        <ItemRef ItemOID="IT.DM.STUDYID" OrderNumber="1" Mandatory="Yes" Role="Identifier"/>
+        <ItemRef ItemOID="IT.DM.USUBJID" OrderNumber="2" Mandatory="Yes" Role="Identifier"/>
+        <ItemRef ItemOID="IT.DM.ARMCD" OrderNumber="3" Mandatory="Yes" Role="Topic"/>
+        <ItemRef ItemOID="IT.DM.AGEU" OrderNumber="4" Mandatory="No" Role="Record Qualifier"/>
+      </ItemGroupDef>
+
+      <ItemDef OID="IT.DM.STUDYID" Name="STUDYID" DataType="text" Length="20" CommentOID="COM.STUDYID">
+        <Description><TranslatedText xml:lang="en">Study Identifier</TranslatedText></Description>
+        <def:Origin Type="Collected"/>
+      </ItemDef>
+      <ItemDef OID="IT.DM.USUBJID" Name="USUBJID" DataType="text" Length="20" CommentOID="COM.USUBJID">
+        <Description><TranslatedText xml:lang="en">Unique Subject Identifier</TranslatedText></Description>
+        <def:Origin Type="Collected"/>
+      </ItemDef>
+      <ItemDef OID="IT.DM.ARMCD" Name="ARMCD" DataType="text" Length="8" CommentOID="COM.ARMCD">
+        <Description><TranslatedText xml:lang="en">Planned Arm Code</TranslatedText></Description>
+        <def:Origin Type="Collected"/>
+      </ItemDef>
+      <ItemDef OID="IT.DM.AGEU" Name="AGEU" DataType="text" Length="8">
+        <Description><TranslatedText xml:lang="en">Age Unit</TranslatedText></Description>
+        <def:ValueListRef ValueListOID="VL.DM.AGEU"/>
+      </ItemDef>
+      <ItemDef OID="IT.DM.AGEU.A" Name="AGEU_A" DataType="text" Length="8" CommentOID="COM.AGEU.A">
+        <Description><TranslatedText xml:lang="en">Age Unit (A)</TranslatedText></Description>
+      </ItemDef>
+      <ItemDef OID="IT.DM.AGEU.B" Name="AGEU_B" DataType="text" Length="8" CommentOID="COM.AGEU.B">
+        <Description><TranslatedText xml:lang="en">Age Unit (B)</TranslatedText></Description>
+      </ItemDef>
+
+      <def:ValueListDef OID="VL.DM.AGEU">
+        <ItemRef ItemOID="IT.DM.AGEU.A" OrderNumber="1" Mandatory="No">
+          <def:WhereClauseRef WhereClauseOID="WC.AGEU.A"/>
+        </ItemRef>
+        <ItemRef ItemOID="IT.DM.AGEU.B" OrderNumber="2" Mandatory="No">
+          <def:WhereClauseRef WhereClauseOID="WC.AGEU.B"/>
+        </ItemRef>
+      </def:ValueListDef>
+
+      <def:WhereClauseDef OID="WC.AGEU.A">
+        <RangeCheck SoftHard="Soft" def:ItemOID="IT.DM.ARMCD" Comparator="EQ">
+          <CheckValue>A</CheckValue>
+        </RangeCheck>
+      </def:WhereClauseDef>
+      <def:WhereClauseDef OID="WC.AGEU.B">
+        <RangeCheck SoftHard="Soft" def:ItemOID="IT.DM.ARMCD" Comparator="EQ">
+          <CheckValue>B</CheckValue>
+        </RangeCheck>
+      </def:WhereClauseDef>
+      <CommentDef OID="COM.STUDYID">
+        <Description><TranslatedText xml:lang="en">Standard study identifier.</TranslatedText></Description>
+      </CommentDef>
+      <CommentDef OID="COM.USUBJID">
+        <Description><TranslatedText xml:lang="en">Standard unique subject identifier.</TranslatedText></Description>
+      </CommentDef>
+      <CommentDef OID="COM.ARMCD">
+        <Description><TranslatedText xml:lang="en">Planned Arm Code as collected.</TranslatedText></Description>
+      </CommentDef>
+      <CommentDef OID="COM.AGEU.A">
+        <Description><TranslatedText xml:lang="en">Age Unit for ARMCD=A, as collected.</TranslatedText></Description>
+      </CommentDef>
+      <CommentDef OID="COM.AGEU.B">
+        <Description><TranslatedText xml:lang="en">Age Unit for ARMCD=B, as collected.</TranslatedText></Description>
+      </CommentDef>
+    </MetaDataVersion>
+  </Study>
+</ODM>

@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- CDISC-SEND-0137, PLAN-stopped-rule-engine-fixes item 1, the sensitivity arm: EX.EXDOSE carries a comment at the VALUE level only, and only the EXTRT=PLACEBO entry has it - the EXTRT=DRUG A entry does not, so the variable is not documented for every value. -->
+<ODM xmlns:def="http://www.cdisc.org/ns/def/v2.1" ODMVersion="1.3.2" FileType="Snapshot"
+     FileOID="DEF.CDISC.SEND0137VLMP" CreationDateTime="2026-01-01T00:00:00">
+  <Study OID="S1">
+    <MetaDataVersion OID="MDV.1" Name="CDISC-SEND-0137 value-level partial comment fixture" DefineVersion="2.1.0"
+                     StandardName="SEND" StandardVersion="3.1.1">
+
+      <ItemGroupDef OID="IG.EX" Name="EX" Domain="EX" Repeating="Yes" Purpose="Tabulation"
+                    SASDatasetName="EX">
+        <ItemRef ItemOID="IT.EX.STUDYID" OrderNumber="1" Mandatory="Yes" Role="Identifier"/>
+        <ItemRef ItemOID="IT.EX.USUBJID" OrderNumber="2" Mandatory="Yes" Role="Identifier"/>
+        <ItemRef ItemOID="IT.EX.EXTRT" OrderNumber="3" Mandatory="Yes" Role="Topic"/>
+        <ItemRef ItemOID="IT.EX.EXDOSE" OrderNumber="4" Mandatory="No" Role="Record Qualifier"/>
+      </ItemGroupDef>
+
+      <ItemDef OID="IT.EX.STUDYID" Name="STUDYID" DataType="text" Length="20" CommentOID="COM.STUDYID">
+        <Description><TranslatedText xml:lang="en">Study Identifier</TranslatedText></Description>
+        <def:Origin Type="Collected"/>
+      </ItemDef>
+      <ItemDef OID="IT.EX.USUBJID" Name="USUBJID" DataType="text" Length="20" CommentOID="COM.USUBJID">
+        <Description><TranslatedText xml:lang="en">Unique Subject Identifier</TranslatedText></Description>
+        <def:Origin Type="Collected"/>
+      </ItemDef>
+      <ItemDef OID="IT.EX.EXTRT" Name="EXTRT" DataType="text" Length="40" CommentOID="COM.EXTRT">
+        <Description><TranslatedText xml:lang="en">Name of Treatment</TranslatedText></Description>
+        <def:Origin Type="Collected"/>
+      </ItemDef>
+      <ItemDef OID="IT.EX.EXDOSE" Name="EXDOSE" DataType="float" Length="8">
+        <Description><TranslatedText xml:lang="en">Dose</TranslatedText></Description>
+        <def:ValueListRef ValueListOID="VL.EX.EXDOSE"/>
+      </ItemDef>
+      <ItemDef OID="IT.EX.EXDOSE.PLACEBO" Name="EXDOSE_PLACEBO" DataType="float" Length="8" CommentOID="COM.EXDOSE.PLACEBO">
+        <Description><TranslatedText xml:lang="en">Dose (PLACEBO)</TranslatedText></Description>
+      </ItemDef>
+      <ItemDef OID="IT.EX.EXDOSE.DRUGA" Name="EXDOSE_DRUGA" DataType="float" Length="8">
+        <Description><TranslatedText xml:lang="en">Dose (DRUG A)</TranslatedText></Description>
+      </ItemDef>
+
+      <def:ValueListDef OID="VL.EX.EXDOSE">
+        <ItemRef ItemOID="IT.EX.EXDOSE.PLACEBO" OrderNumber="1" Mandatory="No">
+          <def:WhereClauseRef WhereClauseOID="WC.EXDOSE.PLACEBO"/>
+        </ItemRef>
+        <ItemRef ItemOID="IT.EX.EXDOSE.DRUGA" OrderNumber="2" Mandatory="No">
+          <def:WhereClauseRef WhereClauseOID="WC.EXDOSE.DRUGA"/>
+        </ItemRef>
+      </def:ValueListDef>
+
+      <def:WhereClauseDef OID="WC.EXDOSE.PLACEBO">
+        <RangeCheck SoftHard="Soft" def:ItemOID="IT.EX.EXTRT" Comparator="EQ">
+          <CheckValue>PLACEBO</CheckValue>
+        </RangeCheck>
+      </def:WhereClauseDef>
+      <def:WhereClauseDef OID="WC.EXDOSE.DRUGA">
+        <RangeCheck SoftHard="Soft" def:ItemOID="IT.EX.EXTRT" Comparator="EQ">
+          <CheckValue>DRUG A</CheckValue>
+        </RangeCheck>
+      </def:WhereClauseDef>
+      <CommentDef OID="COM.STUDYID">
+        <Description><TranslatedText xml:lang="en">Standard study identifier.</TranslatedText></Description>
+      </CommentDef>
+      <CommentDef OID="COM.USUBJID">
+        <Description><TranslatedText xml:lang="en">Standard unique subject identifier.</TranslatedText></Description>
+      </CommentDef>
+      <CommentDef OID="COM.EXTRT">
+        <Description><TranslatedText xml:lang="en">Name of Treatment as collected.</TranslatedText></Description>
+      </CommentDef>
+      <CommentDef OID="COM.EXDOSE.PLACEBO">
+        <Description><TranslatedText xml:lang="en">Dose for EXTRT=PLACEBO, as collected.</TranslatedText></Description>
+      </CommentDef>
+    </MetaDataVersion>
+  </Study>
+</ODM>

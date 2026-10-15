@@ -731,6 +731,9 @@ quantifier over a scalar predicate is that predicate (`any(p(X))` ≡ `p(X)`, `n
 | [`var_has_comment([x,] "DEFINE")`](functions.md#var_has_comment) | value | Whether Define-XML attaches a comment to the variable; `DEFINE` only |
 | [`var_has_method([x,] "DEFINE")`](functions.md#var_has_method) | value | Whether Define-XML attaches a derivation method to the variable; `DEFINE` only |
 | [`var_has_value_list([x,] "DEFINE")`](functions.md#var_has_value_list) | value | Whether Define-XML documents the variable per value (a `def:ValueListRef`); `DEFINE` only |
+| [`var_vlm_has_comment([x,] "DEFINE")`](functions.md#var_vlm_has_comment) | value | Whether EVERY value-level entry of the variable carries a comment; one answer per variable; `DEFINE` only |
+| [`var_vlm_has_method([x,] "DEFINE")`](functions.md#var_vlm_has_method) | value | Whether EVERY value-level entry of the variable carries a derivation method; one answer per variable; `DEFINE` only |
+| [`var_vlm_has_origin([x,] "DEFINE")`](functions.md#var_vlm_has_origin) | value | Whether EVERY value-level entry of the variable has an origin; one answer per variable; `DEFINE` only |
 | [`var_label([x,] [level])`](functions.md#var_label) | value | The variable's label; available at every level |
 | [`var_length([x,] [level])`](functions.md#var_length) | value | The variable's declared length; available at every level |
 | [`var_mandatory([x,] "DEFINE")`](functions.md#var_mandatory) | value | Whether Define-XML marks the variable mandatory; `DEFINE` only |

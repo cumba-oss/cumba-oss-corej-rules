@@ -1,0 +1,14 @@
+#!RuleTest
+#test CDISC-SEND-0340 expect=noViolation domain=DM
+#note "PLAN-stopped-rule-engine-fixes item 1 (Define-XML 2.1 section 5.3.12.3: a variable may be documented at the value level only): DM.AGEU has no comment at the variable level but every value-level entry of its def:ValueListDef (ARMCD=A / B) carries one. The define documents the variable completely, so the rule must not fire. Fires (one finding on AGEU) under the rule before its var_vlm_has_comment(\"DEFINE\") != true conjunct."
+#library standard=sendig version=3-1-1
+#library variable-metadata DM AGEU core=Exp
+#define-xml CDISC-SEND-0340-vlm-define.xml
+dataset DM
+col STUDYID  type=Char
+col USUBJID  type=Char
+col ARMCD    type=Char
+col AGEU     type=Char
+---
+S1 | S1-001 | A |
+S1 | S1-002 | B |

@@ -1,0 +1,13 @@
+#!RuleTest
+#test CDISC-SEND-0008 expect=noViolation domain=DM
+#note "PLAN-stopped-rule-engine-fixes item 1 (Define-XML 2.1 section 5.3.12.3: a variable may be documented at the value level only): DM.BRTHDTC has no origin at the variable level but every value-level entry of its def:ValueListDef (SEX=M / F) carries one. The define documents the variable completely, so the rule must not fire. Fires (one finding on BRTHDTC) under the rule before its var_vlm_has_origin(\"DEFINE\") != true conjunct."
+#library standard=sendig version=3-1-1
+#define-xml CDISC-SEND-0008-vlm-define.xml
+dataset DM
+col STUDYID  type=Char
+col USUBJID  type=Char
+col BRTHDTC  type=Char
+col SEX      type=Char
+---
+S1 | S1-001 | 2024-01-01 | M
+S1 | S1-002 | 2024-02-01 | F

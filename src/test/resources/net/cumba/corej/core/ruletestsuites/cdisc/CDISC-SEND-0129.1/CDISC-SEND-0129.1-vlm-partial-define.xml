@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- CDISC-SEND-0129.1, PLAN-stopped-rule-engine-fixes item 1, the sensitivity arm: SE.SESTDTC carries a derivation method at the VALUE level only, and only the ETCD=SCREEN entry has it - the ETCD=TRT entry does not, so the variable is not documented for every value. -->
+<ODM xmlns:def="http://www.cdisc.org/ns/def/v2.1" ODMVersion="1.3.2" FileType="Snapshot"
+     FileOID="DEF.CDISC.SEND01291VLMP" CreationDateTime="2026-01-01T00:00:00">
+  <Study OID="S1">
+    <MetaDataVersion OID="MDV.1" Name="CDISC-SEND-0129.1 value-level partial method fixture" DefineVersion="2.1.0"
+                     StandardName="SEND" StandardVersion="3.1.1">
+
+      <ItemGroupDef OID="IG.SE" Name="SE" Domain="SE" Repeating="Yes" Purpose="Tabulation"
+                    SASDatasetName="SE">
+        <ItemRef ItemOID="IT.SE.STUDYID" OrderNumber="1" Mandatory="Yes" Role="Identifier"/>
+        <ItemRef ItemOID="IT.SE.USUBJID" OrderNumber="2" Mandatory="Yes" Role="Identifier"/>
+        <ItemRef ItemOID="IT.SE.ETCD" OrderNumber="3" Mandatory="Yes" Role="Topic"/>
+        <ItemRef ItemOID="IT.SE.SESTDTC" OrderNumber="4" Mandatory="No" Role="Record Qualifier"/>
+      </ItemGroupDef>
+
+      <ItemDef OID="IT.SE.STUDYID" Name="STUDYID" DataType="text" Length="20">
+        <Description><TranslatedText xml:lang="en">Study Identifier</TranslatedText></Description>
+        <def:Origin Type="Collected"/>
+      </ItemDef>
+      <ItemDef OID="IT.SE.USUBJID" Name="USUBJID" DataType="text" Length="20">
+        <Description><TranslatedText xml:lang="en">Unique Subject Identifier</TranslatedText></Description>
+        <def:Origin Type="Collected"/>
+      </ItemDef>
+      <ItemDef OID="IT.SE.ETCD" Name="ETCD" DataType="text" Length="8">
+        <Description><TranslatedText xml:lang="en">Element Code</TranslatedText></Description>
+        <def:Origin Type="Collected"/>
+      </ItemDef>
+      <ItemDef OID="IT.SE.SESTDTC" Name="SESTDTC" DataType="text" Length="10">
+        <Description><TranslatedText xml:lang="en">Start Date/Time of Element</TranslatedText></Description>
+        <def:Origin Type="Derived"/>
+        <def:ValueListRef ValueListOID="VL.SE.SESTDTC"/>
+      </ItemDef>
+      <ItemDef OID="IT.SE.SESTDTC.SCREEN" Name="SESTDTC_SCREEN" DataType="text" Length="10">
+        <Description><TranslatedText xml:lang="en">Start Date/Time of Element (SCREEN)</TranslatedText></Description>
+        <def:Origin Type="Derived"/>
+      </ItemDef>
+      <ItemDef OID="IT.SE.SESTDTC.TRT" Name="SESTDTC_TRT" DataType="text" Length="10">
+        <Description><TranslatedText xml:lang="en">Start Date/Time of Element (TRT)</TranslatedText></Description>
+        <def:Origin Type="Derived"/>
+      </ItemDef>
+
+      <def:ValueListDef OID="VL.SE.SESTDTC">
+        <ItemRef ItemOID="IT.SE.SESTDTC.SCREEN" OrderNumber="1" Mandatory="No" MethodOID="MT.SESTDTC.SCREEN">
+          <def:WhereClauseRef WhereClauseOID="WC.SESTDTC.SCREEN"/>
+        </ItemRef>
+        <ItemRef ItemOID="IT.SE.SESTDTC.TRT" OrderNumber="2" Mandatory="No">
+          <def:WhereClauseRef WhereClauseOID="WC.SESTDTC.TRT"/>
+        </ItemRef>
+      </def:ValueListDef>
+
+      <def:WhereClauseDef OID="WC.SESTDTC.SCREEN">
+        <RangeCheck SoftHard="Soft" def:ItemOID="IT.SE.ETCD" Comparator="EQ">
+          <CheckValue>SCREEN</CheckValue>
+        </RangeCheck>
+      </def:WhereClauseDef>
+      <def:WhereClauseDef OID="WC.SESTDTC.TRT">
+        <RangeCheck SoftHard="Soft" def:ItemOID="IT.SE.ETCD" Comparator="EQ">
+          <CheckValue>TRT</CheckValue>
+        </RangeCheck>
+      </def:WhereClauseDef>
+      <MethodDef OID="MT.SESTDTC.SCREEN" Name="SESTDTC for ETCD=SCREEN" Type="Computation">
+        <Description><TranslatedText xml:lang="en">Start Date/Time of Element derived for ETCD=SCREEN.</TranslatedText></Description>
+      </MethodDef>
+    </MetaDataVersion>
+  </Study>
+</ODM>
