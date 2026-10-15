@@ -171,19 +171,22 @@ class UnqualifiedJoinedReadLintTest
     // SDTM 21 -> 14 on 2026-10-05 (PLAN-merged-evaluation-table W4, MQ1): the seven bare AESMIE
     // reads of CDISC-CG0043 (3 packages) and FDA-SD1143 (4) are respelled AE.AESMIE, a qualified
     // read no bare census counts. FLAGS stayed 0.
+    // SEND 6 -> 2 on 2026-10-15 (PLAN-send-base-ig-view P3): the base-IG view gives the
+    // sendig/ar-1-0 provider SENDIG 3.1's RELREC, TA and TE, so FDA-SD0077 [IDVARVAL, IDVAR,
+    // RDOMAIN] and FDA-SD1012 [ETCD] now find their reads defined by a scoped dataset; FDA-SD1023
+    // [VISIT, VISITNUM] stays (SV is in no SENDIG product). FLAGS stayed 0.
     private static final Map<String, Integer> EXPECTED_CANDIDATES = Map.of("ADaM", 5, "SDTM", 14,
-            "SEND", 6);
+            "SEND", 2);
 
     private static final Map<String, Integer> EXPECTED_UNRESOLVED = Map.ofEntries(
             Map.entry("adam/adamig-1-0\t&DOM&", 1), Map.entry("adam/adamig-1-1\t&DOM&", 1),
             Map.entry("adam/adamig-1-2\t&DOM&", 1), Map.entry("adam/adamig-1-3\t&DOM&", 1),
-            Map.entry("sendig/ar-1-0\tRELREC (no variables)", 1),
-            Map.entry("sendig/ar-1-0\tSV (no variables)", 1),
-            Map.entry("sendig/ar-1-0\tTA (no variables)", 1),
             // The three sendig/dart-1-2 rows (DM 5, DS 3, RELREC 2) left on 2026-10-10
             // (PLAN-seed-sendig-dart-1-2 P3): the store holds the SENDIG-DART 1.2 product now, so
             // those ten joins are examined (EXPECTED_REACH SEND +10) instead of being unjudgeable.
-            Map.entry("sendig/ar-1-0\tTE (no variables)", 1));
+            // The sendig/ar-1-0 RELREC, TA and TE rows left on 2026-10-15 (PLAN-send-base-ig-view
+            // P3): the base-IG view defines them from SENDIG 3.1. SV stays (no SENDIG prints it).
+            Map.entry("sendig/ar-1-0\tSV (no variables)", 1));
 
     // + the two dart-1-1 rows on 2026-09-30 (PLAN-send-tfdetect-pathology-unpark): the un-parked
     // CDISC-SEND-0204 / 0205 are scoped to TF, which the SENDIG-DART 1.1 library does not define.
@@ -192,18 +195,10 @@ class UnqualifiedJoinedReadLintTest
     // their TF scope selects no library dataset there either (DART 1.2 carries no TF, as 1.1).
     // + their four -A rows on 2026-10-11 (PLAN-join-key-one-side-absent-drop QK17): the non-pooled
     // split siblings ship in the same packages with the same TF scope.
-    private static final Set<String> EXPECTED_EMPTY = Set.of(
-            "rules-cdisc-sendig-dart-1-1.json\tCDISC-SEND-0204",
-            "rules-cdisc-sendig-dart-1-1.json\tCDISC-SEND-0205",
-            "rules-cdisc-sendig-dart-1-2.json\tCDISC-SEND-0204",
-            "rules-cdisc-sendig-dart-1-2.json\tCDISC-SEND-0205",
-            "rules-cdisc-sendig-dart-1-1.json\tCDISC-SEND-0204-A",
-            "rules-cdisc-sendig-dart-1-1.json\tCDISC-SEND-0205-A",
-            "rules-cdisc-sendig-dart-1-2.json\tCDISC-SEND-0204-A",
-            "rules-cdisc-sendig-dart-1-2.json\tCDISC-SEND-0205-A",
-            "rules-fda-sendig-ar-1-0.json\tFDA-SD1205", "rules-fda-sendig-ar-1-0.json\tFDA-SD1206",
-            "rules-fda-sendig-ar-1-0.json\tFDA-SD1207", "rules-fda-sendig-ar-1-0.json\tFDA-SD9747",
-            "rules-fda-sendig-ar-1-0.json\tFDA-SE1152");
+    // -> EMPTY on 2026-10-15 (PLAN-send-base-ig-view P3): the base-IG view gives the DART 1.1 /
+    // 1.2 providers SENDIG's TF and the AR provider SENDIG 3.1's datasets, so all thirteen
+    // (package, rule) pairs now select a library dataset and their reads are examined.
+    private static final Set<String> EXPECTED_EMPTY = Set.of();
 
     private static final Map<String, Integer> EXPECTED_CAPTURES = Map.of("CDISC-AD0591\t&VAR&", 2,
             "CDISC-AD0898\t&DOM&SEQ", 4);

@@ -1,0 +1,23 @@
+#!RuleTest
+#test CDISC-SEND-0048 expect=violation domain=TF
+#note "SENDIG-DART 1.2 prints no TF; the base-IG view (PLAN-send-base-ig-view, B-BASE) reads it from SENDIG v3.1.1. TFSPID comes after TFSTRESC, against the SENDIG TF variable order -> fires. Before the view the rule SKIPPED (no IG order for TF)."
+#library-ref standard=sendig version=dart-1-2 ct=sendct-2026-03-27
+#expectViolationCount 1
+dataset TF label="Tumor Findings"
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col TFSEQ type=Num label="Sequence Number"
+col TFTESTCD type=Char label="Tumor Examination Short Name"
+col TFTEST type=Char label="Tumor Examination Name"
+col TFORRES type=Char label="Result or Finding as Collected"
+col TFSTRESC type=Char label="Standardized Result in Character Format"
+col TFSPID type=Char label="Mass Identifier"
+col TFRESCAT type=Char label="Neoplasm Classification"
+col TFSPEC type=Char label="Specimen Material Type"
+col TFDTHREL type=Char label="Relationship to Death"
+col TFDETECT type=Num label="Time in Days to Detection of Tumor"
+---
+S1 | TF | S1-001 | 1 | TUMEX | Tumor Examination | ADENOCARCINOMA | ADENOCARCINOMA, MALIGNANT | MASS 1 | MALIGNANT | ABDOMINAL WALL | N | 127
+S1 | TF | S1-002 | 1 | TUMEX | Tumor Examination | ADENOCARCINOMA | ADENOCARCINOMA, MALIGNANT | MASS 2 | MALIGNANT | ABDOMINAL WALL | N | 127
+---

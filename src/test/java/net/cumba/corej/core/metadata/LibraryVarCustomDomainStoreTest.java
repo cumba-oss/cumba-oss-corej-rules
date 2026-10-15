@@ -33,6 +33,8 @@ import net.cumba.corej.core.exec.RuleRunnerCalls;
 import net.cumba.corej.core.exec.Violation;
 import net.cumba.corej.core.expr.eval.ExprCompiler;
 import net.cumba.corej.core.metadata.store.StoreMetadataProviderFactory;
+import net.cumba.corej.core.metadata.store.StoredDataset;
+import net.cumba.corej.core.metadata.store.StoredVariable;
 import net.cumba.corej.core.model.Rule;
 import net.cumba.corej.core.rulespec.MetadataStoreFixture;
 import net.cumba.datatable.IDataTable;
@@ -449,6 +451,31 @@ class LibraryVarCustomDomainStoreTest
     }
 
 
+    /** The columns minus the sponsor {@code --FOO} variable no standard defines. */
+    private static Set<String> standardColumns(List<String> aColumns)
+    {
+        Set<String> out = new TreeSet<>(aColumns);
+        out.removeIf(c -> c.endsWith("FOO"));
+        return out;
+    }
+
+
+    /** The stored model dataset's rows by variable name. */
+    private static Map<String, StoredVariable> modelDatasetRows(String aModelKey, String aDataset)
+    {
+        Map<String, StoredVariable> out = new LinkedHashMap<>();
+        for (StoredDataset ds : StoredSendRosters.stored(aModelKey).datasets())
+        {
+            if (aDataset.equals(ds.name()))
+            {
+                ds.variables().forEach(v -> out.put(v.name(), v));
+            }
+        }
+        assertFalse(out.isEmpty(), aModelKey + " defines " + aDataset);
+        return out;
+    }
+
+
     /** Standard SEND domains SENDIG 3.1.1 defines and {@code aPackage} does not. */
     private static Set<String> igAbsentRelativeTo311(String aPackage)
     {
@@ -687,18 +714,26 @@ class LibraryVarCustomDomainStoreTest
     @Test
     void theIgAbsentStandardSendPopulationsHoldEveryMeasuredDomain()
     {
-        // Derived from the store; a store change that shrinks either set reds here.
-        Set<String> ar = igAbsentRelativeTo311("sendig ar-1-0");
+        // Derived from the STORED products (the population the base-IG view fills); a store
+        // change that shrinks either set reds here.
+        Set<String> ar = StoredSendRosters.storedAbsentRelativeTo311("sendig ar-1-0");
         assertTrue(ar.containsAll(AR_GO_ABSENT), "AR 1.0: " + ar);
         assertTrue(ar.containsAll(AR_NON_GO_ABSENT), "AR 1.0: " + ar);
-        Set<String> dart = igAbsentRelativeTo311("sendig dart-1-1");
+        assertTrue(ar.contains("SUPPQUAL"), "AR 1.0 prints no SUPPQUAL: " + ar);
+        Set<String> dart = StoredSendRosters.storedAbsentRelativeTo311("sendig dart-1-1");
         assertTrue(dart.containsAll(DART_ABSENT), "DART 1.1: " + dart);
         // PLAN-seed-sendig-dart-1-2 D4: the E14 supplement follows the Library's DART 1.1
         // inclusion rule, so DART 1.2 leaves out exactly what DART 1.1 does (VS, CV, RE and EG
         // stay IG-absent although §2.2.2 lets a juvenile study submit them).
-        Set<String> dart12 = igAbsentRelativeTo311("sendig dart-1-2");
+        Set<String> dart12 = StoredSendRosters.storedAbsentRelativeTo311("sendig dart-1-2");
         assertTrue(dart12.containsAll(DART_ABSENT), "DART 1.2: " + dart12);
         assertEquals(dart, dart12, "DART 1.2 leaves out what DART 1.1 does");
+        // PLAN-send-base-ig-view: the provider answers the composed product, which leaves none of
+        // them out.
+        for (String pkg : List.of("sendig ar-1-0", "sendig dart-1-1", "sendig dart-1-2"))
+        {
+            assertEquals(Set.of(), igAbsentRelativeTo311(pkg), pkg + " through the base-IG view");
+        }
     }
 
 
@@ -728,7 +763,7 @@ class LibraryVarCustomDomainStoreTest
 
 
     @Test
-    void arsLeftOutStandardDomainsAreJudgedForTypeAndStaySilentOnLabels() throws IOException
+    void arsLeftOutStandardDomainsAreJudgedForTypeAndLabelByTheBaseSendig() throws IOException
     {
         String ar = "sendig ar-1-0";
         String fda = "rules-fda-sendig-ar-1-0.json";
@@ -743,20 +778,19 @@ class LibraryVarCustomDomainStoreTest
         {
             assertOnlyTheTypeErrorFires(fda, ar, "FDA-SE0055", d.getKey(), d.getValue());
             assertOnlyTheTypeErrorFires(fda, ar, "FDA-SD0055", d.getKey(), d.getValue());
-            // The LVC-F1 gap, asserted as TODAY's answer and not as correct: the model's
-            // class-level labels are not SENDIG's (328 differ at AR), so none is served, and the
-            // label rule stays silent on a conformant dataset and on a wrong one alike. ⚠ A
-            // SENDIG-label view (LVC-F1 ⓑ) would — rightly — make the wrong one fire.
+            // LVC-F1 (b), PLAN-send-base-ig-view: the base SENDIG's labels are served, so the
+            // label rule is silent on a conformant dataset and reports every standard variable of
+            // a wrongly labelled one (the sponsor --FOO stays unserved).
             assertEquals(Set.of(), reportedOn(fda, ar, "FDA-SE0063",
                     conformantSend(d.getKey(), d.getValue(), false)), d.getKey());
-            assertEquals(Set.of(), reportedOn(fda, ar, "FDA-SE0063",
+            assertEquals(standardColumns(d.getValue()), reportedOn(fda, ar, "FDA-SE0063",
                     wronglyLabelledSend(d.getKey(), d.getValue())), d.getKey());
         }
     }
 
 
     @Test
-    void dartsLeftOutStandardDomainsAreJudgedByTheModel() throws IOException
+    void dartsLeftOutStandardDomainsAreJudgedByTheBaseSendig() throws IOException
     {
         String dart = "sendig dart-1-1";
         String cdisc = "rules-cdisc-sendig-dart-1-1.json";
@@ -773,55 +807,59 @@ class LibraryVarCustomDomainStoreTest
                     domain);
             assertEquals(Set.of(), reportedOn(cdisc, dart, "CDISC-SEND-0009.1", conformant),
                     domain);
-            // LVC-F1, as today's answer: 102 labels differ at DART, so none is served — silent on a
-            // conformant dataset and on a wrongly labelled one alike. ⚠ A SENDIG-label view
-            // (LVC-F1 ⓑ) would — rightly — make the wrong one fire.
+            // LVC-F1 (b), PLAN-send-base-ig-view: the base SENDIG's labels are served — silent on
+            // a conformant dataset, every standard variable of a wrongly labelled one reported.
             IDataTable wrong = wronglyLabelledSend(domain, columns);
             assertEquals(Set.of(), reportedOn(fda, dart, "FDA-SE0063", conformant), domain);
             assertEquals(Set.of(), reportedOn(cdisc, dart, "CDISC-SEND-0276", conformant), domain);
-            assertEquals(Set.of(), reportedOn(fda, dart, "FDA-SE0063", wrong), domain);
-            assertEquals(Set.of(), reportedOn(cdisc, dart, "CDISC-SEND-0276", wrong), domain);
+            assertEquals(standardColumns(columns), reportedOn(fda, dart, "FDA-SE0063", wrong),
+                    domain);
+            assertEquals(standardColumns(columns),
+                    reportedOn(cdisc, dart, "CDISC-SEND-0276", wrong), domain);
         }
     }
 
 
     @Test
-    void dartsPmorresGetsASend00091FindingOnAConformantDefine() throws IOException
+    void dartsPmorresNoLongerGetsASend00091FindingOnAConformantDefine() throws IOException
     {
-        // ⚠ The named consequence of LVC-D2 (a), announced in RELEASE-NOTES-pending: SENDIG 3.1.1
-        // gives PMORRES the role "Variable Qualifier", the SDTM model's Findings class gives
-        // --ORRES "Result Qualifier", and SEND-0009.1 ships at DART 1.1. A base-IG view (LVC-F1)
-        // would remove it.
+        // The named consequence of LVC-D2 (a) — SENDIG gives PMORRES the role "Variable
+        // Qualifier", the SDTM model's Findings class gives --ORRES "Result Qualifier", so
+        // SEND-0009.1 reported PMORRES at DART 1.1 on a conformant Define — is removed by the
+        // base-IG view (PLAN-send-base-ig-view): DART 1.1 now reads PM from SENDIG 3.1.
         MetadataProvider dart = provider("sendig dart-1-1");
         IDataTable pm = conformantSend("PM", findingsColumns("PM"), false);
         assertEquals("Variable Qualifier",
-                provider("sendig 3-1-1").getVariableMetadata("PM", "PMORRES").get("role"));
+                provider("sendig 3-1").getVariableMetadata("PM", "PMORRES").get("role"));
+        assertEquals("Variable Qualifier", dart.getVariableMetadata("PM", "PMORRES").get("role"));
         RuleExecutionResult result = run("rules-cdisc-sendig-dart-1-1.json", dart,
                 "CDISC-SEND-0009.1", pm);
-        assertEquals(Set.of("PMORRES"), reported(result, "SEND-0009.1 @ DART 1.1 PM"));
-        Violation finding = findingOn(result, "PMORRES");
-        assertEquals("Variable Qualifier", finding.getValues().get("define_variable_role"));
-        assertEquals("Result Qualifier", finding.getValues().get("library_variable_role"));
+        assertEquals(Set.of(), reported(result, "SEND-0009.1 @ DART 1.1 PM"));
     }
 
 
     @Test
-    void arsSpecialPurposeTrialDesignAndRelationshipDomainsStayUnserved()
+    void arsSpecialPurposeTrialDesignAndRelationshipDomainsReadTheBaseSendig()
     {
-        // Plan 17 section 5b C3: algorithm B has no domain-keyed model tier, so for AR's eight
-        // non-general-observation IG-absent domains it answers [] — and this read, which takes
-        // B's row, serves nothing there, silently. Pinned as today's answer so a change is a
-        // decision (LVC-F1 ⓓ), not a drift.
-        MetadataProvider reference = provider("sendig 3-1-1");
+        // Before PLAN-send-base-ig-view these eight (and SUPPQUAL) read nothing: algorithm B has
+        // no domain-keyed model tier for a non-general-observation class. The base-IG view gives
+        // the AR run SENDIG 3.1's datasets, so every column reads exactly what a SENDIG 3.1 run
+        // reads (B-BASE: AR names SENDIG v3.1).
+        MetadataProvider base = provider("sendig 3-1");
         MetadataProvider ar = provider("sendig ar-1-0");
-        for (String domain : AR_NON_GO_ABSENT)
+        int served = 0;
+        for (String domain : new TreeSet<>(AR_NON_GO_ABSENT))
         {
-            IDataTable t = dataset(domain, reference.getColumnOrder(domain));
+            IDataTable t = dataset(domain, base.getColumnOrder(domain));
             for (String column : columnsOf(t))
             {
-                assertEquals(Map.of(), read(ar, t, column), domain + "." + column);
+                // (The helper adds a DOMAIN column POOLDEF and RELREC do not define.)
+                Map<String, String> expected = read(base, t, column);
+                assertEquals(expected, read(ar, t, column), domain + "." + column);
+                served += expected.isEmpty() ? 0 : 1;
             }
         }
+        assertTrue(served >= 60, "reads " + served);
     }
 
     // ------------------------------------------------------------------
@@ -974,7 +1012,7 @@ class LibraryVarCustomDomainStoreTest
                 List.of("STUDYID", "NHOID", "OISEQ", "OIPARMCD", "OIPARM", "OIVAL"));
         IDataTable relspec = MockTable.of().name("RELSPEC").col("STUDYID", "S").col("USUBJID", "U")
                 .col("REFID", "R").col("SPEC", "s").col("PARENT", "p").col("LEVEL", "1").build();
-        misses.put("sdtmig 3-4", List.of(noTopic, noDomain, di, dr));
+        misses.put("sdtmig 3-4", List.of(noTopic, noDomain));
         misses.put("sdtmig 3-2", List.of(noTopic, noDomain, di, dr, oi, relspec));
         misses.put("sendig 3-1-1", List.of(noTopic, noDomain));
         int reads = 0;
@@ -996,14 +1034,42 @@ class LibraryVarCustomDomainStoreTest
                 }
             }
         }
-        assertTrue(reads >= 60, "reads " + reads);
-        // No SKIP: the type and role rules execute on a sniffer miss, exactly as before.
-        IDataTable diRun = dataset("DI", List.of("STUDYID", "SPDEVID", "DISEQ", "DIPARMCD"));
-        for (String ruleId : List.of("CDISC-CG0012", "CDISC-CG0010", "FDA-SD0055"))
+        assertTrue(reads >= 40, "reads " + reads);
+        // PLAN-send-base-ig-view B-MD: at SDTMIG 3.4 the SDTM 2.0 model defines DI and DR, so a
+        // column the model dataset defines reads its row (name, type, role — LVC-D1 (a)), and
+        // one it does not define reads nothing. At SDTMIG 3.2 (SDTM 1.4: no DI / DR / OI /
+        // RELSPEC) they stay sniffer misses that read nothing (above).
+        MetadataProvider sdtmig34 = provider("sdtmig 3-4");
+        int modelReads = 0;
+        for (IDataTable t : List.of(di, dr))
         {
+            String member = t.getMetaData().getName();
+            Map<String, StoredVariable> model = modelDatasetRows("models/sdtm/2-0", member);
+            for (String column : columnsOf(t))
+            {
+                StoredVariable row = model.get(column);
+                Map<String, String> expected = row == null ? Map.of()
+                        : Map.of("name", row.name(), "simpleDatatype", row.simpleDatatype(), "role",
+                                row.role());
+                assertEquals(expected, read(sdtmig34, t, column),
+                        "sdtmig 3-4 " + member + "." + column);
+                modelReads += row == null ? 0 : 1;
+            }
+        }
+        assertEquals(11, modelReads, "DI: 7 model columns incl. DOMAIN; DR: STUDYID USUBJID "
+                + "SPDEVID DOMAIN — DRSEQ is not a model variable");
+        // No SKIP: the type and role rules execute on DI. Since B-MD the type rules judge it by
+        // the SDTM 2.0 model's DI: DISEQ is Num there and character here (the helper's cells),
+        // so both type rules report it; the role rule needs a Define and stays silent.
+        IDataTable diRun = dataset("DI", List.of("STUDYID", "SPDEVID", "DISEQ", "DIPARMCD"));
+        Map<String, Set<String>> expected = Map.of("CDISC-CG0012", Set.of("DISEQ"), "CDISC-CG0010",
+                Set.of(), "FDA-SD0055", Set.of("DISEQ"));
+        for (Map.Entry<String, Set<String>> e : expected.entrySet())
+        {
+            String ruleId = e.getKey();
             String file = "rules-" + (ruleId.startsWith("FDA") ? "fda" : "cdisc")
                     + "-sdtmig-3-4.json";
-            assertEquals(Set.of(), reportedOn(file, "sdtmig 3-4", ruleId, diRun), ruleId);
+            assertEquals(e.getValue(), reportedOn(file, "sdtmig 3-4", ruleId, diRun), ruleId);
         }
     }
 }

@@ -350,30 +350,55 @@ class CustomDomainModelWalkStoreTest
     @Test
     void theIgAbsentStandardSendDomainsAreExactlyTheMeasuredSets()
     {
-        // Derived from the store, so a store change that moves either set reds here.
-        assertEquals(new TreeSet<>(AR_ABSENT), igAbsentRelativeTo311("sendig ar-1-0"));
-        assertEquals(new TreeSet<>(DART_ABSENT), igAbsentRelativeTo311("sendig dart-1-1"));
+        // Derived from the STORED products, so a store change that moves either set reds here.
+        // AR prints no SUPPQUAL either (the base-IG view brings it in, B-SUPP).
+        Set<String> ar = new TreeSet<>(AR_ABSENT);
+        ar.add("SUPPQUAL");
+        assertEquals(ar, StoredSendRosters.storedAbsentRelativeTo311("sendig ar-1-0"));
+        assertEquals(new TreeSet<>(DART_ABSENT),
+                StoredSendRosters.storedAbsentRelativeTo311("sendig dart-1-1"));
+        // Through the base-IG view (PLAN-send-base-ig-view) the provider leaves none out.
+        assertEquals(Set.of(), igAbsentRelativeTo311("sendig ar-1-0"));
+        assertEquals(Set.of(), igAbsentRelativeTo311("sendig dart-1-1"));
     }
 
 
     @Test
-    void everyIgAbsentGeneralObservationDomainWalksItsScopeClass()
+    void everyIgAbsentGeneralObservationDomainReadsTheBaseSendigRows()
     {
-        MetadataProvider reference = provider("sendig 3-1-1");
+        // PLAN-send-base-ig-view: the general-observation domains AR / DART leave out are no
+        // longer walked as IG-absent (their scope class's model rows): the base-IG view gives the
+        // run the base SENDIG's dataset, so every IG variable reads the base's label, core, type
+        // and role (B-BASE: AR 1.0 and DART 1.1 name SENDIG v3.1).
+        MetadataProvider base = provider("sendig 3-1");
         int checked = 0;
         for (String pkg : List.of("sendig ar-1-0", "sendig dart-1-1"))
         {
             MetadataProvider provider = provider(pkg);
-            for (String domain : igAbsentRelativeTo311(pkg))
+            for (String domain : StoredSendRosters.storedAbsentRelativeTo311(pkg))
             {
-                // The dataset carries the variables SENDIG 3.1.1 defines for it.
-                IDataTable t = dataset(domain, reference.getColumnOrder(domain));
-                String scope = provider.getDatasetClass(domain, domain, columnsOf(t));
-                if (Set.of("EVENTS", "INTERVENTIONS", "FINDINGS").contains(scope))
+                IDataTable t = dataset(domain, base.getColumnOrder(domain));
+                String scope = base.getDatasetClass(domain, domain, columnsOf(t));
+                if (!Set.of("Events", "Interventions", "Findings").contains(scope))
                 {
-                    assertWalksTheScopeClass(provider, t, scope, pkg + " " + domain);
-                    checked++;
+                    continue;
                 }
+                assertFalse(provider.isDomainCustom(domain), pkg + " " + domain);
+                assertEquals(scope, provider.getDatasetClass(domain, domain, columnsOf(t)),
+                        pkg + " " + domain);
+                // The base IG's own variables (the walk also lists the run's model class
+                // variables, whose rows are the run's model's: AR names SDTM 1.8).
+                for (String variable : StoredSendRosters.storedVariables("sendig 3-1", domain))
+                {
+                    Map<String, String> want = base.getVariableMetadata(domain, variable);
+                    Map<String, String> got = provider.getVariableMetadata(domain, variable);
+                    for (String key : List.of("label", "core", "simpleDatatype", "role"))
+                    {
+                        assertEquals(want.get(key), got.get(key),
+                                pkg + " " + domain + "." + variable + " " + key);
+                    }
+                }
+                checked++;
             }
         }
         // AR: DS, EX and 18 Findings domains; DART: its 6, all Findings.
@@ -394,35 +419,31 @@ class CustomDomainModelWalkStoreTest
 
 
     @Test
-    void theOtherDomainsSendigAr10LeavesOutAreJudgedByTheirModelDatasets() throws IOException
+    void theOtherDomainsSendigAr10LeavesOutAreJudgedByTheBaseSendig() throws IOException
     {
-        // Measured in phase 2: AR's special-purpose (CO, SE), trial-design (TA TE TS TX) and
-        // relationship (POOLDEF, RELREC) datasets are IG-absent too. The scope ladder places them
-        // (the curated map) and the model walk's domain-keyed tier serves the linked model's own
-        // dataset table, so FDA-SD0058 and FDA-SD1079 judge them now (both SKIPPED before). On the
-        // SENDIG 3.1.1 IG shape every column is a model variable, in order: executed, clean.
-        MetadataProvider reference = provider("sendig 3-1-1");
+        // AR's special-purpose (CO, SE), trial-design (TA TE TS TX) and relationship (POOLDEF,
+        // RELREC) datasets: before PLAN-send-base-ig-view algorithm B answered [] for them (no
+        // domain-keyed model tier). The base-IG view gives the AR run SENDIG 3.1's datasets, so
+        // algorithm B now answers exactly what a SENDIG 3.1 run answers, and FDA-SD0058 /
+        // FDA-SD1079 judge them on the IG shape: executed, clean.
+        MetadataProvider base = provider("sendig 3-1");
         MetadataProvider ar = provider("sendig ar-1-0");
         String pkg = "rules-fda-sendig-ar-1-0.json";
         Set<String> judged = new TreeSet<>();
-        for (String domain : igAbsentRelativeTo311("sendig ar-1-0"))
+        for (String domain : StoredSendRosters.storedAbsentRelativeTo311("sendig ar-1-0"))
         {
-            List<String> ig = reference.getColumnOrder(domain);
+            List<String> ig = base.getColumnOrder(domain);
             IDataTable t = igShaped(domain, ig);
-            String scope = ar.getDatasetClass(domain, domain, columnsOf(t));
-            if (Set.of("EVENTS", "INTERVENTIONS", "FINDINGS").contains(scope))
+            String scope = base.getDatasetClass(domain, domain, columnsOf(t));
+            if (Set.of("Events", "Interventions", "Findings").contains(scope)
+                    || "SUPPQUAL".equals(domain))
             {
                 continue;
             }
-            List<String> model = ar.getStandardModelVariables(t, null);
-            assertNotNull(model, domain);
-            assertTrue(model.containsAll(ig), domain + " (" + scope + "): " + model);
-            // Algorithm B has no domain-keyed model tier: for a non-general-observation class it
-            // answers [] (plan section 5b C3) — so get_dataset_filtered_variables(),
-            // natural_key_variables() and var_*("LIBRARY") see nothing here. Pinned so a change to
-            // it is a decision, not a drift (PLAN-library-var-custom-domains builds on it).
-            assertEquals(List.of(), ar.getStandardVariablesDetailed(t, null),
-                    domain + ": algorithm B");
+            List<Map<String, String>> detailed = ar.getStandardVariablesDetailed(t, null);
+            assertFalse(detailed.isEmpty(), domain + ": algorithm B answers the base dataset");
+            assertEquals(base.getStandardVariablesDetailed(t, null).stream().map(m -> m.get("name"))
+                    .toList(), detailed.stream().map(m -> m.get("name")).toList(), domain);
             assertEquals(Map.of(), byVariable(run(pkg, "sendig ar-1-0", "FDA-SD0058", t), domain));
             assertEquals(0, count(run(pkg, "sendig ar-1-0", "FDA-SD1079", t), domain), domain);
             judged.add(domain);
@@ -841,18 +862,33 @@ class CustomDomainModelWalkStoreTest
         IDataTable gf = igShaped("GF", provider(SDTMIG_34).getColumnOrder("GF"));
         assertSkipsUnserved(run("rules-fda-sdtmig-3-3.json", "sdtmig 3-3", "FDA-SD1078", gf),
                 "FDA-SD1078 SDTMIG 3.3 GF");
-        // SEND: the general-observation domains SENDIG-AR 1.0 / DART 1.1 / SENDIG 3.0 leave out.
-        String ar = "rules-fda-sendig-ar-1-0.json";
-        for (String id : List.of("FDA-SD1078", "FDA-SD1149"))
-        {
-            assertSkipsUnserved(run(ar, "sendig ar-1-0", id, standardFindings("LB")),
-                    id + " SENDIG-AR 1.0 LB");
-        }
-        assertSkipsUnserved(run("rules-fda-sendig-dart-1-1.json", "sendig dart-1-1", "FDA-SD1149",
-                standardFindings("EG")), "FDA-SD1149 SENDIG-DART 1.1 EG");
+        // SEND: SENDIG 3.0 leaves CV out and has no base-IG view (B-SCOPE) — the control. The
+        // AR / DART populations execute now (theCoreFilterRulesExecuteOnTheBaseIgView...).
         IDataTable cv = igShaped("CV", provider("sendig 3-1-1").getColumnOrder("CV"));
         assertSkipsUnserved(run("rules-fda-sendig-3-0.json", "sendig 3-0", "FDA-SD1149", cv),
                 "FDA-SD1149 SENDIG 3.0 CV");
+    }
+
+
+    @Test
+    void theCoreFilterRulesExecuteOnTheBaseIgViewExactlyAsTheBaseJudges() throws IOException
+    {
+        // PLAN-send-base-ig-view, the G 5 populations: SKIPPED (no `core` on the model rows) ->
+        // executed, with the base SENDIG's `core`. The oracle is the same shipped rule over the
+        // base's own provider (SENDIG 3.1; FDA-SD1078 ships at SENDIG-AR only). count() asserts
+        // the run EXECUTED — the move itself.
+        String ar = "rules-fda-sendig-ar-1-0.json";
+        String dart = "rules-fda-sendig-dart-1-1.json";
+        for (String id : List.of("FDA-SD1078", "FDA-SD1149"))
+        {
+            IDataTable lb = standardFindings("LB");
+            assertEquals(count(run(ar, "sendig 3-1", id, lb), id + " SENDIG 3.1 LB"),
+                    count(run(ar, "sendig ar-1-0", id, lb), id + " SENDIG-AR 1.0 LB"), id);
+        }
+        IDataTable eg = standardFindings("EG");
+        assertEquals(count(run(dart, "sendig 3-1", "FDA-SD1149", eg), "FDA-SD1149 SENDIG 3.1 EG"),
+                count(run(dart, "sendig dart-1-1", "FDA-SD1149", eg),
+                        "FDA-SD1149 SENDIG-DART 1.1 EG"));
     }
 
 
@@ -870,17 +906,20 @@ class CustomDomainModelWalkStoreTest
         assertEquals(1, count(run(FDA_34, SDTMIG_34, "FDA-SD1078", lb), "FDA-SD1078 LB"));
         assertEquals(1, count(run(PMDA_34, SDTMIG_34, "PMDA-SD1078", lb), "PMDA-SD1078 LB"));
         assertEquals(0, count(run(FDA_34, SDTMIG_34, "FDA-SD1149", lb), "FDA-SD1149 LB"));
-        MetadataProvider reference = provider("sendig 3-1-1");
+        MetadataProvider reference = provider("sendig 3-1");
         IDataTable ts = igShaped("TS", reference.getColumnOrder("TS"));
-        // The premise of the AR TS control, asserted rather than assumed: the walk resolves
-        // nothing for TS at SENDIG-AR 1.0, so the rule keeps its empty answer (U-DEF), not a SKIP.
-        assertEquals(List.of(),
-                provider("sendig ar-1-0").getStandardVariablesDetailed(ts, _ -> null),
-                "AR TS: the walk resolves no variable");
+        // The AR TS control, re-read against the base-IG view (PLAN-send-base-ig-view): the walk
+        // now resolves SENDIG 3.1's TS rows, and the rules answer what a SENDIG 3.1 run answers.
+        assertFalse(provider("sendig ar-1-0").getStandardVariablesDetailed(ts, _ -> null).isEmpty(),
+                "AR TS: the walk resolves the base's TS");
         for (String id : List.of("FDA-SD1078", "FDA-SD1149"))
         {
-            assertEquals(0, count(run("rules-fda-sendig-ar-1-0.json", "sendig ar-1-0", id, ts),
-                    id + " AR TS"), id + " AR TS: empty resolution");
+            assertEquals(
+                    count(run("rules-fda-sendig-ar-1-0.json", "sendig 3-1", id, ts),
+                            id + " 3.1 TS"),
+                    count(run("rules-fda-sendig-ar-1-0.json", "sendig ar-1-0", id, ts),
+                            id + " AR TS"),
+                    id + " AR TS: the base's answer");
         }
     }
 
