@@ -248,7 +248,14 @@ class CustomDomainModelWalkStoreTest
      */
     private static Set<String> shippingPackages(String aRuleId) throws IOException
     {
-        Set<String> out = new TreeSet<>();
+        return new TreeSet<>(shippingFiles(aRuleId).keySet());
+    }
+
+
+    /** {@link #shippingPackages}, each store key mapped to the generated package file. */
+    private static Map<String, String> shippingFiles(String aRuleId) throws IOException
+    {
+        Map<String, String> out = new TreeMap<>();
         try (Stream<Path> files = Files.list(CorpusPaths.rules()))
         {
             for (Path file : files.sorted().toList())
@@ -259,7 +266,8 @@ class CustomDomainModelWalkStoreTest
                 {
                     String[] parts = name.substring(0, name.length() - ".json".length()).split("-",
                             4);
-                    out.add(parts[2] + " " + parts[3]);
+                    assertNull(out.put(parts[2] + " " + parts[3], name),
+                            aRuleId + " ships twice for " + parts[2] + " " + parts[3]);
                 }
             }
         }
@@ -864,11 +872,47 @@ class CustomDomainModelWalkStoreTest
         assertEquals(0, count(run(FDA_34, SDTMIG_34, "FDA-SD1149", lb), "FDA-SD1149 LB"));
         MetadataProvider reference = provider("sendig 3-1-1");
         IDataTable ts = igShaped("TS", reference.getColumnOrder("TS"));
+        // The premise of the AR TS control, asserted rather than assumed: the walk resolves
+        // nothing for TS at SENDIG-AR 1.0, so the rule keeps its empty answer (U-DEF), not a SKIP.
+        assertEquals(List.of(),
+                provider("sendig ar-1-0").getStandardVariablesDetailed(ts, _ -> null),
+                "AR TS: the walk resolves no variable");
         for (String id : List.of("FDA-SD1078", "FDA-SD1149"))
         {
             assertEquals(0, count(run("rules-fda-sendig-ar-1-0.json", "sendig ar-1-0", id, ts),
                     id + " AR TS"), id + " AR TS: empty resolution");
         }
+    }
+
+
+    /**
+     * PACK G fold (G5 LOW5): at <b>every</b> package the corpus ships a core carrier in, one domain
+     * that package's IG defines serves {@code core}, so the rule executes — an IG-defined domain
+     * never SKIPs as unserved. The packages are the corpus's population ({@link #shippingFiles}),
+     * not a list written here; the domain is {@code LB}, else {@code DM} (SENDIG-AR 1.0 leaves
+     * {@code LB} out), chosen by the IG's own dataset table, never by whether its rows carry
+     * {@code core}.
+     */
+    @Test
+    void theCoreFilterRulesExecuteOnAnIgDefinedDomainAtEveryShippingPackage() throws IOException
+    {
+        int runs = 0;
+        for (String id : List.of("FDA-SD1078", "PMDA-SD1078", "FDA-SD1149"))
+        {
+            for (Map.Entry<String, String> pkg : shippingFiles(id).entrySet())
+            {
+                MetadataProvider provider = provider(pkg.getKey());
+                String domain = Stream.of("LB", "DM")
+                        .filter(d -> !provider.getColumnOrder(d).isEmpty()).findFirst()
+                        .orElseThrow(() -> new AssertionError(
+                                pkg.getKey() + " defines neither LB nor DM"));
+                String what = id + " " + pkg.getKey() + " " + domain;
+                executed(run(pkg.getValue(), pkg.getKey(), id,
+                        igShaped(domain, provider.getColumnOrder(domain))), what);
+                runs++;
+            }
+        }
+        assertTrue(runs >= 6, "the shipping population must not go dark: " + runs + " runs");
     }
 
     // ------------------------------------------------------------------
