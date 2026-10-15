@@ -122,9 +122,10 @@ class PruneDefineXmlDriver // NOSONAR S3577 — Underscore-categorised name is t
      * <ul>
      * <li>{@code AE}, {@code DM}, {@code LB}, {@code TA} — primary tables opened directly via
      * {@code testTable(...)}.</li>
-     * <li>{@code RELREC} — primary for {@code CORE-000916} variants; the Pilot-01 RELREC rows
-     * reference {@code AE} and {@code DS} as RDOMAINs, so both targets must be in the resolver's
-     * inventory for the distinct(IDVAR) value_is_reference lookup to resolve.</li>
+     * <li>{@code RELREC} — primary for the {@code CDISC-CG0370} tests
+     * ({@code SdtmCrossDomainRuleTest}); the Pilot-01 RELREC rows reference {@code AE} and
+     * {@code DS} as RDOMAINs, so both targets must be in the resolver's inventory for the
+     * distinct(IDVAR) value_is_reference lookup to resolve.</li>
      * <li>{@code DS} — only loaded to satisfy RELREC's RDOMAIN targets; no test opens it
      * directly.</li>
      * </ul>
