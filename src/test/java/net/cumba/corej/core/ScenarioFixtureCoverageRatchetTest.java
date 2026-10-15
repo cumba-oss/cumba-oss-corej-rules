@@ -223,7 +223,10 @@ class ScenarioFixtureCoverageRatchetTest
     // re-measured that day) gained their first .cdt suites (204 files). Measured by setting the
     // ratchet to 0 and reading 312 back: 389 before the suites, so 403 was carrying 14 rows of
     // slack from earlier corpus movements (not decomposed here).
-    private static final int MAX_UNCOVERED = 312;
+    // ⭐ 312 -> 283 the same day: the remaining 29 CDISC-CG rules without a #test directive
+    // gained their first suites (80 files). Measured by zeroing and reading 283 back. The 283 are
+    // CDISC-SEND 175 + CDISC-AD 85 + DRAFT 23: no CDISC-CG, FDA or PMDA rule is uncovered.
+    private static final int MAX_UNCOVERED = 283;
 
     /**
      * Floor on the corpus, so a run that loaded nothing cannot report perfect coverage. The corpus
