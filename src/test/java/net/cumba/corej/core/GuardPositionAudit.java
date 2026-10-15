@@ -4,11 +4,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
+import net.cumba.corej.core.exec.ScopeVariableEntry;
 import net.cumba.corej.core.expr.ast.Expr;
 import net.cumba.corej.core.model.DomainScope;
 import net.cumba.corej.core.model.MatchDataset;
+import net.cumba.corej.core.model.Requirements;
 import net.cumba.corej.core.model.Rule;
 import net.cumba.corej.core.model.Scope;
+import net.cumba.corej.core.model.VariableRequirement;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -116,7 +119,9 @@ import org.jspecify.annotations.Nullable;
  * flood route is now structurally closed. {@link PresenceLeaf#mitigated()} derives exactly that
  * condition, cross-dataset and with <b>no exemption list</b>: every dataset whose vacuous
  * {@code $}-operation the {@code Check} tests with a {@linkplain #VACUOUS_ON_EMPTY_MEMBERSHIP
- * vacuous-on-empty} membership operator must carry a presence-implying unit in guard position.
+ * vacuous-on-empty} membership operator must carry a presence-implying unit in guard position, or a
+ * presence requirement in {@code Requirements} (a qualified {@code Variables.All} entry or a
+ * {@code Datasets} entry), where R-4.12 hoisted the {@code Fix #246} guards (finding T10).
  * </p>
  */
 public final class GuardPositionAudit
@@ -333,6 +338,10 @@ public final class GuardPositionAudit
                 guarded.add(leaf.dataset());
             }
         }
+        // T10 (FINDINGS-pmd-test-sources): a guard hoisted into Requirements (R-4.12) guards
+        // exactly as the Check leaf it replaced did. Reading the Check alone left every hoisted
+        // rule unmitigated while its flood route was closed — a flag that never derives true.
+        guarded.addAll(requirementGuards(rule));
         if (!guarded.containsAll(dangerous))
         {
             return List.copyOf(leaves);
@@ -346,6 +355,52 @@ public final class GuardPositionAudit
                     : leaf);
         }
         return List.copyOf(out);
+    }
+
+
+    /**
+     * The datasets this rule's {@code Requirements} block guards (finding T10). A qualified
+     * {@code Requirements.Variables.All} entry such as {@code TV.VISIT} skips the whole rule when
+     * that column is absent, which is what a top-level {@code var_exists(TV.VISIT)} conjunct did
+     * before R-4.12 hoisted the {@code Fix #246} guards there; a {@code Requirements.Datasets}
+     * entry does the same for the dataset. ⚠ {@code Any}, {@code None} and {@code All_Or_None} do
+     * <b>not</b> count: none of them implies that one named dataset is present ({@code None}
+     * demands absence, {@code Any} is satisfied by a sibling, and a group lets the rule run with
+     * both sides absent).
+     */
+    private static Set<String> requirementGuards(Rule rule)
+    {
+        Set<String> out = new TreeSet<>();
+        Requirements requirements = rule.getRequirements();
+        if (requirements == null)
+        {
+            return out;
+        }
+        VariableRequirement variables = requirements.getVariables();
+        if (variables != null && variables.getAll() != null)
+        {
+            for (String entry : variables.getAll())
+            {
+                String qualifier = entry == null ? null
+                        : trimToNull(ScopeVariableEntry.parse(entry).qualifier());
+                if (qualifier != null)
+                {
+                    out.add(qualifier);
+                }
+            }
+        }
+        if (requirements.getDatasets() != null)
+        {
+            for (String dataset : requirements.getDatasets())
+            {
+                String name = trimToNull(dataset);
+                if (name != null)
+                {
+                    out.add(name);
+                }
+            }
+        }
+        return out;
     }
 
 
