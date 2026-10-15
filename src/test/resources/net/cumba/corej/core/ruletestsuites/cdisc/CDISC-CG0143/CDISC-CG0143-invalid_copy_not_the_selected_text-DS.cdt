@@ -1,0 +1,33 @@
+#!RuleTest
+#test CDISC-CG0143 expect=violation domain=DS
+#note "Round 2026-10-15, ruling D130 extended by the owner to CG0143 (the DM copy must EQUAL the value min_date selected -- compare as TEXT). P1: the consent row is the earliest (2026-01-01T09:00) and RFICDTC 2026-01-01 is the same day at lower precision -> FIRES (not the selected value). P2: the same instant spelled with a UTC offset (RFICDTC 2026-01-01T11:00+02:00 vs 2026-01-01T09:00) -> FIRES. P3: RFICDTC is the exact text -> quiet. Under the old date() comparison P1 and P2 were silent (same day / same instant)."
+#library standard=sdtmig version=3-4
+#expectViolationCount 2
+#expectViolationAt row=1 USUBJID=P1
+#expectViolationAt row=3 USUBJID=P2
+dataset DS label=Disposition
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col DSSEQ type=Num label="Sequence Number"
+col DSDECOD type=Char label="Standardized Disposition Term"
+col DSSTDTC type=Char label="Start Date/Time of Disposition Event"
+---
+S1 | DS | P1 | 1 | INFORMED CONSENT OBTAINED | 2026-01-01T09:00
+S1 | DS | P1 | 2 | RANDOMIZED                | 2026-01-10
+S1 | DS | P2 | 1 | INFORMED CONSENT OBTAINED | 2026-01-01T09:00
+S1 | DS | P2 | 2 | RANDOMIZED                | 2026-01-10
+S1 | DS | P3 | 1 | INFORMED CONSENT OBTAINED | 2026-01-01T09:00
+S1 | DS | P3 | 2 | RANDOMIZED                | 2026-01-10
+---
+
+dataset DM label=Demographics
+col STUDYID type=Char label="Study Identifier"
+col DOMAIN type=Char label="Domain Abbreviation"
+col USUBJID type=Char label="Unique Subject Identifier"
+col RFICDTC type=Char label="Date/Time of Informed Consent"
+---
+S1 | DM | P1 | 2026-01-01
+S1 | DM | P2 | 2026-01-01T11:00+02:00
+S1 | DM | P3 | 2026-01-01T09:00
+---

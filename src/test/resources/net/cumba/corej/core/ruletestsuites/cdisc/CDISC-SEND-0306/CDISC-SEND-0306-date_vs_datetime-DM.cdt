@@ -1,7 +1,9 @@
 #!RuleTest
-#test CDISC-SEND-0306 expect=noViolation domain=DM
-#note "PLAN-scalar-date-extremes: Measured in phase 0: own EXENDTC 2020-02-01 (a date) and pool P7 EXENDTC 2020-02-01T10:00 (a datetime) -> latest_date answers the DATE (its hull ends at the end of the day), and date(RFXENDTC) != that answer is silent for RFXENDTC 2020-02-01T10:00 (008) and for 2020-02-01 (009): typed date equality holds on the same day. Pin (silent before too)."
+#test CDISC-SEND-0306 expect=violation domain=DM
+#note "Round 2026-10-15, ruling D130 extended by the owner to this rule (compare the copy as TEXT): latest_date answers the subject's own DATE (the same-day tie goes to the date, its hull being wider), so RFXENDTC 2020-02-01 (009) is that value and stays silent, while 008's datetime is not the selected value and FIRES. Before D130: PLAN-scalar-date-extremes: Measured in phase 0: own EXENDTC 2020-02-01 (a date) and pool P7 EXENDTC 2020-02-01T10:00 (a datetime) -> latest_date answers the DATE (its hull ends at the end of the day), and date(RFXENDTC) != that answer is silent for RFXENDTC 2020-02-01T10:00 (008) and for 2020-02-01 (009): typed date equality holds on the same day. Pin (silent before too)."
 #library standard=sendig version=3-1-1
+#expectViolationCount 1
+#expectViolationAt row=1 USUBJID=008
 dataset DM label=Demographics
 col STUDYID  type=Char label="Study Identifier"
 col DOMAIN   type=Char label="Domain Abbreviation"

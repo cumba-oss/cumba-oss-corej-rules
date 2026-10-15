@@ -33,8 +33,8 @@ Bindings:
   expression: "min_date(DSSTDTC, domain=\"DS\", group=[USUBJID])"
 Check:
   expression: >-
-    DSDECOD == "INFORMED CONSENT OBTAINED" and not empty(DSSTDTC) and date(DSSTDTC) ==
-    $min_ds_dsstdtc and not empty(DM.RFICDTC) and date(DM.RFICDTC) != $min_ds_dsstdtc
+    DSDECOD == "INFORMED CONSENT OBTAINED" and not empty(DSSTDTC) and DSSTDTC == $min_ds_dsstdtc and
+    not empty(DM.RFICDTC) and DM.RFICDTC != $min_ds_dsstdtc
 Outcome:
   Message: "RFICDTC does not equal the earliest DSSTDTC for the subject's informed\
     \ consent record in the DS dataset."
