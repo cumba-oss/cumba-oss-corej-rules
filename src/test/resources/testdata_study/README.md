@@ -1,18 +1,21 @@
 # Test study fixture — provenance and licence
 
 The Java-resident rule suites read this folder (`AbstractSdtmRuleTest`, `AbstractAdamRuleTest`): each `define.xml`
-is opened as a library and its archive-location leaves name the `.dsjc` datasets beside it. Per the project owner
+is opened as a library and its archive-location leaves name the datasets beside it (`adam/`: the `.dsjc` files;
+`sdtm/`: the pilot's own `.json` files). Per the project owner
 (2026-10-14), the third-party test files of this project were taken from three repositories:
 `cdisc-org/DataExchange-DatasetJson`, `cdisc-org/sdtm-adam-pilot-project` and `phuse-org/phuse-scripts`.
 
 - `adam/` comes from **`cdisc-org/DataExchange-DatasetJson`** (MIT; 2026-10-14, `PLAN-mit-fixture-resourcing`). It
   replaced the earlier ADaM fixture, which was a modified copy of the CDISC pilot ADaM data.
-- `sdtm/` is the CDISC **pilot** SDTM data (`cdisc-org/sdtm-adam-pilot-project`), kept as a recorded risk: see
+- `sdtm/` is the CDISC **pilot** SDTM data (`cdisc-org/sdtm-adam-pilot-project`): the pilot's own Dataset-JSON
+  files, unmodified (2026-10-15, `PLAN-sdtm-pilot-dataset-json-fixtures`), and a define pruned to those six domains,
+  kept as a recorded risk: see
   [The pilot data's terms](#the-pilot-datas-terms--accepted-risk-and-pending-request).
 
 md5 is of the file as committed. **identical** = byte-identical to the named source file; **derived** = made from
-the source content, as described; **own** = written for this project. Comparisons were made on 2026-10-14 against the
-GitHub copies at the commits named; "(inference)" marks what was not measured.
+the source content, as described; **own** = written for this project. Comparisons were made on 2026-10-14 (`sdtm/`:
+2026-10-15) against the GitHub copies at the commits named; "(inference)" marks what was not measured.
 
 ## `adam/` — from `cdisc-org/DataExchange-DatasetJson`
 
@@ -47,25 +50,20 @@ column *names* differed in the loaded schemas.
 
 | Path | md5 | Relationship to the source |
 |---|---|---|
-| `sdtm/define.xml` | `487a6d98c8bc99e6fdcea26040dbad22` | **derived** from `updated-pilot-submission-package/900172/m5/datasets/cdiscpilot01/tabulations/sdtm/define.xml` (md5 `ecbefff4cf1879b6ebc606e76706fc87`): pruned to the six domains AE, DM, DS, LB, RELREC and TA with their item, code-list, method and comment definitions, re-serialised (attribute order, layout), and the six archive-location leaves renamed from `<domain>.xpt` to `<domain>.dsjc`. Every one of its 208 identified elements is present in the source; 194 are equal in attributes and content, the other 14 differ only by those leaf names (measured, element-wise); produced by `PruneDefineXmlDriver` (inference: from the full pilot define held outside git under `testdata/study/`) |
-| `sdtm/ae.dsjc` | `e891a7f1bf622b85c528470230bf29a0` | **derived** from `…/tabulations/sdtm/ae.xpt` (md5 `e7de1f518101c5670789db31cafa824e`) |
-| `sdtm/dm.dsjc` | `df620c0c66dc390f93dc53ece340fb92` | **derived** from `…/tabulations/sdtm/dm.xpt` (md5 `9c8ddfc5f7a1fa233667ea889f420775`) |
-| `sdtm/ds.dsjc` | `6e172b1e3d7ccbd50deb088949902491` | **derived** from `…/tabulations/sdtm/ds.xpt` (md5 `5f2a52a8dbfe0c25e42fd34faee14624`) |
-| `sdtm/lb.dsjc` | `705feb261774d486ca0fda5af2b1741f` | **derived** from `…/tabulations/sdtm/lb.xpt` (md5 `c31ba158fe500d68d22453aa8d64a44b`) |
-| `sdtm/relrec.dsjc` | `aaa026c646f9170d4e9a44f944aacc84` | **derived** from `…/tabulations/sdtm/relrec.xpt` (md5 `e26c8fbed053faf54fc19b909bb528ac`) |
-| `sdtm/ta.dsjc` | `9125ee7bf427573ce252f917a0bde68f` | **derived** from `…/tabulations/sdtm/ta.xpt` (md5 `4bb67aa45093fab8e6f39c7260f99a50`) |
+| `sdtm/define.xml` | `bd655c7a1cc9601bb3a79ce6481bfee5` | **derived** from `updated-pilot-submission-package/900172/m5/datasets/cdiscpilot01/tabulations/sdtm/define.xml` (md5 `ecbefff4cf1879b6ebc606e76706fc87`; the driver refuses any other input) by `PruneDefineXmlDriver` (`-Dtest=PruneDefineXmlDriver#pruneSdtmDefine -Dprune.defines=true -Dprune.sdtm.source=<checkout>/…/tabulations/sdtm/define.xml`): pruned to the six domains AE, DM, DS, LB, RELREC and TA with their item, code-list, method and comment definitions, re-serialised (attribute order, layout), and the six archive-location leaves renamed from `<domain>.xpt` to `<domain>.json` (`href` and title). Every one of its 208 identified elements is present in the source; 194 are equal in attributes and content, the other 14 differ only by those leaf names (measured element-wise 2026-10-14, when the leaves named `.dsjc`; on 2026-10-15 the driver regenerated this file from the source and the result differed from the previous file only in the twelve leaf strings) |
+| `sdtm/ae.json` | `8c4337609170e1c8b0984153dc6a7281` | **identical** to `…/tabulations/sdtm/ae.json` (git blob `a102c62711a096a16ba78adeb8eefb18ab6a24de`) |
+| `sdtm/dm.json` | `6a1e4c8519b2cfa4efc275d61e22fb06` | **identical** to `…/tabulations/sdtm/dm.json` (git blob `9ee91c55799c28848362fefaef4b6c141d9277ce`) |
+| `sdtm/ds.json` | `64c9ee9d05ed5e135641f8811ae1c39b` | **identical** to `…/tabulations/sdtm/ds.json` (git blob `f65b7afd5525dfd678fccbea89913f1182c740e3`) |
+| `sdtm/lb.json` | `3033d09cc85d603d3ff7dc6663bb765b` | **identical** to `…/tabulations/sdtm/lb.json` (git blob `85ccbda9b5a999a1f6e0cea4aa679358ddf2f139`) |
+| `sdtm/relrec.json` | `0211299d1676922d7f88377464e7593a` | **identical** to `…/tabulations/sdtm/relrec.json` (git blob `9a5209d52323872edefd611303f3c3e74528cd60`) |
+| `sdtm/ta.json` | `87a09f852d791d12f9707876e89bb5fa` | **identical** to `…/tabulations/sdtm/ta.json` (git blob `d2174b2286bf9f1ab300e4dcdf4d5c9071351d99`) |
 
-The six datasets are the pilot's SAS XPORT files converted to zlib-compressed Dataset-JSON 1.1 (`sourceSystem`
-`CumbaDataTable`). The values are unchanged: same rows in the same order, same columns, and every cell equal once
-trailing blanks are trimmed and an empty character value is read as missing (measured 2026-10-14 against the `.xpt`
-files at `667511d4`, read with pandas).
-
-CDISC's pilot repository itself publishes these six domains as Dataset-JSON 1.1:
-`…/tabulations/sdtm/{ae,dm,ds,lb,relrec,ta}.json` (commits `8646d29` "Add Dataset-JSON" and `b8068a0`, both
-2024-12-18). Our values equal those too: same columns, same rows in the same order, every cell equal once trailing
-blanks are trimmed, with `LB`'s floating-point results equal to the last bit (largest relative difference 2.2e-16;
-measured 2026-10-14 at `667511d4`). So the format conversion is CDISC's own; what remains our modification is the
-domain subset, the pruned define and our `.dsjc` serialisation of the same values.
+The six datasets are CDISC's own Dataset-JSON 1.1 files, committed byte for byte: each committed file's git blob is
+the pilot's blob at `667511d4`. Their values are not bit-equal to the pilot's SAS XPORT files: in 24 222 `LB` cells
+(`LBSTRESN`, `LBSTNRLO`, `LBSTNRHI`, `VISITNUM`) the `.json` value differs from the `.xpt` value by one unit in the
+last place (for example `0.05` against the `.xpt`'s `0.049999999999999996`), from CDISC's own XPT → Dataset-JSON
+conversion; the `.dsjc` files these replaced (our re-serialisation of the `.xpt`, deleted 2026-10-15) carried the
+`.xpt` bits (measured 2026-10-15 against an exact decode of `lb.xpt`; no suite result moved).
 
 ## Sources
 
@@ -111,8 +109,10 @@ The MIT condition requires this notice in all copies or substantial portions; th
 ### `cdisc-org/sdtm-adam-pilot-project`
 
 - **Repository:** <https://github.com/cdisc-org/sdtm-adam-pilot-project>; HEAD of `master` at retrieval was
-  `667511d4b183871d74392ba691c935c38d431d39` (committed 2024-12-20), retrieved 2026-10-14. The files used were last
-  changed in commit `2f1a3eb6` (2019-05-23).
+  `667511d4b183871d74392ba691c935c38d431d39` (committed 2024-12-20), retrieved 2026-10-14 (the six `.json`:
+  2026-10-15). The define was last changed in commit `2f1a3eb6` (2019-05-23); the six
+  `tabulations/sdtm/<domain>.json` files were added in commit `8646d296` ("Add Dataset-JSON") and last changed in
+  commit `b8068a0b` ("Fix encoding issue"), both 2024-12-18.
 - **Content:** the CDISC SDTM/ADaM pilot submission package, study `CDISCPILOT01` (example data, not real study data).
 - **Terms:** the repository has **no** `LICENSE` file. Its `README.md` ("DISCLAIMER AND LIABILITY", "Terms of Use")
   says, in the part bearing on redistribution: *"By downloading / using this data, you agree to the Terms of use. …
@@ -123,11 +123,9 @@ The MIT condition requires this notice in all copies or substantial portions; th
 
 #### The pilot data's terms — accepted risk and pending request
 
-The `sdtm/` files are a format conversion (SAS XPORT → Dataset-JSON) and a domain subset of the pilot data, and the
-define is trimmed to those domains; clause (b) forbids modifying the data. The pilot repository publishes the same six
-domains as Dataset-JSON 1.1 itself (see the `sdtm/` section), so the modification that remains is the subset, the
-pruned define and our serialisation of the values. The project owner accepted this as a
-recorded risk (2026-10-14). DatasetJson's own SDTM example is a different study (SDTM-MSG v2, other subjects and
+Clause (b) forbids modifying the data. The six `sdtm/` datasets are the pilot repository's own Dataset-JSON files,
+unmodified (since 2026-10-15); what remains is the domain subset and the define, which is trimmed to those six
+domains and names the `.json` files in its leaves. The project owner accepted this as a recorded risk (2026-10-14). DatasetJson's own SDTM example is a different study (SDTM-MSG v2, other subjects and
 columns), so it cannot replace these files without rewriting the SDTM suites' expectations. A request to CDISC for
-permission to redistribute the converted, subset data with attribution is **pending**: drafted 2026-10-14 for the
+permission to redistribute the subset data and the pruned define with attribution is **pending**: drafted 2026-10-14 for the
 owner to send; its answer will be recorded here. If CDISC refuses, the SDTM fixture is re-sourced under a new plan.
