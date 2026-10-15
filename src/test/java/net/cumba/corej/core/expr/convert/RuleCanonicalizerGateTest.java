@@ -47,11 +47,13 @@ class RuleCanonicalizerGateTest
     private static final int MIN_FILES = 3400;
 
     /**
-     * The all-false-positive level of {@code hasComment} at 2026-09-11: eight files whose {@code #}
-     * sits inside a quoted value. ⛔ Raise this ONLY after diffing the new file and confirming it
-     * loses nothing — a rise is the signal that a real comment is about to be deleted.
+     * The true comment count of the authored corpus. It was 8 until 2026-10-15, all of them
+     * {@code #}s inside quoted values that the old line scanner misread; {@code hasComment} now
+     * asks the YAML scanner (findings T6 / T6b), so the count is exact and any hit is a real
+     * comment a canonicalisation would delete. ⛔ Do not raise it: move the comment's text to the
+     * guidelines or a scenario {@code #note} instead.
      */
-    private static final int MAX_COMMENT_HITS = 8;
+    private static final int MAX_COMMENT_HITS = 0;
 
     /**
      * Every authored rule is a fixed point of the canonical writer.
@@ -71,17 +73,18 @@ class RuleCanonicalizerGateTest
         assertEquals(List.of(), r.failures(),
                 "round-trip data-safety check failed — canonicalising these would change what the"
                         + " rule MEANS, not merely how it is spelled:\n" + r.failures());
+        // Asserted BEFORE the canonical-form check: a real comment also makes its file
+        // non-canonical, and the remedy that message names (a fix-up run) deletes the comment.
+        assertTrue(r.comments() <= MAX_COMMENT_HITS,
+                "hasComment now trips on " + r.comments() + " file(s), above " + MAX_COMMENT_HITS
+                        + ". A REAL YAML comment has been added and a"
+                        + " canonicalisation would delete it silently (the files are named in the"
+                        + " test output). Move the text to the guidelines or a scenario #note,"
+                        + " where canonicalisation cannot reach it.");
         assertEquals(0, r.changed(),
                 "rule file(s) are not canonical under RuleCanonicalizer. Run it without"
-                        + " -Dcanonicalize.check to fix. ⚠ Check the comment count below first: a"
+                        + " -Dcanonicalize.check to fix. ⚠ The comment count above is checked first: a"
                         + " fix-up run DELETES YAML comments.");
-        assertTrue(r.comments() <= MAX_COMMENT_HITS,
-                "hasComment now trips on " + r.comments() + " file(s), above the all-false-positive"
-                        + " floor of " + MAX_COMMENT_HITS + ". A REAL YAML comment has been added"
-                        + " and a canonicalisation would delete it silently. Diff the new file:"
-                        + " if its # is inside a quoted value, raise the floor; if it is a real"
-                        + " comment, move the text to the guidelines or a scenario #note, where"
-                        + " canonicalisation cannot reach it.");
     }
 
 }

@@ -124,12 +124,11 @@ import org.jspecify.annotations.Nullable;
  * </p>
  *
  * <p>
- * &#9888;&#9888; <b>{@code comments-stripped} is MOSTLY a false-positive counter — but it is not
- * only that, and the difference has already cost a comment.</b> {@link #hasComment} scans line by
- * line and does not carry double-quote state across a folded scalar's continuation lines, so a
- * {@code #} inside a <em>quoted string value</em> reads as a comment: sheet-issue references such
- * as {@code #127}, {@code SDTM IG #4.1.5.3.2}, {@code naming conventions #10}. Those hits lose
- * nothing — their files come out byte-identical.
+ * &#9888;&#9888; <b>{@code comments-stripped} counts real comments only, since 2026-10-15.</b>
+ * {@link #hasComment} used to scan line by line without carrying double-quote state across a folded
+ * scalar's continuation lines, so a {@code #} inside a <em>quoted string value</em> (sheet
+ * references such as {@code #127}, {@code naming conventions #10}) read as a comment. It now asks
+ * the YAML scanner (finding T6), so every hit is a comment the fix-up mode would delete.
  * </p>
  *
  * <p>
@@ -146,9 +145,9 @@ import org.jspecify.annotations.Nullable;
  * <b>R-5.15a</b>, in {@code CORE-RULES-SPECIFICATION.md}'s {@code returntype} row, in
  * {@code rule-review-manual.md}, and in all four of that rule's {@code .cdt} scenario
  * {@code #note}s — but that was luck, not design. After the 2026-09-11 re-canonicalisation the
- * count is <b>8</b>, and 8 is the all-false-positive floor: <b>a rise above it means a real comment
- * is about to be eaten.</b> The per-file names are printed by {@link #run}, so the floor can be
- * checked rather than assumed.
+ * count was <b>8</b>, all of them false positives; with the scanner-based detector (2026-10-15) it
+ * is <b>0</b>, so <b>any hit is a real comment about to be eaten.</b> The per-file names are
+ * printed by {@link #run}.
  * </p>
  *
  * <p>
@@ -945,36 +944,27 @@ public final class RuleCanonicalizer
 
 
     /**
-     * A best-effort scan for a YAML comment: a {@code #} that is the first non-blank character or
-     * is preceded by whitespace, outside single/double-quoted scalars.
+     * Whether {@code text} holds a YAML comment, decided by the YAML scanner itself (SnakeYAML with
+     * comment processing on, the parser underneath Jackson's {@code YAMLFactory}). Finding T6: the
+     * former line-by-line scan did not carry quote state across a folded scalar's continuation
+     * lines, so a {@code #} inside a quoted value read as a comment (8 files in 2026-09). A
+     * hand-written cross-line state machine was rejected because an apostrophe in a plain scalar
+     * would leak quote state and hide a real comment; the scanner has neither problem.
+     *
+     * @param text
+     *            one rule file's YAML text
+     * @return {@code true} when the scanner reports at least one comment
      */
     static boolean hasComment(String text)
     {
-        for (String line : text.split("\n", -1))
+        org.yaml.snakeyaml.LoaderOptions options = new org.yaml.snakeyaml.LoaderOptions();
+        options.setProcessComments(true);
+        for (org.yaml.snakeyaml.events.Event event : new org.yaml.snakeyaml.Yaml(options)
+                .parse(new java.io.StringReader(text)))
         {
-            boolean inSingle = false;
-            boolean inDouble = false;
-            for (int i = 0; i < line.length(); i++)
+            if (event instanceof org.yaml.snakeyaml.events.CommentEvent)
             {
-                char c = line.charAt(i);
-                if (inDouble && c == '\\')
-                {
-                    i++;
-                    continue;
-                }
-                if (c == '\'' && !inDouble)
-                {
-                    inSingle = !inSingle;
-                }
-                else if (c == '"' && !inSingle)
-                {
-                    inDouble = !inDouble;
-                }
-                else if (c == '#' && !inSingle && !inDouble
-                        && (i == 0 || line.charAt(i - 1) == ' ' || line.charAt(i - 1) == '\t'))
-                {
-                    return true;
-                }
+                return true;
             }
         }
         return false;

@@ -396,6 +396,45 @@ class RuleCanonicalizerTest
         assertFalse(RuleCanonicalizer.hasComment(in), "quoted # is not a comment");
     }
 
+
+    /**
+     * Finding T6: the corpus writer folds a long double-quoted value with a trailing {@code \} and
+     * continues it on the next line, so a {@code #} that starts a continuation line is still inside
+     * the quotes. The line-by-line scan read it as a comment (8 such files in 2026-09).
+     */
+    @Test
+    void hashOnAFoldedQuotedContinuationLineIsNotAComment()
+    {
+        String in = """
+                Core:
+                  Id: "CORE-1"
+                Description: "a long value that the writer folds onto a second line\\
+                  \\ #211 and naming conventions #10 stay inside the quotes"
+                Standards: []
+                """;
+        assertFalse(RuleCanonicalizer.hasComment(in), "a folded quoted # is not a comment");
+    }
+
+
+    /**
+     * The failure mode that kept T6 unattempted: an apostrophe in a plain or block scalar must not
+     * open a quote and hide a real comment after it.
+     */
+    @Test
+    void anApostropheInAPlainScalarDoesNotHideALaterComment()
+    {
+        String in = """
+                Core:
+                  Id: "CORE-1"
+                Description: >-
+                  the subject's value
+                Check:
+                  expression: AESEQ == 1 # a real trailing comment
+                Standards: []
+                """;
+        assertTrue(RuleCanonicalizer.hasComment(in), "the trailing comment must still be seen");
+    }
+
     // ---- structure preservation -------------------------------------------
 
 
